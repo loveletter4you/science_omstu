@@ -1,6 +1,8 @@
 package main
 
-import "github.com/loveletter4u/cris/internal/httpserver"
+import (
+	"github.com/loveletter4u/cris/internal/httpserver"
+)
 
 func main() {
 	r := httpserver.NewServer()

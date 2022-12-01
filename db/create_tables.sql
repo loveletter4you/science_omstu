@@ -31,8 +31,8 @@ create table if not exists authors
 create table author_interest
 (
     id bigserial primary key,
-    interest_id integer not null references interests,
-    author_id integer not null references authors,
+    interest_id  integer not null references interests,
+    author_id    integer not null references authors,
     unique(interest_id, author_id)
 );
 
@@ -48,7 +48,7 @@ create table if not exists author_identifier
     author_id     integer      not null references authors,
     identifier_id integer      not null references identifiers,
     identifier    varchar(256) not null,
-    unique (identifier_id, identifier)
+    unique (author_id, identifier_id)
 );
 create table if not exists source_type
 (
@@ -130,7 +130,7 @@ create table if not exists organizations
     id      serial primary key,
     name    varchar(256) not null,
     country varchar(64),
-    city    varchar
+    city    varchar(64)
 );
 
 create table if not exists author_type
