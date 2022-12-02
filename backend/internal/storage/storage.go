@@ -6,8 +6,10 @@ import (
 )
 
 type Storage struct {
-	config *Config
-	Db     *sql.DB
+	config               *Config
+	db                   *sql.DB
+	authorRepository     *AuthorRepository
+	identifierRepository *IdentifierRepository
 }
 
 func NewStorage(config *Config) *Storage {
@@ -27,11 +29,35 @@ func (s *Storage) Open() error {
 		return err
 	}
 
-	s.Db = db
+	s.db = db
 
 	return nil
 }
 
 func (s *Storage) Close() {
-	s.Db.Close()
+	s.db.Close()
+}
+
+func (s *Storage) Author() *AuthorRepository {
+	if s.authorRepository != nil {
+		return s.authorRepository
+	}
+
+	s.authorRepository = &AuthorRepository{
+		storage: s,
+	}
+
+	return s.authorRepository
+}
+
+func (s *Storage) Identifier() *IdentifierRepository {
+	if s.identifierRepository != nil {
+		return s.identifierRepository
+	}
+
+	s.identifierRepository = &IdentifierRepository{
+		storage: s,
+	}
+
+	return s.identifierRepository
 }
