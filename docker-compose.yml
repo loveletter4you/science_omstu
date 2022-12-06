@@ -10,6 +10,8 @@ services:
     restart: on-failure
     depends_on:
       - db
+    networks:
+      - default
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
