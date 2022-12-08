@@ -22,7 +22,11 @@ func (server *HttpServer) StartServer() error {
 	if err := server.storage.Open(); err != nil {
 		return err
 	}
-	server.router.GET("/author/:id", controllers.GetAuthorById(server.storage))
+	server.Routes()
 	err := server.router.Run(":8000")
+	server.storage.Close()
 	return err
+}
+func (server *HttpServer) Routes() {
+	server.router.GET("/author/:id", controllers.GetAuthorById(server.storage))
 }

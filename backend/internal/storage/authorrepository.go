@@ -26,14 +26,14 @@ func (ar *AuthorRepository) AddAuthor(author *model.Author) error {
 func (ar *AuthorRepository) AddAuthorIdentifier(authorIdentifier *model.AuthorIdentifier) error {
 	query := fmt.Sprintf("INSERT INTO author_identifier (author_id, identifier_id, identifier) "+
 		"VALUES (%d, %d, '%s') RETURNING id",
-		authorIdentifier.AuthorId, authorIdentifier.IdentifierId, authorIdentifier.Identifier)
+		authorIdentifier.Author.Id, authorIdentifier.Identifier.Id, authorIdentifier.IdentifierValue)
 	err := ar.storage.db.QueryRow(query).Scan(&authorIdentifier.Id)
 	return err
 }
 
 func (ar *AuthorRepository) GetAuthorIdentifiers(author *model.Author) ([]*model.AuthorIdentifier, error) {
 	authorIdentifiers := make([]*model.AuthorIdentifier, 0)
-	query := fmt.Sprintf("SELECT author_identifier.id , author_identifier.author_id, "+
+	query := fmt.Sprintf("SELECT author_identifier.id , "+
 		"author_identifier.identifier_id, author_identifier.identifier, identifiers.name "+
 		"FROM author_identifier, identifiers "+
 		"WHERE author_id = %d AND author_identifier.identifier_id = identifiers.id", author.Id)
@@ -43,28 +43,14 @@ func (ar *AuthorRepository) GetAuthorIdentifiers(author *model.Author) ([]*model
 	}
 	defer rows.Close()
 	for rows.Next() {
-		authorIdentifier := &model.AuthorIdentifier{}
-		if err := rows.Scan(&authorIdentifier.Id, &authorIdentifier.AuthorId, &authorIdentifier.IdentifierId,
-			&authorIdentifier.Identifier, &authorIdentifier.IdentifierName); err != nil {
+		authorIdentifier := &model.AuthorIdentifier{
+			Identifier: &model.Identifier{},
+		}
+		if err := rows.Scan(&authorIdentifier.Id, &authorIdentifier.Identifier.Id,
+			&authorIdentifier.IdentifierValue, &authorIdentifier.Identifier.Name); err != nil {
 			return nil, err
 		}
 		authorIdentifiers = append(authorIdentifiers, authorIdentifier)
 	}
 	return authorIdentifiers, nil
-}
-
-func (ar *AuthorRepository) GetAuthorWithIdentifiersById(id int) (*model.Author,
-	[]*model.AuthorIdentifier, error) {
-	var author *model.Author
-	var authorIdentifiers []*model.AuthorIdentifier
-	var err error
-	author, err = ar.GetAuthorById(id)
-	if err != nil {
-		return nil, nil, err
-	}
-	authorIdentifiers, err = ar.GetAuthorIdentifiers(author)
-	if err != nil {
-		return nil, nil, err
-	}
-	return author, authorIdentifiers, nil
 }

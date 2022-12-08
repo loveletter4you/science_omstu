@@ -14,7 +14,7 @@ func AuthorsFill(reader io.Reader, storage *storage.Storage) {
 		fmt.Println(err)
 		return
 	}
-	
+
 	spin := &model.Identifier{Name: "spin"}
 	if err := storage.Identifier().AddIdentifier(spin); err != nil {
 		fmt.Println(err)
@@ -51,9 +51,9 @@ func AuthorsFill(reader io.Reader, storage *storage.Storage) {
 		}
 		if row["spin"] != "0" && row["spin"] != "" {
 			authorIdentifier := &model.AuthorIdentifier{
-				AuthorId:     author.Id,
-				IdentifierId: spin.Id,
-				Identifier:   row["spin"],
+				Author:          author,
+				Identifier:      spin,
+				IdentifierValue: row["spin"],
 			}
 			if err := storage.Author().AddAuthorIdentifier(authorIdentifier); err != nil {
 				fmt.Println(err)
@@ -62,9 +62,9 @@ func AuthorsFill(reader io.Reader, storage *storage.Storage) {
 		}
 		if row["orcid"] != "0" && row["orcid"] != "" {
 			authorIdentifier := &model.AuthorIdentifier{
-				AuthorId:     author.Id,
-				IdentifierId: orcid.Id,
-				Identifier:   row["orcid"],
+				Author:          author,
+				Identifier:      orcid,
+				IdentifierValue: row["orcid"],
 			}
 			if err := storage.Author().AddAuthorIdentifier(authorIdentifier); err != nil {
 				return
@@ -72,9 +72,9 @@ func AuthorsFill(reader io.Reader, storage *storage.Storage) {
 		}
 		if row["scopus author id"] != "0" && row["scopus author id"] != "" {
 			authorIdentifier := &model.AuthorIdentifier{
-				AuthorId:     author.Id,
-				IdentifierId: scopus.Id,
-				Identifier:   row["scopus author id"],
+				Author:          author,
+				Identifier:      scopus,
+				IdentifierValue: row["scopus author id"],
 			}
 			if err := storage.Author().AddAuthorIdentifier(authorIdentifier); err != nil {
 				return
@@ -82,9 +82,9 @@ func AuthorsFill(reader io.Reader, storage *storage.Storage) {
 		}
 		if row["researcher id"] != "0" && row["researcher id"] != "" {
 			authorIdentifier := &model.AuthorIdentifier{
-				AuthorId:     author.Id,
-				IdentifierId: researcher.Id,
-				Identifier:   row["researcher id"],
+				Author:          author,
+				Identifier:      researcher,
+				IdentifierValue: row["researcher id"],
 			}
 			if err := storage.Author().AddAuthorIdentifier(authorIdentifier); err != nil {
 				return

@@ -9,7 +9,7 @@ import (
 
 func main() {
 	s := storage.NewStorage(storage.NewConfig())
-	file, err := os.Open("./2022-11-28out.csv")
+	file, err := os.Open("./authors.csv")
 	if err != nil {
 		fmt.Println(err)
 		return

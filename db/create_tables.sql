@@ -15,7 +15,7 @@ create table if not exists users
 
 create table if not exists interests
 (
-    id serial primary key,
+    id       serial primary key,
     interest varchar(64) not null unique
 );
 
@@ -133,17 +133,10 @@ create table if not exists organizations
     city    varchar(64)
 );
 
-create table if not exists author_type
-(
-    id   serial primary key,
-    name varchar(64) not null unique
-);
-
 create table if not exists author_publication
 (
     id             bigserial primary key,
     author_id      integer not null references authors,
-    author_type    integer not null references author_type,
     publication_id integer not null references publications,
     unique (author_id, author_type, publication_id)
 );
@@ -166,7 +159,7 @@ create table if not exists publication_link
 (
     id             bigserial primary key,
     publication_id integer       not null references publications,
-    link_type      integer       not null references publication_links_type,
+    link_type_id   integer       not null references publication_links_type,
     link           varchar(2048) not null unique,
     unique (publication_id, link_type)
 )
