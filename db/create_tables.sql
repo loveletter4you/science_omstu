@@ -138,7 +138,7 @@ create table if not exists author_publication
     id             bigserial primary key,
     author_id      integer not null references authors,
     publication_id integer not null references publications,
-    unique (author_id, author_type, publication_id)
+    unique (author_id, publication_id)
 );
 
 create table if not exists author_publication_organization
@@ -161,5 +161,5 @@ create table if not exists publication_link
     publication_id integer       not null references publications,
     link_type_id   integer       not null references publication_links_type,
     link           varchar(2048) not null unique,
-    unique (publication_id, link_type)
+    unique (publication_id, link_type_id)
 )

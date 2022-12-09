@@ -11,8 +11,19 @@ type Author struct {
 }
 
 type AuthorIdentifier struct {
-	Id              int         `json:"id"`
+	Id              int64       `json:"id"`
 	Author          *Author     `json:"author,omitempty"`
 	Identifier      *Identifier `json:"identifier_info,omitempty"`
 	IdentifierValue string      `json:"identifier"`
+}
+
+type Interest struct {
+	Id   int
+	Name string
+}
+
+type AuthorInterest struct {
+	Id       int64
+	Interest *Interest
+	Author   *Author
 }

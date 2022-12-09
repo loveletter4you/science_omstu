@@ -16,7 +16,7 @@ func GetAuthorById(s *storage.Storage) func(c *gin.Context) {
 		}
 		author, err := s.Author().GetAuthorById(id)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 			return
 		}
 		authorIdentifiers, err := s.Author().GetAuthorIdentifiers(author)
