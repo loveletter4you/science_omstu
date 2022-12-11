@@ -28,5 +28,6 @@ func (server *HttpServer) StartServer() error {
 	return err
 }
 func (server *HttpServer) Routes() {
-	server.router.GET("/author/:id", controllers.GetAuthorById(server.storage))
+	server.router.GET("/api/author/:id", controllers.GetAuthorById(server.storage))
+	server.router.GET("/api/authors", controllers.GetAuthors(server.storage))
 }

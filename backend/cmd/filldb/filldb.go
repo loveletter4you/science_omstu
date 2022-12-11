@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	s := storage.NewStorage(storage.NewConfig())
+	s := storage.NewStorage(storage.LocalConfig())
 	file, err := os.Open("./authors.csv")
 	if err != nil {
 		fmt.Println(err)

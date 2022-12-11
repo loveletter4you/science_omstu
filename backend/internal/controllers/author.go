@@ -7,6 +7,20 @@ import (
 	"strconv"
 )
 
+func GetAuthors (s *storage.Storage) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		authors, err := s.Author().GetAuthors()
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+		response := map[string]interface{}{
+			"authors":      authors,
+		}
+		c.JSON(http.StatusOK, response)
+	}
+}
+
 func GetAuthorById(s *storage.Storage) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))

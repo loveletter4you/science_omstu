@@ -1,0 +1,20 @@
+.appWrapperNavbar{
+    grid-area: n;
+    margin: 25px auto;
+}
+
+.item {
+    display: inline-block;
+    font-size: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.item a {
+    color: black;
+    text-decoration: none;
+    padding: 0 20px 0px 20px;
+}
+
+.item a.active {
+    color: orangered;
+}
