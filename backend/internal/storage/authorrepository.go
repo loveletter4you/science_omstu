@@ -54,3 +54,21 @@ func (ar *AuthorRepository) GetAuthorIdentifiers(author *model.Author) ([]*model
 	}
 	return authorIdentifiers, nil
 }
+
+func (ar *AuthorRepository) GetAuthors() ([]*model.Author, error) {
+	authors := make([]*model.Author, 0)
+	query := "SELECT id, name, surname, patronymic, user_id FROM authors"
+	rows, err := ar.storage.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		author := &model.Author{}
+		if err := rows.Scan(&author.Id, &author.Name, &author.Surname, &author.Patronymic, &author.UserID); err != nil {
+			return nil, err
+		}
+		authors = append(authors, author)
+	}
+	return authors, nil
+}
