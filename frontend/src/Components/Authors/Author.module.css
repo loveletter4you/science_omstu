@@ -6,3 +6,6 @@
     text-transform: uppercase;
     display: inline-flex;
 }
+.author {
+    font-size:max(1em, min(4em, 1.333vw));
+}

@@ -2,6 +2,6 @@
     grid-area: f;
     padding: 20px;
     background-color: darkcyan;
-    font-size: 12px;
+    font-size:max(1em, min(4em, 0vw));
     color: white;
 }
