@@ -6,7 +6,7 @@ import {setAllAuthors } from "../../Redux/all-authors-reduser";
 
 class AuthorsContainer extends React.Component {
     componentDidMount() {
-        axios.get(`/api/authors?page=${this.props.currentPage}&count=${this.props.pageSize}`).then(response => {
+        axios.get(`/api/authors?page=0&limit=15`).then(response => {
             this.props.setAllAuthors(response.data.authors);
         });
     }

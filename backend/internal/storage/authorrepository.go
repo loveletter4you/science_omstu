@@ -55,9 +55,11 @@ func (ar *AuthorRepository) GetAuthorIdentifiers(author *model.Author) ([]*model
 	return authorIdentifiers, nil
 }
 
-func (ar *AuthorRepository) GetAuthors() ([]*model.Author, error) {
+func (ar *AuthorRepository) GetAuthors(page int, limit int) ([]*model.Author, error) {
+	offset := page * limit
 	authors := make([]*model.Author, 0)
-	query := "SELECT id, name, surname, patronymic, user_id FROM authors"
+	query := fmt.Sprintf("SELECT id, name, surname, patronymic, user_id FROM authors OFFSET %d LIMIT %d",
+		offset, limit)
 	rows, err := ar.storage.db.Query(query)
 	if err != nil {
 		return nil, err
@@ -71,4 +73,11 @@ func (ar *AuthorRepository) GetAuthors() ([]*model.Author, error) {
 		authors = append(authors, author)
 	}
 	return authors, nil
+}
+
+func (ar *AuthorRepository) GetAuthorsCount() (int, error) {
+	var count int
+	query := "SELECT count(*) FROM authors"
+	err := ar.storage.db.QueryRow(query).Scan(&count)
+	return count, err
 }

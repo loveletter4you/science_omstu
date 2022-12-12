@@ -10,7 +10,7 @@ import (
 
 func FillAuthors(s *storage.Storage) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		authors, err := s.Author().GetAuthors()
+		authors, err := s.Author().GetAuthors(0, 1)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
