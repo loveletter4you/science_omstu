@@ -44,6 +44,7 @@ services:
     build: 
       context: nginx/
       dockerfile: Dockerfile
+    restart: on-failure
     volumes:
       - ./nginx:/etc/nginx/
     ports:
