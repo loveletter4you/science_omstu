@@ -7,7 +7,7 @@ import Paginator from "./Paginator.css"
 const AllAuthors = (props) => {
     let pageCount = Math.ceil( props.totalAuthors / props.pageSize);
     let pages = [];
-    for (let i = 0; i < pageCount; i++) {
+    for (let i = 1; i <= pageCount; i++) {
         pages.push(i);
     }
     const handlePageClick = (e) => {
