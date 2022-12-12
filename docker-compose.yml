@@ -12,6 +12,8 @@ services:
       - db
     networks:
       - default
+    volumes:
+      - "./backend/resources:/backend/resources"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password

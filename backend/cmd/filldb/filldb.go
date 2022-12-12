@@ -9,7 +9,7 @@ import (
 
 func main() {
 	s := storage.NewStorage(storage.LocalConfig())
-	file, err := os.Open("./authors.csv")
+	file, err := os.Open("../../resources/authors.csv")
 	if err != nil {
 		fmt.Println(err)
 		return
