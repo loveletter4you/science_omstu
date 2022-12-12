@@ -17,6 +17,7 @@ func FillAuthors(s *storage.Storage) func(c *gin.Context) {
 		}
 		if len(authors) != 0 {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": "DB already filled"})
+			return
 		}
 
 		file, err := os.Open("/backend/resources/authors.csv")

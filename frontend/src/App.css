@@ -4,13 +4,14 @@
     width: 100%;
     min-height: 1px;
     grid-template-areas:
-  "h n"
-  "c c"
-  "f f";
+  "h n n"
+  "c c c"
+  "f f f";
 
-    grid-template-rows: 60px 5fr;
-    grid-template-columns: 2fr 10fr;
+    grid-template-rows: 70px 1fr 60px;
+    grid-template-columns: 200px 1fr 50px;
 }
+
 .app-wrapper-content {
     grid-area: c;
     padding-left: 50px;

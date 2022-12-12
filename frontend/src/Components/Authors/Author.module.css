@@ -1,10 +1,8 @@
 .item {
     text-transform: lowercase;
     display: inline-flex;
-
 }
 .first::first-letter {
     text-transform: uppercase;
     display: inline-flex;
-
 }

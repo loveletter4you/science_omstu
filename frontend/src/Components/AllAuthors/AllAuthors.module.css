@@ -1,10 +1,18 @@
 .item {
     font-size: 16px;
     font-family: Arial;
-    text-transform: capitalize;
+    display: flex;
+    flex-flow: column;
+    padding-bottom: 7px;
 
 }
-
+.first::first-letter {
+    text-transform: uppercase;
+}
+.line {
+    display: inline-flex;
+    text-transform: lowercase;
+}
 .item a {
     color: black;
     text-decoration: none;
