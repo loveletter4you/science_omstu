@@ -3,7 +3,7 @@ import h from './Header.module.css'
 
 const Header = () => {
     return <div className={h.appWrapperHeader}>
-        <div>Cris system of OmSTU</div>
+        <div>CRIS system of OmSTU</div>
     </div>
 }
 

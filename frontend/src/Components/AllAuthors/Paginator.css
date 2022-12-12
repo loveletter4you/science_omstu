@@ -1,0 +1,29 @@
+li a {
+
+    padding: 0.1rem 1rem;
+    border: gray 1px solid;
+    cursor: default;
+    text-decoration: none;
+}
+
+li.previous a,
+li.next a,
+li.break a {
+    border-color: grey;
+}
+
+li.active a {
+    background-color: lightblue;
+    border-color: blue;
+    color: blue;
+    min-width: 32px;
+}
+
+li.disabled a {
+    color: black;
+}
+
+li.disable,
+li.disabled a {
+    cursor: default;
+}
