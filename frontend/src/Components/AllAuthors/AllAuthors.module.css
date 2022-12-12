@@ -1,0 +1,15 @@
+.item {
+    font-size: 16px;
+    font-family: Arial;
+    text-transform: capitalize;
+
+}
+
+.item a {
+    color: black;
+    text-decoration: none;
+}
+
+.item a.active {
+
+}

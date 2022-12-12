@@ -1,0 +1,7 @@
+.appWrapperFooter {
+    grid-area: f;
+    padding: 20px;
+    background-color: darkcyan;
+    font-size: 12px;
+    color: white;
+}
