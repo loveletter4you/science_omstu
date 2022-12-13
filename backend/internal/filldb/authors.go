@@ -4,10 +4,19 @@ import (
 	"github.com/loveletter4u/cris/internal/model"
 	"github.com/loveletter4u/cris/internal/storage"
 	"io"
+	"log"
 )
 
 func AuthorsFill(reader io.Reader, storage *storage.Storage) error {
 	dataSet := CSVToMap(reader)
+	authors, err := storage.Author().GetAuthors(0, 1)
+	if err != nil {
+		return err
+	}
+	if len(authors) != 0 {
+		log.Print("Authors exists")
+		return nil
+	}
 
 	spin := &model.Identifier{Name: "spin"}
 	if err := storage.Identifier().AddIdentifier(spin); err != nil {
