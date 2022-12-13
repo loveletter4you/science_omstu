@@ -6,10 +6,11 @@ import (
 )
 
 type Storage struct {
-	config               *Config
-	db                   *sql.DB
-	authorRepository     *AuthorRepository
-	identifierRepository *IdentifierRepository
+	config                *Config
+	db                    *sql.DB
+	authorRepository      *AuthorRepository
+	identifierRepository  *IdentifierRepository
+	publicationRepository *PublicationRepository
 }
 
 func NewStorage(config *Config) *Storage {
@@ -60,4 +61,16 @@ func (s *Storage) Identifier() *IdentifierRepository {
 	}
 
 	return s.identifierRepository
+}
+
+func (s *Storage) Publication() *PublicationRepository {
+	if s.publicationRepository != nil {
+		return s.publicationRepository
+	}
+
+	s.publicationRepository = &PublicationRepository{
+		storage: s,
+	}
+
+	return s.publicationRepository
 }
