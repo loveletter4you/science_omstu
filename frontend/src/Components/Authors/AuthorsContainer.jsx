@@ -7,6 +7,7 @@ import {useLocation, useNavigate, useParams} from "react-router-dom";
 
 
 class AuthorsContainer extends React.Component {
+
     componentDidMount() {
         let id = this.props.router.params.id;
         axios.get(`/api/author/` + id).then(response => {

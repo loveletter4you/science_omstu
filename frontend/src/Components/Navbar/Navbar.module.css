@@ -1,20 +1,34 @@
 .appWrapperNavbar{
-    grid-area: n;
-    margin: 25px auto;
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 28px;
+    display: flex;
+    align-items: center;
+
 }
 
-.item {
-    display: inline-block;
-    font-size:max(1em, min(4em, 1.333vw));
-    font-family: Arial;
+.item + .item{
+    margin-left: 20px;
 }
 
 .item a {
     color: black;
     text-decoration: none;
-    padding: 0 20px 0px 20px;
 }
 
 .item a.active {
     color: orangered;
+}
+
+.btn{
+    margin-left: 50px;
+    font-size: 18px;
+    cursor: pointer;
+    background-color: #2C3878;
+    color:white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 10px;
 }

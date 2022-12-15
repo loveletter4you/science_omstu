@@ -1,6 +1,6 @@
 import React  from "react";
 import axios from "axios";
-import AllAuthors from "./AllAuthors";
+import Sdfdsfdsfs from "./sdfdsfdsfs";
 import {connect} from "react-redux";
 import {setAllAuthors, setAuthorsTotalCount, setCurrentPage} from "../../Redux/all-authors-reduser";
 
@@ -11,6 +11,7 @@ class AuthorsContainer extends React.Component {
             this.props.setAuthorsTotalCount(response.data.total_authors);
         });
     }
+
     onPageChange = (pageNumber) => {
         this.props.setCurrentPage(pageNumber)
         axios.get(`/api/authors?page=${pageNumber-1}&limit=${this.props.pageSize}`).then(response => {
@@ -21,7 +22,7 @@ class AuthorsContainer extends React.Component {
     render() {
         return (
             <>
-                <AllAuthors {...this.props}
+                <Sdfdsfdsfs {...this.props}
                             authors={this.props.authors}
                             onPageChange={this.onPageChange}
                             totalAuthors={this.props.totalAuthors}

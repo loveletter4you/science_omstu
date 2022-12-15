@@ -1,21 +1,25 @@
 .app-wrapper {
-    margin: 0 auto;
-    display: grid;
     width: 100%;
-    min-height: 1px;
-    grid-template-areas:
-  "h n n"
-  "c c c"
-  "f f f";
+    /*background-color: rgba(79, 143, 154, 0.27);*/
+    padding-top: 12px;
+    height: 100vh;
+    font-family: 'Roboto', sans-serif;
+}
 
-    grid-template-rows: 70px 1fr 60px;
-    grid-template-columns: 200px 1fr 50px;
+.app-wrapper__container{
+    width: 1200px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 15px 20px;
+
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .app-wrapper-content {
-    grid-area: c;
     padding-left: 50px;
     padding-top: 30px;
-    display: flex;
-    flex-wrap: wrap;
+    flex: 1 1;
 }
+

@@ -7,9 +7,15 @@ const Author = (props) => {
     }
 
     return <div className={s.author}>
-        <div className={s.item}> <div className={s.first}>Фамилия:&nbsp;</div><div className={s.first}>{props.author.author.surname}</div></div>
+        <div className={s.item}>
+            <div className={s.first}>Фамилия:&nbsp;</div>
+            <div className={s.first}>{props.author.author.surname}</div>
+        </div>
+
         <div>Имя: {props.author.author.name}</div>
+
         <div>Отчество: {props.author.author.patronymic}</div>
+
         {props.author.identifiers.map(i => {
             return (<div>{i.identifier_info.name}: {i.identifier}</div>
             )
