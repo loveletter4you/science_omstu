@@ -9,6 +9,9 @@ type AuthorRepository struct {
 	storage *Storage
 }
 
+//здесь непосредственно все запросы, если селект запросы - возвращаем ссылку на объект(ы) которые получаем
+//инсерт запросы - заполняем все необходимые поля, и получаем айдишник, который записываем в тот же объект
+
 func (ar *AuthorRepository) GetAuthorById(id int) (*model.Author, error) {
 	author := &model.Author{}
 	query := fmt.Sprintf("SELECT id, name, surname, patronymic, user_id FROM authors WHERE id = %d", id)

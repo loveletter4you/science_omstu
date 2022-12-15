@@ -37,9 +37,22 @@ func (pr *PublicationRepository) AddPublication(publication *model.Publication) 
 	return err
 }
 
-func (pr *PublicationRepository) AddAuthorPublication(authorPublication model.AuthorPublication) error {
+func (pr *PublicationRepository) AddAuthorPublication(authorPublication *model.AuthorPublication) error {
 	query := fmt.Sprintf("INSERT INTO author_publication (author_id, publication_id) VALUES (%d, %d) RETURNING id",
 		authorPublication.Author.Id, authorPublication.Publication.Id)
-	err := pr.storage.db.QueryRow(query).Scan(authorPublication.Id)
+	err := pr.storage.db.QueryRow(query).Scan(&authorPublication.Id)
+	return err
+}
+
+func (pr *PublicationRepository) AddPublicationLink(link *model.PublicationLink) error {
+	query := fmt.Sprintf("INSERT INTO publication_link (publication_id, link_type_id, link) VALUES (%d, %d, '%s') RETURNING id",
+		link.Publication.Id, link.LinkType.Id, link.Link)
+	err := pr.storage.db.QueryRow(query).Scan(&link.Id)
+	return err
+}
+
+func (pr *PublicationRepository) AddPublicationLinkType(linkType *model.PublicationLinkType) error {
+	query := fmt.Sprintf("INSERT INTO publication_links_type (name) VALUES ('%s') RETURNING id", linkType.Name)
+	err := pr.storage.db.QueryRow(query).Scan(&linkType.Id)
 	return err
 }

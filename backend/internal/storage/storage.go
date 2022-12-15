@@ -5,6 +5,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// Структура сторага, тут подключаемся к базе данных и пишем туда запросики
+
 type Storage struct {
 	config                *Config
 	db                    *sql.DB
@@ -18,6 +20,8 @@ func NewStorage(config *Config) *Storage {
 		config: config,
 	}
 }
+
+//открываем подключение по данным из конфига
 
 func (s *Storage) Open() error {
 	db, err := sql.Open("postgres", s.config.DataBaseURL)
@@ -38,6 +42,9 @@ func (s *Storage) Open() error {
 func (s *Storage) Close() {
 	s.db.Close()
 }
+
+//подключаем репозитории, в которых выполняем запросики в базу данных (подробнее в authorrepository.go)
+//репозитории - дополнительный уровень абстракции для более удобного разделения логики работы с базой данных
 
 func (s *Storage) Author() *AuthorRepository {
 	if s.authorRepository != nil {
