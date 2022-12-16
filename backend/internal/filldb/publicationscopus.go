@@ -6,6 +6,7 @@ import (
 	"github.com/loveletter4u/cris/internal/storage"
 	"io"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -36,12 +37,57 @@ func publicationScopusFill(reader io.Reader, storage *storage.Storage) error {
 	if err != nil {
 		return err
 	}
+	typeJournal := &model.SourceType{Name: "Журнал"}
+	err = storage.Source().AddSourceType(typeJournal)
+	if err != nil {
+		return err
+	}
+	typeConference := &model.SourceType{Name: "Конференция"}
+	err = storage.Source().AddSourceType(typeConference)
+	if err != nil {
+		return err
+	}
+	sourceLinkISSN := &model.SourceLinkType{Name: "ISSN"}
+	err = storage.Source().AddSourceLinkType(sourceLinkISSN)
+	if err != nil {
+		return err
+	}
 	for _, row := range dataSet {
+		source := &model.Source{Name: row["Source title"]}
+		if row["Document Type"] == "Conference Paper" {
+			source.SourceType = typeConference
+		} else {
+			source.SourceType = typeJournal
+		}
+		err := storage.Source().AddSource(source)
+		if err != nil {
+			return err
+		}
+		if row["ISSN"] != "" {
+			sourceLink := &model.SourceLink{
+				Source:         source,
+				SourceLinkType: sourceLinkISSN,
+				Link:           row["ISSN"],
+			}
+			err := storage.Source().AddSourceLink(sourceLink)
+			if err != nil {
+				return err
+			}
+		}
 		date, err := time.Parse("2006", row["Year"])
 		if err != nil {
 			return err
 		}
+		publicationType := &model.PublicationType{
+			Name: row["Document Type"],
+		}
+		err = storage.Publication().AddPublicationType(publicationType)
+		if err != nil {
+			return err
+		}
 		publication := &model.Publication{
+			Type:            publicationType,
+			Source:          source,
 			Title:           row["Title"],
 			Abstract:        row["Abstract"],
 			PublicationDate: date,
@@ -59,7 +105,6 @@ func publicationScopusFill(reader io.Reader, storage *storage.Storage) error {
 		if err != nil {
 			return err
 		}
-		fmt.Println(publication)
 		if row["DOI"] != "" {
 			linkDoi := &model.PublicationLink{
 				Publication: publication,
@@ -70,6 +115,13 @@ func publicationScopusFill(reader io.Reader, storage *storage.Storage) error {
 			if err != nil {
 				return err
 			}
+		}
+		authorsAndOrg := strings.Split(row["Authors with affiliations"], ";")
+		authorsScopus := strings.Split(row["Author(s) ID"], ";")
+		fmt.Print(authorsScopus)
+		for i, author := range authorsAndOrg {
+			fmt.Print(i)
+			fmt.Print(author)
 		}
 	}
 	return nil

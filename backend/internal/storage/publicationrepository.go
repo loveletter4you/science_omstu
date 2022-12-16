@@ -56,3 +56,22 @@ func (pr *PublicationRepository) AddPublicationLinkType(linkType *model.Publicat
 	err := pr.storage.db.QueryRow(query).Scan(&linkType.Id)
 	return err
 }
+
+func (pr *PublicationRepository) AddPublicationType(publicationType *model.PublicationType) error {
+	query := fmt.Sprintf("SELECT EXISTS(SELECT FROM publication_types WHERE name = '%s')", publicationType.Name)
+	var exist bool
+	err := pr.storage.db.QueryRow(query).Scan(&exist)
+	if err != nil {
+		return err
+	}
+	if exist {
+		query = fmt.Sprintf("SELECT id FROM publication_types WHERE name = '%s' LIMIT 1", publicationType.Name)
+		err := pr.storage.db.QueryRow(query).Scan(&publicationType.Id)
+		return err
+	} else {
+		query = fmt.Sprintf("INSERT INTO publication_types (name) VALUES ('%s') RETURNING id",
+			publicationType.Name)
+		err := pr.storage.db.QueryRow(query).Scan(&publicationType.Id)
+		return err
+	}
+}

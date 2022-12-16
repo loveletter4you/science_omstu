@@ -13,6 +13,7 @@ type Storage struct {
 	authorRepository      *AuthorRepository
 	identifierRepository  *IdentifierRepository
 	publicationRepository *PublicationRepository
+	sourceRepository      *SourceRepository
 }
 
 func NewStorage(config *Config) *Storage {
@@ -80,4 +81,16 @@ func (s *Storage) Publication() *PublicationRepository {
 	}
 
 	return s.publicationRepository
+}
+
+func (s *Storage) Source() *SourceRepository {
+	if s.sourceRepository != nil {
+		return s.sourceRepository
+	}
+
+	s.sourceRepository = &SourceRepository{
+		storage: s,
+	}
+
+	return s.sourceRepository
 }
