@@ -1,29 +1,26 @@
-li a {
 
-    padding: 0.1rem 1rem;
-    border: gray 1px solid;
-    cursor: default;
-    text-decoration: none;
+.pagination{
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 22px;
+    gap: 5px;
+    margin-bottom: 20px;
 }
 
-li.previous a,
-li.next a,
-li.break a {
-    border-color: grey;
+.pagination li{
+    padding: 8px 15px;
+    cursor: pointer;
+    border-radius: 3px;
+    font-weight: 400;
 }
 
-li.active a {
-    background-color: lightblue;
-    border-color: blue;
-    color: blue;
-    min-width: 32px;
+.pagination li:hover{
+    background-color:#5AB1BB;
+    color:#fff;
 }
 
-li.disabled a {
-    color: black;
-}
-
-li.disable,
-li.disabled a {
-    cursor: default;
+.pagination li.selected{
+    background-color: #1bab95;
 }

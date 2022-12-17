@@ -1,26 +1,31 @@
-import React from "react";
-import s from "./Author.module.css"
+import React, {useState} from 'react';
+import {NavLink, useParams} from "react-router-dom";
+import axios from "axios";
+import s from './Author.module.css'
 
-const Author = (props) => {
-    if (!props.author) {
-        return <div>Ошибка</div>
-    }
+const Author = () => {
+    const params = useParams();
+    const [author, setAuthor] = useState([]);
 
-    return <div className={s.author}>
-        <div className={s.item}>
-            <div className={s.first}>Фамилия:&nbsp;</div>
-            <div className={s.first}>{props.author.author.surname}</div>
+    React.useEffect(() => {
+        const fecthAuthor = async () => {
+            const res = await axios.get(`/api/author/${params.id}`);
+            setAuthor(res.data.author);
+        }
+
+        fecthAuthor();
+    }, [])
+
+    return (<div className={s.list}>
+            {author === undefined ? 'Ну подождите пж' : <>
+                <p className={s.list__item}>Фамилия: {author.surname}</p>
+                <p className={s.list__item}>Имя: {author.name}</p>
+                <p className={s.list__item}>Отчество: {author.patronymic}</p>
+            </>
+            }
         </div>
-
-        <div>Имя: {props.author.author.name}</div>
-
-        <div>Отчество: {props.author.author.patronymic}</div>
-
-        {props.author.identifiers.map(i => {
-            return (<div>{i.identifier_info.name}: {i.identifier}</div>
-            )
-        })}
-    </div>
-}
+    );
+};
 
 export default Author;
+

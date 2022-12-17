@@ -1,11 +1,11 @@
-.item {
-    text-transform: lowercase;
-    display: inline-flex;
+
+.list{
+    margin: 20px 0;
+    padding-left: 25px;
 }
-.first::first-letter {
-    text-transform: uppercase;
-    display: inline-flex;
-}
-.author {
-    font-size:max(1em, min(4em, 1.333vw));
+
+.list__item{
+    color: #2e2e2e;
+    font-size: 24px;
+    margin-bottom: 5px;
 }

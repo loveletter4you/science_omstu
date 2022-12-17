@@ -11,9 +11,11 @@ const Sdfdsfdsfs = (props) => {
     for (let i = 1; i <= pageCount; i++) {
         pages.push(i);
     }
+
     const handlePageClick = (e) => {
         props.onPageChange(e.selected + 1)
     }
+
     return <div>
         <div className={s.item}>
             {props.authors.map(a => <div key={a.id}>
@@ -33,7 +35,6 @@ const Sdfdsfdsfs = (props) => {
         </div>
         <div className={s.number}>
 
-
             <ReactPaginate
                 breakLabel="..."
                 nextLabel="->"
@@ -42,6 +43,7 @@ const Sdfdsfdsfs = (props) => {
                 pageCount={pageCount}
                 previousLabel="<-"
                 renderOnZeroPageCount={null}
+
                 containerClassName="pagination justify-content-center"
                 pageClassName="page-item"
                 pageLinkClassName="page-link"
