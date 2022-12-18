@@ -27,11 +27,23 @@ func (ar *AuthorRepository) AddAuthor(author *model.Author) error {
 }
 
 func (ar *AuthorRepository) AddAuthorIdentifier(authorIdentifier *model.AuthorIdentifier) error {
-	query := fmt.Sprintf("INSERT INTO author_identifier (author_id, identifier_id, identifier) "+
-		"VALUES (%d, %d, '%s') RETURNING id",
-		authorIdentifier.Author.Id, authorIdentifier.Identifier.Id, authorIdentifier.IdentifierValue)
-	err := ar.storage.db.QueryRow(query).Scan(&authorIdentifier.Id)
-	return err
+	query := fmt.Sprintf("SELECT EXISTS(SELECT FROM author_identifier WHERE identifer = '%s')", authorIdentifier.Identifier)
+	var exist bool
+	err := ar.storage.db.QueryRow(query).Scan(&exist)
+	if err != nil {
+		return err
+	}
+	if exist {
+		query = fmt.Sprintf("SELECT id FROM author_identifier WHERE identifer = '%s' LIMIT 1", authorIdentifier.Identifier)
+		err := ar.storage.db.QueryRow(query).Scan(&authorIdentifier.Id)
+		return err
+	} else {
+		query := fmt.Sprintf("INSERT INTO author_identifier (author_id, identifier_id, identifier) "+
+			"VALUES (%d, %d, '%s') RETURNING id",
+			authorIdentifier.Author.Id, authorIdentifier.Identifier.Id, authorIdentifier.IdentifierValue)
+		err := ar.storage.db.QueryRow(query).Scan(&authorIdentifier.Id)
+		return err
+	}
 }
 
 func (ar *AuthorRepository) GetAuthorIdentifiers(author *model.Author) ([]*model.AuthorIdentifier, error) {
