@@ -1,7 +1,8 @@
-.appWrapperFooter {
-    grid-area: f;
-    padding: 20px;
+.footer {
     background-color: darkcyan;
-    font-size:max(1em, min(4em, 0vw));
+    font-size: 17px;
     color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    margin-bottom: 50px;
 }

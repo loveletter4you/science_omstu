@@ -1,32 +1,29 @@
 import React from "react";
 import './App.css';
 import Header from "./Components/Header/Header";
-import Navbar from "./Components/Navbar/Navbar";
 import Footer from "./Components/Footer/Footer";
-import {BrowserRouter, Route, Routes} from "react-router-dom";
-import AuthorsContainer from "./Components/Authors/AuthorsContainer";
-import {Provider} from "react-redux";
-import store from "./Redux/redux-store";
-import AllAuthorsContainer from "./Components/AllAuthors/AllAuthorsContainer";
+import {Route, Routes} from "react-router-dom";
+import AllAuthors from "./Components/AllAuthors/AllAuthors";
+import Author from "./Components/Authors/Author";
+import Publications from "./Components/Publications/Publications";
 
 function App(props) {
-    return <BrowserRouter>
-        <Provider store={store}>
-        <div className='app-wrapper'>
+    return <div className='app-wrapper'>
+        <div className="app-wrapper__container">
             <Header/>
-            <Navbar/>
             <div className='app-wrapper-content'>
                 <Routes>
                     <Route path='/author/:id'
-                           element={<AuthorsContainer/>}/>
+                           element={<Author/>}/>
                     <Route path='/authors'
-                           element={<AllAuthorsContainer/>}/>
+                           element={<AllAuthors/>}/>
+                    <Route path='/publications'
+                           element={<Publications/>}/>
                 </Routes>
             </div>
             <Footer/>
         </div>
-        </Provider>
-    </BrowserRouter>
+    </div>
 }
 
 export default App;

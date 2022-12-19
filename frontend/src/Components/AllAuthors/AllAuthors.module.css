@@ -1,32 +1,128 @@
-.item {
 
-    font-size:max(1em, min(4em, 1.333vw));
-    font-family: Arial;
-    display: flex;
-    flex-flow: column;
-    padding-bottom: 7px;
-
+*{
+    padding: 0;
+    margin: 0;
 }
 
-.first::first-letter {
-    text-transform: uppercase;
+.item{
+    margin: 20px 0;
+    padding-left: 25px;
 }
 
-.line {
-    display: inline-flex;
-    text-transform: lowercase;
+.list__item{
+    color:#2e2e2e;
+    font-size: 20px;
+    border: none;
+    outline: none;
+    list-style-type: none;
+    margin-bottom: 5px;
 }
 
-.item a {
-    color: black;
+
+.list__item a{
     text-decoration: none;
+    color:inherit;
 }
 
-.number {
-    font-size:max(1em, min(4em, 1.333vw));
+.list__item a:hover{
+    color:red;
 }
 
-.number li {
-    display: inline-block;
+.block{
+    display: flex;
+    flex-direction: column;
+
 }
+
+.input{
+    align-self: center;
+    width: 410px;
+    height: 30px;
+    margin-top: 15px;
+    padding: 5px 10px;
+    font-size: 15px;
+    outline: none;
+    border: 1px solid #000;
+    border-radius: 10px;
+}
+
+.input::placeholder{
+    font-size: 15px;
+}
+
+.input:focus{
+    border: 2px solid #000;
+}
+
+.block__item{
+    display: flex;
+    justify-content: space-between;
+}
+
+/*Sort*/
+.sort {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.sort__label {
+     display: flex;
+     align-items: center;
+}
+
+.sort__label b {
+    margin-right: 8px;
+}
+
+.sort__label span {
+    color: orange;
+    border-bottom: 1px dashed orange;
+    cursor: pointer;
+}
+
+.sort__popup {
+    position: absolute;
+    right: 0;
+    margin-top: 20px;
+    background: #ffffff;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.09);
+    border-radius: 10px;
+    overflow: hidden;
+    padding: 10px 0;
+    width: 160px;
+    margin-right: -55px;
+}
+
+.sort ul{
+    overflow: hidden;
+}
+
+.sort ul li{
+    padding: 12px 20px;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 5px;
+}
+
+.sort ul li.active:hover{
+    background: rgba(254, 95, 30, 0.05);
+}
+
+.sort ul li:hover{
+    font-weight: bold;
+    color: orange;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
