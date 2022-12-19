@@ -4,11 +4,17 @@ import {NavLink, useLocation, useNavigate, useParams} from "react-router-dom";
 import s from "./AllAuthors.module.css";
 import ReactPaginate from "react-paginate";
 import Paginator from './Paginator.css';
+import {useSelector} from "react-redux";
 
 const AllAuthors = () => {
     const [authors, setAuthors] = React.useState([]);
     const [seePopup, setSeePopup] = React.useState(false);
-    const [popupValue, setPopupValue] = React.useState('популярности');
+    // const [popupValue, setPopupValue] = React.useState('популярности');
+    // onClick={() => setPopupValue('публикациям')
+    // let popup = useSelector(state => state.sort.popupValue)
+    // console.log(popup);
+
+    // const value = useSelector((state) => console.log('AllAuthors-state',state))
 
     let pageSize = 20;
     let total_authors = 1070;
@@ -22,7 +28,6 @@ const AllAuthors = () => {
     }
 
     const handlePageClick = (e) => {
-        console.log(e.selected);
         const fetchAutors = async () => {
             const res = await axios.get(`//localhost/api/authors?page=${e.selected}&limit=20`);
             setAuthors(res.data.authors);
@@ -46,7 +51,7 @@ const AllAuthors = () => {
             <input className={s.input} placeholder='Search' type="text"/>
             <div className={s.block__item}>
                 <ul className={s.item}>
-                    {authors === undefined ? 'Жди,сука' : authors.map(a => <>
+                    {authors === undefined ? 'Подожди пж' : authors.map(a => <>
                             <li key={a.id} className={s.list__item}>
                                 <NavLink to={'/author/' + a.id}> {a.surname} {a.name} {a.patronymic}</NavLink>
                             </li>
@@ -57,15 +62,15 @@ const AllAuthors = () => {
                 <div className={s.sort}>
                     <div className={s.sort__label} onClick={() => setSeePopup(!seePopup)}>
                         <b>Сортировка по:</b>
-                        <span>{popupValue}</span>
+                        <span>dsfdsfds</span>
                     </div>
 
                     {
                         seePopup === false ? '' : <div className={s.sort__popup}>
                             <ul>
-                                <li className={s.active} onClick={() => setPopupValue('популярности')}>популярности</li>
-                                <li onClick={() => setPopupValue('публикациям')}>публикациям</li>
-                                <li onClick={() => setPopupValue('алфавиту')}>алфавиту</li>
+                                <li className={s.active}>популярности</li>
+                                <li>публикациям</li>
+                                <li>алфавиту</li>
                             </ul>
                         </div>
                     }
