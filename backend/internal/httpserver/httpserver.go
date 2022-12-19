@@ -31,7 +31,14 @@ func (server *HttpServer) StartServer() error {
 	if err != nil {
 		return err
 	}
-	filldb.AuthorsFill(file, server.storage)
+	err = filldb.AuthorsFill(file, server.storage)
+	if err != nil {
+		return err
+	}
+	err = filldb.PublicationFill(server.storage)
+	if err != nil {
+		return err
+	}
 	server.Routes()
 	err = server.router.Run(":8000")
 	server.storage.Close()

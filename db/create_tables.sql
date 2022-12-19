@@ -72,7 +72,7 @@ create table if not exists sources
 (
     id             serial primary key,
     source_type_id integer     not null references source_type,
-    name           varchar(64) not null
+    name           varchar(256) not null
 );
 
 create table if not exists source_link
