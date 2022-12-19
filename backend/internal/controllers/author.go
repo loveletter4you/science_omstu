@@ -7,6 +7,9 @@ import (
 	"strconv"
 )
 
+// Контролеры для роутов, тут обращаемся к методам сторейджа,
+// которые вернут репозитории и в них уже работаем с методами которые отправляют запросики в базу данных
+
 func GetAuthors(s *storage.Storage) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		page, err := strconv.Atoi(c.DefaultQuery("page", "0"))

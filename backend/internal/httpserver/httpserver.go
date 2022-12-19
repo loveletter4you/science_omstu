@@ -8,6 +8,8 @@ import (
 	"os"
 )
 
+//Сервер
+
 type HttpServer struct {
 	router  *gin.Engine
 	storage *storage.Storage
@@ -21,6 +23,7 @@ func NewServer() *HttpServer {
 }
 
 func (server *HttpServer) StartServer() error {
+	//метод запуска сервера, здесь подключаем бд, заполняем ее, задаем роуты и запускаем сервер на 8000 порте
 	if err := server.storage.Open(); err != nil {
 		return err
 	}
@@ -28,13 +31,21 @@ func (server *HttpServer) StartServer() error {
 	if err != nil {
 		return err
 	}
-	filldb.AuthorsFill(file, server.storage)
+	err = filldb.AuthorsFill(file, server.storage)
+	if err != nil {
+		return err
+	}
+	err = filldb.PublicationFill(server.storage)
+	if err != nil {
+		return err
+	}
 	server.Routes()
 	err = server.router.Run(":8000")
 	server.storage.Close()
 	return err
 }
 func (server *HttpServer) Routes() {
+	//Здесь прописываем роуты
 	api := server.router.Group("/api")
 	api.GET("/author/:id", controllers.GetAuthorById(server.storage))
 	api.GET("/authors", controllers.GetAuthors(server.storage))

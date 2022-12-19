@@ -44,14 +44,23 @@
 					"urlencoded": []
 				},
 				"url": {
-					"raw": "localhost/api/author/1",
+					"raw": "localhost/api/authors?page=0&limit=20",
 					"host": [
 						"localhost"
 					],
 					"path": [
 						"api",
-						"author",
-						"1"
+						"authors"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "limit",
+							"value": "20"
+						}
 					]
 				},
 				"description": "limit - число пользователей возвращаемых api\npage - страница возвращаемых пользователей (первая - 0)"

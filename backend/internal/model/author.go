@@ -2,6 +2,8 @@ package model
 
 import "database/sql"
 
+//Модели, как в базе данных
+
 type Author struct {
 	Id         int           `json:"id"`
 	Name       string        `json:"name"`

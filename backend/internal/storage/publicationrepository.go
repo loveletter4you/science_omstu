@@ -30,16 +30,48 @@ func (pr *PublicationRepository) GetPublications(page int, limit int) ([]*model.
 }
 
 func (pr *PublicationRepository) AddPublication(publication *model.Publication) error {
-	query := fmt.Sprintf("INSERT INTO publications (type_id, source_id, title, abstract, publication_date) VALUES (%d, %d, '%s', '%s', '%s') RETURNING id",
+	query := fmt.Sprintf("INSERT INTO publications (type_id, source_id, title, abstract, publication_date) VALUES (%d, %d, $$%s$$, $$%s$$, $$%s$$) RETURNING id",
 		publication.Type.Id, publication.Source.Id, publication.Title, publication.Abstract,
 		publication.PublicationDate.Format("2006-01-02"))
 	err := pr.storage.db.QueryRow(query).Scan(&publication.Id)
 	return err
 }
 
-func (pr *PublicationRepository) AddAuthorPublication(authorPublication model.AuthorPublication) error {
+func (pr *PublicationRepository) AddAuthorPublication(authorPublication *model.AuthorPublication) error {
 	query := fmt.Sprintf("INSERT INTO author_publication (author_id, publication_id) VALUES (%d, %d) RETURNING id",
 		authorPublication.Author.Id, authorPublication.Publication.Id)
-	err := pr.storage.db.QueryRow(query).Scan(authorPublication.Id)
+	err := pr.storage.db.QueryRow(query).Scan(&authorPublication.Id)
 	return err
+}
+
+func (pr *PublicationRepository) AddPublicationLink(link *model.PublicationLink) error {
+	query := fmt.Sprintf("INSERT INTO publication_link (publication_id, link_type_id, link) VALUES (%d, %d, $$%s$$) RETURNING id",
+		link.Publication.Id, link.LinkType.Id, link.Link)
+	err := pr.storage.db.QueryRow(query).Scan(&link.Id)
+	return err
+}
+
+func (pr *PublicationRepository) AddPublicationLinkType(linkType *model.PublicationLinkType) error {
+	query := fmt.Sprintf("INSERT INTO publication_links_type (name) VALUES ('%s') RETURNING id", linkType.Name)
+	err := pr.storage.db.QueryRow(query).Scan(&linkType.Id)
+	return err
+}
+
+func (pr *PublicationRepository) AddPublicationType(publicationType *model.PublicationType) error {
+	query := fmt.Sprintf("SELECT EXISTS(SELECT FROM publication_types WHERE name = '%s')", publicationType.Name)
+	var exist bool
+	err := pr.storage.db.QueryRow(query).Scan(&exist)
+	if err != nil {
+		return err
+	}
+	if exist {
+		query = fmt.Sprintf("SELECT id FROM publication_types WHERE name = '%s' LIMIT 1", publicationType.Name)
+		err := pr.storage.db.QueryRow(query).Scan(&publicationType.Id)
+		return err
+	} else {
+		query = fmt.Sprintf("INSERT INTO publication_types (name) VALUES ('%s') RETURNING id",
+			publicationType.Name)
+		err := pr.storage.db.QueryRow(query).Scan(&publicationType.Id)
+		return err
+	}
 }
