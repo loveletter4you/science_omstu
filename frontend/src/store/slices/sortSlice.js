@@ -12,6 +12,6 @@ export const sortSlice = createSlice({
     },
 })
 
-export const { setPopupValue } = sortSlice.actions
+export const { setPopupValue } = sortSlice.actions;
 
-export default sortSlice.reducer
+export default sortSlice.reducer;

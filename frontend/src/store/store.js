@@ -2,7 +2,6 @@ import { configureStore } from '@reduxjs/toolkit'
 import allAuthorsSlice from "./slices/allAuthorsSlice";
 import authorSlice from "./slices/authorSlice";
 import {sortSlice} from "./slices/sortSlice";
-import AllAuthors from "../Components/AllAuthors/AllAuthors";
 
 
 const store = configureStore({
@@ -13,6 +12,6 @@ const store = configureStore({
     },
 })
 
-// console.log('store', store);
-
+// console.log(store.dispatch());
 export default store;
+

@@ -18,6 +18,7 @@ const allAuthorsSlice = createSlice({
     }
 });
 
+
 export const {setAuthors} = allAuthorsSlice.actions;
 
 export default allAuthorsSlice;

@@ -16,6 +16,9 @@ const AllAuthors = () => {
 
     // const value = useSelector((state) => console.log('AllAuthors-state',state))
 
+    const value = useSelector(state => state);
+    console.log('store', value);
+
     let pageSize = 20;
     let total_authors = 1070;
 
@@ -40,7 +43,6 @@ const AllAuthors = () => {
         const fetchAutors = async () => {
             const res = await axios.get(`//localhost/api/authors?page=0&limit=20`);
             setAuthors(res.data.authors);
-            console.log(res.data);
         }
 
         fetchAutors();
