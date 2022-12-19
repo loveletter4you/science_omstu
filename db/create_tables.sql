@@ -80,8 +80,7 @@ create table if not exists source_link
     id                  bigserial primary key,
     source_id           integer       not null references sources,
     source_link_type_id integer       not null references sources_link_type,
-    link                varchar(2048) not null unique,
-    unique (source_id, source_link_type_id)
+    link                varchar(2048) not null
 );
 
 create table if not exists source_rating
@@ -137,8 +136,7 @@ create table if not exists author_publication
 (
     id             bigserial primary key,
     author_id      integer not null references authors,
-    publication_id integer not null references publications,
-    unique (author_id, publication_id)
+    publication_id integer not null references publications
 );
 
 create table if not exists author_publication_organization

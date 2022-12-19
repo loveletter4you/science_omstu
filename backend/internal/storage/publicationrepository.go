@@ -30,7 +30,7 @@ func (pr *PublicationRepository) GetPublications(page int, limit int) ([]*model.
 }
 
 func (pr *PublicationRepository) AddPublication(publication *model.Publication) error {
-	query := fmt.Sprintf("INSERT INTO publications (type_id, source_id, title, abstract, publication_date) VALUES (%d, %d, '%s', '%s', '%s') RETURNING id",
+	query := fmt.Sprintf("INSERT INTO publications (type_id, source_id, title, abstract, publication_date) VALUES (%d, %d, $$%s$$, $$%s$$, $$%s$$) RETURNING id",
 		publication.Type.Id, publication.Source.Id, publication.Title, publication.Abstract,
 		publication.PublicationDate.Format("2006-01-02"))
 	err := pr.storage.db.QueryRow(query).Scan(&publication.Id)
@@ -45,7 +45,7 @@ func (pr *PublicationRepository) AddAuthorPublication(authorPublication *model.A
 }
 
 func (pr *PublicationRepository) AddPublicationLink(link *model.PublicationLink) error {
-	query := fmt.Sprintf("INSERT INTO publication_link (publication_id, link_type_id, link) VALUES (%d, %d, '%s') RETURNING id",
+	query := fmt.Sprintf("INSERT INTO publication_link (publication_id, link_type_id, link) VALUES (%d, %d, $$%s$$) RETURNING id",
 		link.Publication.Id, link.LinkType.Id, link.Link)
 	err := pr.storage.db.QueryRow(query).Scan(&link.Id)
 	return err

@@ -20,7 +20,7 @@ func (ar *AuthorRepository) GetAuthorById(id int) (*model.Author, error) {
 }
 
 func (ar *AuthorRepository) AddAuthor(author *model.Author) error {
-	query := fmt.Sprintf("INSERT INTO authors (name, surname, patronymic) VALUES ('%s', '%s', '%s') RETURNING id",
+	query := fmt.Sprintf("INSERT INTO authors (name, surname, patronymic) VALUES ($$%s$$, $$%s$$, $$%s$$) RETURNING id",
 		author.Name, author.Surname, author.Patronymic)
 	err := ar.storage.db.QueryRow(query).Scan(&author.Id)
 	return err
@@ -33,7 +33,7 @@ func (ar *AuthorRepository) GetAuthorIdentifierIfExist(authorIdentifier *model.A
 	if err != nil {
 		return false, err
 	}
-	if exist == "true"{
+	if exist == "true" {
 		query = fmt.Sprintf("SELECT id, author_id FROM author_identifier WHERE identifier = '%s' LIMIT 1", authorIdentifier.IdentifierValue)
 		err := ar.storage.db.QueryRow(query).Scan(&authorIdentifier.Id, &authorIdentifier.Author.Id)
 		return true, err

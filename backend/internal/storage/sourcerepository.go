@@ -10,14 +10,14 @@ type SourceRepository struct {
 }
 
 func (sr *SourceRepository) GetSourceIfExist(source *model.Source) (bool, error) {
-	query := fmt.Sprintf("SELECT EXISTS(SELECT FROM sources WHERE name = '%s')", source.Name)
+	query := fmt.Sprintf("SELECT EXISTS(SELECT FROM sources WHERE name = $$%s$$)", source.Name)
 	var exist string
 	err := sr.storage.db.QueryRow(query).Scan(&exist)
 	if err != nil {
 		return false, err
 	}
 	if exist == "true" {
-		query = fmt.Sprintf("SELECT id FROM sources WHERE name = '%s' LIMIT 1", source.Name)
+		query = fmt.Sprintf("SELECT id FROM sources WHERE name = $$%s$$ LIMIT 1", source.Name)
 		err := sr.storage.db.QueryRow(query).Scan(&source.Id)
 		return true, err
 	}
@@ -25,8 +25,8 @@ func (sr *SourceRepository) GetSourceIfExist(source *model.Source) (bool, error)
 }
 
 func (sr *SourceRepository) AddSource(source *model.Source) error {
-	query := fmt.Sprintf("INSERT INTO sources (source_type_id, name) VALUES (%d, '%s') RETURNING id",
-			source.SourceType.Id, source.Name)
+	query := fmt.Sprintf("INSERT INTO sources (source_type_id, name) VALUES (%d, $$%s$$) RETURNING id",
+		source.SourceType.Id, source.Name)
 	err := sr.storage.db.QueryRow(query).Scan(&source.Id)
 	return err
 }
