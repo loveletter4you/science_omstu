@@ -4,6 +4,8 @@ import axios from "axios";
 import s from './Author.module.css'
 
 const Author = () => {
+
+
     const params = useParams();
     const [author, setAuthor] = useState([]);
 

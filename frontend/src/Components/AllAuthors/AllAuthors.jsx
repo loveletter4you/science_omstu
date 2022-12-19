@@ -9,6 +9,7 @@ import {useSelector} from "react-redux";
 const AllAuthors = () => {
     const [authors, setAuthors] = React.useState([]);
     const [seePopup, setSeePopup] = React.useState(false);
+    const [totalCount, setAuthorsTotalCount] = React.useState(20);
     // const [popupValue, setPopupValue] = React.useState('популярности');
     // onClick={() => setPopupValue('публикациям')
     // let popup = useSelector(state => state.sort.popupValue)
@@ -20,32 +21,32 @@ const AllAuthors = () => {
     console.log('store', value);
 
     let pageSize = 20;
-    let total_authors = 1070;
 
     let pages = [];
 
-    let pageCount = Math.ceil(total_authors / pageSize);
+    let pageCount = Math.ceil(totalCount / pageSize);
 
     for (let i = 1; i <= pageCount; i++) {
         pages[i] = i;
     }
 
     const handlePageClick = (e) => {
-        const fetchAutors = async () => {
+        const fetchAuthors = async () => {
             const res = await axios.get(`//localhost/api/authors?page=${e.selected}&limit=20`);
             setAuthors(res.data.authors);
-
+            setAuthorsTotalCount(res.data.total_authors)
         }
-        fetchAutors();
+        fetchAuthors();
     }
 
     React.useEffect(() => {
-        const fetchAutors = async () => {
+        const fetchAuthors = async () => {
             const res = await axios.get(`//localhost/api/authors?page=0&limit=20`);
             setAuthors(res.data.authors);
+            setAuthorsTotalCount(res.data.total_authors)
         }
 
-        fetchAutors();
+        fetchAuthors();
     }, []);
 
     return (
