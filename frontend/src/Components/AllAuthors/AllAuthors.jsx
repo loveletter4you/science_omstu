@@ -1,12 +1,13 @@
 import React from 'react';
 import axios from "axios";
-import {NavLink, useLocation, useNavigate, useParams} from "react-router-dom";
+import {NavLink} from "react-router-dom";
 import s from "./AllAuthors.module.css";
 import ReactPaginate from "react-paginate";
 import Paginator from './Paginator.css';
 import {useDispatch, useSelector} from "react-redux";
 import {setPopupValue} from "../../store/slices/sortSlice";
 import {setData} from "../../store/slices/allAuthorsSlice";
+
 
 const AllAuthors = () => {
     const [seePopup, setSeePopup] = React.useState(false);
