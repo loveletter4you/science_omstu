@@ -1,10 +1,26 @@
-.item {
-    text-transform: lowercase;
-    display: inline-flex;
 
+.block__image{
+    width: 300px;
+    height: 300px;
 }
-.first::first-letter {
-    text-transform: uppercase;
-    display: inline-flex;
 
+.block{
+    display: flex;
+    margin: 20px 0;
+    padding-left: 25px;
+    color: #2e2e2e;
+    font-size: 24px;
 }
+
+.block__info{
+    padding: 20px 30px;
+}
+
+.block__text{
+    margin-bottom: 10px;
+}
+
+.block__identifiers{
+    margin-bottom: 10px;
+}
+

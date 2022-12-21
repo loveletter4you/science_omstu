@@ -1,9 +1,13 @@
 import React from "react";
-import h from './Header.module.css'
+import s from './Header.module.css'
+import logo from '../../assets/img/logo.png'
+import Navbar from "../Navbar/Navbar";
 
 const Header = () => {
-    return <div className={h.appWrapperHeader}>
-        <div>Cris system of OmSTU</div>
+    return <div className={s.header}>
+        <img src={logo} alt=""/>
+        <Navbar/>
+
     </div>
 }
 

@@ -1,42 +1,41 @@
 package filldb
 
 import (
-	"fmt"
 	"github.com/loveletter4u/cris/internal/model"
 	"github.com/loveletter4u/cris/internal/storage"
 	"io"
+	"log"
 )
 
-func AuthorsFill(reader io.Reader, storage *storage.Storage) {
+func AuthorsFill(reader io.Reader, storage *storage.Storage) error {
 	dataSet := CSVToMap(reader)
-
-	if err := storage.Open(); err != nil {
-		fmt.Println(err)
-		return
+	authors, err := storage.Author().GetAuthors(0, 1)
+	if err != nil {
+		return err
+	}
+	if len(authors) != 0 {
+		log.Print("Authors exists")
+		return nil
 	}
 
 	spin := &model.Identifier{Name: "spin"}
 	if err := storage.Identifier().AddIdentifier(spin); err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
 
 	orcid := &model.Identifier{Name: "orcid"}
 	if err := storage.Identifier().AddIdentifier(orcid); err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
 
 	scopus := &model.Identifier{Name: "scopus"}
 	if err := storage.Identifier().AddIdentifier(scopus); err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
 
 	researcher := &model.Identifier{Name: "researcher"}
 	if err := storage.Identifier().AddIdentifier(researcher); err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
 
 	for _, row := range dataSet {
@@ -46,8 +45,7 @@ func AuthorsFill(reader io.Reader, storage *storage.Storage) {
 			Patronymic: row["patronymic"],
 		}
 		if err := storage.Author().AddAuthor(author); err != nil {
-			fmt.Println(err)
-			return
+			return err
 		}
 		if row["spin"] != "0" && row["spin"] != "" {
 			authorIdentifier := &model.AuthorIdentifier{
@@ -56,8 +54,7 @@ func AuthorsFill(reader io.Reader, storage *storage.Storage) {
 				IdentifierValue: row["spin"],
 			}
 			if err := storage.Author().AddAuthorIdentifier(authorIdentifier); err != nil {
-				fmt.Println(err)
-				return
+				return err
 			}
 		}
 		if row["orcid"] != "0" && row["orcid"] != "" {
@@ -67,7 +64,7 @@ func AuthorsFill(reader io.Reader, storage *storage.Storage) {
 				IdentifierValue: row["orcid"],
 			}
 			if err := storage.Author().AddAuthorIdentifier(authorIdentifier); err != nil {
-				return
+				return err
 			}
 		}
 		if row["scopus author id"] != "0" && row["scopus author id"] != "" {
@@ -77,7 +74,7 @@ func AuthorsFill(reader io.Reader, storage *storage.Storage) {
 				IdentifierValue: row["scopus author id"],
 			}
 			if err := storage.Author().AddAuthorIdentifier(authorIdentifier); err != nil {
-				return
+				return err
 			}
 		}
 		if row["researcher id"] != "0" && row["researcher id"] != "" {
@@ -87,9 +84,9 @@ func AuthorsFill(reader io.Reader, storage *storage.Storage) {
 				IdentifierValue: row["researcher id"],
 			}
 			if err := storage.Author().AddAuthorIdentifier(authorIdentifier); err != nil {
-				return
+				return err
 			}
 		}
 	}
-	storage.Close()
+	return nil
 }

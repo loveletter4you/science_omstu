@@ -1,0 +1,26 @@
+
+.pagination{
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 22px;
+    gap: 5px;
+    margin-bottom: 20px;
+}
+
+.pagination li{
+    padding: 8px 15px;
+    cursor: pointer;
+    border-radius: 3px;
+    font-weight: 400;
+}
+
+.pagination li:hover{
+    background-color:#5AB1BB;
+    color:#fff;
+}
+
+.pagination li.selected{
+    background-color: #1bab95;
+}

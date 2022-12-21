@@ -9,6 +9,9 @@ type AuthorRepository struct {
 	storage *Storage
 }
 
+//здесь непосредственно все запросы, если селект запросы - возвращаем ссылку на объект(ы) которые получаем
+//инсерт запросы - заполняем все необходимые поля, и получаем айдишник, который записываем в тот же объект
+
 func (ar *AuthorRepository) GetAuthorById(id int) (*model.Author, error) {
 	author := &model.Author{}
 	query := fmt.Sprintf("SELECT id, name, surname, patronymic, user_id FROM authors WHERE id = %d", id)
@@ -17,10 +20,26 @@ func (ar *AuthorRepository) GetAuthorById(id int) (*model.Author, error) {
 }
 
 func (ar *AuthorRepository) AddAuthor(author *model.Author) error {
-	query := fmt.Sprintf("INSERT INTO authors (name, surname, patronymic) VALUES ('%s', '%s', '%s') RETURNING id",
+	query := fmt.Sprintf("INSERT INTO authors (name, surname, patronymic) VALUES ($$%s$$, $$%s$$, $$%s$$) RETURNING id",
 		author.Name, author.Surname, author.Patronymic)
 	err := ar.storage.db.QueryRow(query).Scan(&author.Id)
 	return err
+}
+
+func (ar *AuthorRepository) GetAuthorIdentifierIfExist(authorIdentifier *model.AuthorIdentifier) (bool, error) {
+	query := fmt.Sprintf("SELECT EXISTS(SELECT FROM author_identifier WHERE identifier = '%s')", authorIdentifier.IdentifierValue)
+	var exist string
+	err := ar.storage.db.QueryRow(query).Scan(&exist)
+	if err != nil {
+		return false, err
+	}
+	if exist == "true" {
+		query = fmt.Sprintf("SELECT id, author_id FROM author_identifier WHERE identifier = '%s' LIMIT 1", authorIdentifier.IdentifierValue)
+		err := ar.storage.db.QueryRow(query).Scan(&authorIdentifier.Id, &authorIdentifier.Author.Id)
+		return true, err
+	} else {
+		return false, nil
+	}
 }
 
 func (ar *AuthorRepository) AddAuthorIdentifier(authorIdentifier *model.AuthorIdentifier) error {
@@ -55,9 +74,11 @@ func (ar *AuthorRepository) GetAuthorIdentifiers(author *model.Author) ([]*model
 	return authorIdentifiers, nil
 }
 
-func (ar *AuthorRepository) GetAuthors() ([]*model.Author, error) {
+func (ar *AuthorRepository) GetAuthors(page int, limit int) ([]*model.Author, error) {
+	offset := page * limit
 	authors := make([]*model.Author, 0)
-	query := "SELECT id, name, surname, patronymic, user_id FROM authors"
+	query := fmt.Sprintf("SELECT id, name, surname, patronymic, user_id FROM authors OFFSET %d LIMIT %d",
+		offset, limit)
 	rows, err := ar.storage.db.Query(query)
 	if err != nil {
 		return nil, err
@@ -71,4 +92,11 @@ func (ar *AuthorRepository) GetAuthors() ([]*model.Author, error) {
 		authors = append(authors, author)
 	}
 	return authors, nil
+}
+
+func (ar *AuthorRepository) GetAuthorsCount() (int, error) {
+	var count int
+	query := "SELECT count(*) FROM authors"
+	err := ar.storage.db.QueryRow(query).Scan(&count)
+	return count, err
 }
