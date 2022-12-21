@@ -16,7 +16,7 @@ const AllAuthors = () => {
     const dispatch = useDispatch();
 
 
-    let pageCount = Math.ceil(totalCount / pageSize);
+    let pageCount = Math.ceil(total_authors / pageSize);
 
     const handlePageClick = (e) => {
         const fetchAuthors = async () => {
@@ -31,7 +31,7 @@ const AllAuthors = () => {
             const res = await axios.get(`//localhost/api/authors?page=0&limit=20`);
             dispatch(setData(res.data));
         }
-        fetchAutors();
+        fetchAuthors();
     }, []);
 
     return (
