@@ -9,6 +9,14 @@ type SourceRepository struct {
 	storage *Storage
 }
 
+func (sr *SourceRepository) GetSourceById(id int) (*model.Source, error) {
+	source := &model.Source{Id: id,
+		SourceType: &model.SourceType{}}
+	query := fmt.Sprintf("SELECT source_type_id, name FROM sources WHERE id = %d", id)
+	err := sr.storage.db.QueryRow(query).Scan(&source.SourceType.Id, &source.Name)
+	return source, err
+}
+
 func (sr *SourceRepository) GetSourceIfExist(source *model.Source) (bool, error) {
 	query := fmt.Sprintf("SELECT EXISTS(SELECT FROM sources WHERE name = $$%s$$)", source.Name)
 	var exist string

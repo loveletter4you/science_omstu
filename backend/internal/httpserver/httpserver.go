@@ -49,4 +49,5 @@ func (server *HttpServer) Routes() {
 	api := server.router.Group("/api")
 	api.GET("/author/:id", controllers.GetAuthorById(server.storage))
 	api.GET("/authors", controllers.GetAuthors(server.storage))
+	api.GET("/publications", controllers.GetPublications(server.storage))
 }
