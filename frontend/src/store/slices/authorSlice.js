@@ -5,7 +5,8 @@ const initialState = {
     id: null,
     name: null,
     surname: null,
-    patronymic: null
+    patronymic: null,
+    identifiers: []
 };
 
 const authorSlice = createSlice({
@@ -13,11 +14,17 @@ const authorSlice = createSlice({
     initialState,
     reducers: {
         setAuthor(state, action) {
-            state = action.payload.author;
+            const {id, name, surname, patronymic} = action.payload.author;
+            const identifiers = action.payload.identifiers;
+            state.id = id;
+            state.name = name;
+            state.surname = surname;
+            state.patronymic = patronymic;
+            state.identifiers = identifiers;
         },
     }
 });
 
 export const {setAuthor} = authorSlice.actions;
 
-export default authorSlice;
+export default authorSlice.reducer;

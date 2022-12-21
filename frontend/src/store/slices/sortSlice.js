@@ -1,13 +1,16 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+const initialState = {
+    popupValue: 'популярности',
+};
+
+
 export const sortSlice = createSlice({
-    name: 'counter',
-    initialState: {
-        popupValue: 'популярности',
-    },
+    name: 'sort',
+    initialState,
     reducers: {
         setPopupValue(state, action) {
-            state.popupValue = action._payload.popupValue;
+            state.popupValue = action.payload;
         }
     },
 })
@@ -15,3 +18,5 @@ export const sortSlice = createSlice({
 export const { setPopupValue } = sortSlice.actions;
 
 export default sortSlice.reducer;
+
+

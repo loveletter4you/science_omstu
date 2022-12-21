@@ -4,37 +4,24 @@ import {NavLink, useLocation, useNavigate, useParams} from "react-router-dom";
 import s from "./AllAuthors.module.css";
 import ReactPaginate from "react-paginate";
 import Paginator from './Paginator.css';
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
+import {setPopupValue} from "../../store/slices/sortSlice";
+import {setData} from "../../store/slices/allAuthorsSlice";
 
 const AllAuthors = () => {
-    const [authors, setAuthors] = React.useState([]);
     const [seePopup, setSeePopup] = React.useState(false);
-    const [totalCount, setAuthorsTotalCount] = React.useState(20);
-    // const [popupValue, setPopupValue] = React.useState('популярности');
-    // onClick={() => setPopupValue('публикациям')
-    // let popup = useSelector(state => state.sort.popupValue)
-    // console.log(popup);
 
-    // const value = useSelector((state) => console.log('AllAuthors-state',state))
+    const {popupValue} = useSelector(state => state.sort);
+    const {authors,currentPage,pageSize,total_authors } = useSelector(state => state.allAuthors);
+    const dispatch = useDispatch();
 
-    const value = useSelector(state => state);
-    console.log('store', value);
-
-    let pageSize = 20;
-
-    let pages = [];
 
     let pageCount = Math.ceil(totalCount / pageSize);
-
-    for (let i = 1; i <= pageCount; i++) {
-        pages[i] = i;
-    }
 
     const handlePageClick = (e) => {
         const fetchAuthors = async () => {
             const res = await axios.get(`//localhost/api/authors?page=${e.selected}&limit=20`);
-            setAuthors(res.data.authors);
-            setAuthorsTotalCount(res.data.total_authors)
+            dispatch(setData(res.data));
         }
         fetchAuthors();
     }
@@ -42,11 +29,9 @@ const AllAuthors = () => {
     React.useEffect(() => {
         const fetchAuthors = async () => {
             const res = await axios.get(`//localhost/api/authors?page=0&limit=20`);
-            setAuthors(res.data.authors);
-            setAuthorsTotalCount(res.data.total_authors)
+            dispatch(setData(res.data));
         }
-
-        fetchAuthors();
+        fetchAutors();
     }, []);
 
     return (
@@ -65,15 +50,15 @@ const AllAuthors = () => {
                 <div className={s.sort}>
                     <div className={s.sort__label} onClick={() => setSeePopup(!seePopup)}>
                         <b>Сортировка по:</b>
-                        <span>dsfdsfds</span>
+                        <span>{popupValue}</span>
                     </div>
 
                     {
                         seePopup === false ? '' : <div className={s.sort__popup}>
                             <ul>
-                                <li className={s.active}>популярности</li>
-                                <li>публикациям</li>
-                                <li>алфавиту</li>
+                                <li onClick={ () => dispatch(setPopupValue('популярности',))} className={s.active}>популярности</li>
+                                <li onClick={ () => dispatch(setPopupValue('публикациям'))}>публикациям</li>
+                                <li onClick={ () => dispatch(setPopupValue('алфавиту'))}>алфавиту</li>
                             </ul>
                         </div>
                     }
