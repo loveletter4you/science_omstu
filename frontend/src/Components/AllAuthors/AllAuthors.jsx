@@ -15,18 +15,19 @@ const AllAuthors = () => {
     const {authors,currentPage,pageSize,total_authors } = useSelector(state => state.allAuthors);
     const dispatch = useDispatch();
 
-    let pageCount = Math.ceil(total_authors / pageSize);
+
+    let pageCount = Math.ceil(totalCount / pageSize);
 
     const handlePageClick = (e) => {
-        const fetchAutors = async () => {
+        const fetchAuthors = async () => {
             const res = await axios.get(`//localhost/api/authors?page=${e.selected}&limit=20`);
             dispatch(setData(res.data));
         }
-        fetchAutors();
+        fetchAuthors();
     }
 
     React.useEffect(() => {
-        const fetchAutors = async () => {
+        const fetchAuthors = async () => {
             const res = await axios.get(`//localhost/api/authors?page=0&limit=20`);
             dispatch(setData(res.data));
         }

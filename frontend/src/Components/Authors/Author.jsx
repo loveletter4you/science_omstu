@@ -6,6 +6,8 @@ import {useDispatch, useSelector} from "react-redux";
 import {setAuthor} from "../../store/slices/authorSlice";
 
 const Author = () => {
+
+
     const params = useParams();
     // const [author, setAuthor] = useState([]);
 

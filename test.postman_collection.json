@@ -86,6 +86,34 @@
 				"description": "/api/author/:id\nПолучение автора и его идентификаторов по id"
 			},
 			"response": []
+		},
+		{
+			"name": "localhost/api/publications?page=1&limit=15",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost/api/publications?page=1&limit=15",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"api",
+						"publications"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "limit",
+							"value": "15"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
