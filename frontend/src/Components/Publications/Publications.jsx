@@ -1,71 +1,57 @@
 import React from 'react';
 import s from  './Publications.module.css';
+import {useDispatch, useSelector} from "react-redux";
+import axios from "axios";
+import {setData} from "../../store/slices/publicationsSlice";
+import ReactPaginate from "react-paginate";
 
 const Publications = () => {
 
-    const [publications, setPublications] = React.useState([
-        {
-            name:'Статья',
-            autor: 'Автор',
-            year: '2022',
-            sourse: 'https://ru.wikipedia.org/wiki/Википедия:Статья'
-        },
-        {
-            name:'Статья',
-            autor: 'Автор',
-            year: '2022',
-            sourse: 'https://ru.wikipedia.org/wiki/Википедия:Статья'
-        },
-        {
-            name:'Статья',
-            autor: 'Автор',
-            year: '2022',
-            sourse: 'https://ru.wikipedia.org/wiki/Википедия:Статья'
-        },
-        {
-            name:'Статья',
-            autor: 'Автор',
-            year: '2022',
-            sourse: 'https://ru.wikipedia.org/wiki/Википедия:Статья'
-        },
-        {
-            name:'Статья',
-            autor: 'Автор',
-            year: '2022',
-            sourse: 'https://ru.wikipedia.org/wiki/Википедия:Статья'
-        },
-        {
-            name:'Статья',
-            autor: 'Автор',
-            year: '2022',
-            sourse: 'https://ru.wikipedia.org/wiki/Википедия:Статья'
-        },
-        {
-            name:'Статья',
-            autor: 'Автор',
-            year: '2022',
-            sourse: 'https://ru.wikipedia.org/wiki/Википедия:Статья'
-        },
-        {
-            name:'Статья',
-            autor: 'Автор',
-            year: '2022',
-            sourse: 'https://ru.wikipedia.org/wiki/Википедия:Статья'
-        },
-    ]);
+    const {publications,currentPage,pageSize,total_publications } = useSelector(state => state.publications);
+    const dispatch = useDispatch();
+
+    let pageCount = Math.ceil(total_publications / pageSize);
+
+    const handlePageClick = (e) => {
+        const fetchPublications = async () => {
+            const res = await axios.get(`/api/publications?page=${e.selected}&limit=20`);
+            dispatch(setData(res.data));
+        }
+        fetchPublications();
+    }
+
+    React.useEffect(() => {
+        const fetchPublications = async () => {
+            const res = await axios.get(`/api/publications?page=0&limit=20`);
+            dispatch(setData(res.data));
+        }
+        fetchPublications();
+    }, []);
 
     return (
-        <div className={s.container}>
-            {publications.map(p => <div className={s.block}>
-                <div className={s.block__item}>
-                    <p>{p.name}</p>
-                    <p>{p.autor}</p>
-                    <a href={p.sourse} target="_blank">Источник</a>
-                </div>
-                <div className={s.block__item}>
-                    <p>{p.year}</p>
+        <div>
+            <input className={s.input} placeholder='Search' type="text"/>
+            {publications === undefined ? 'Подожди пж' :publications.map(p => <div >
+                <div key={p.id} className={s.block}>
+                    <div>{p.type.name}</div>
+                    <div>{p.title}</div>
+                    <div>{p.source.Name}</div>
+                    <div>{p.publication_date}</div>
                 </div>
             </div>)}
+
+            <ReactPaginate
+                breakLabel="..."
+                nextLabel="->"
+                onPageChange={handlePageClick}
+                pageRangeDisplayed={5}
+                pageCount={pageCount}
+                previousLabel="<-"
+                renderOnZeroPageCount={null}
+
+                containerClassName='pagination'
+                activeLinkClassName='active'
+            />
         </div>
     );
 };
