@@ -1,3 +1,9 @@
+
+*{
+    padding: 0;
+    margin: 0;
+}
+
 .block{
     display: flex;
     flex-direction: column;
@@ -32,4 +38,55 @@
 
 .container{
     /*padding-left: 20px;*/
+}
+
+
+/*Sort*/
+.sort {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.sort__label {
+    display: flex;
+    align-items: center;
+}
+
+.sort__label span {
+    color: orange;
+    border-bottom: 1px dashed orange;
+    cursor: pointer;
+}
+
+.sort__popup {
+    position: absolute;
+    left: 0;
+    margin-top: 20px;
+    background: #ffffff;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.09);
+    border-radius: 10px;
+    overflow: hidden;
+    padding: 10px 0;
+    width: 160px;
+    margin-left: 55px;
+}
+
+.sort ul{
+    overflow: hidden;
+}
+
+.sort ul li{
+    padding: 12px 20px;
+    cursor: pointer;
+    margin-bottom: 5px;
+}
+
+.sort ul li.active:hover{
+    background: rgba(254, 95, 30, 0.05);
+}
+
+.sort ul li:hover{
+    font-weight: bold;
+    color: orange;
 }

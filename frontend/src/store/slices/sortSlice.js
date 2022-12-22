@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 
 
 const initialState = {
-    popupValue: 'популярности',
+    seeFiltered: 'популярности',
 };
 
 
@@ -10,13 +10,13 @@ export const sortSlice = createSlice({
     name: 'sort',
     initialState,
     reducers: {
-        setPopupValue(state, action) {
-            state.popupValue = action.payload;
+        setValue(state, action) {
+            state.seeFiltered = action.payload;
         }
-    },
+    }
 })
 
-export const { setPopupValue } = sortSlice.actions;
+export const { setValue } = sortSlice.actions;
 
 export default sortSlice.reducer;
 

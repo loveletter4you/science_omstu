@@ -10,9 +10,7 @@ import {setData} from "../../store/slices/allAuthorsSlice";
 
 
 const AllAuthors = () => {
-    const [seePopup, setSeePopup] = React.useState(false);
 
-    const {popupValue} = useSelector(state => state.sort);
     const {authors,currentPage,pageSize,total_authors } = useSelector(state => state.allAuthors);
     const dispatch = useDispatch();
 
@@ -47,25 +45,6 @@ const AllAuthors = () => {
                         </>
                     )}
                 </ul>
-
-                <div className={s.sort}>
-                    <div className={s.sort__label} onClick={() => setSeePopup(!seePopup)}>
-                        <b>Сортировка по:</b>
-                        <span>{popupValue}</span>
-                    </div>
-
-                    {
-                        seePopup === false ? '' : <div className={s.sort__popup}>
-                            <ul>
-                                <li onClick={ () => dispatch(setPopupValue('популярности',))} className={s.active}>популярности</li>
-                                <li onClick={ () => dispatch(setPopupValue('публикациям'))}>публикациям</li>
-                                <li onClick={ () => dispatch(setPopupValue('алфавиту'))}>алфавиту</li>
-                            </ul>
-                        </div>
-                    }
-
-
-                </div>
 
             </div>
 
