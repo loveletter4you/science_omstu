@@ -47,7 +47,11 @@ func (server *HttpServer) StartServer() error {
 func (server *HttpServer) Routes() {
 	//Здесь прописываем роуты
 	api := server.router.Group("/api")
-	api.GET("/author/:id", controllers.GetAuthorById(server.storage))
 	api.GET("/authors", controllers.GetAuthors(server.storage))
+	api.GET("/author/:id", controllers.GetAuthorById(server.storage))
+	api.GET("/author/:id/publications", controllers.GetAuthorPublications(server.storage))
 	api.GET("/publications", controllers.GetPublications(server.storage))
+	api.GET("/publication/:id", controllers.GetPublication(server.storage))
+	api.GET("/publication/:id/authors", controllers.GetPublicationAuthors(server.storage))
+
 }

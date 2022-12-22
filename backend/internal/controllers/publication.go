@@ -36,3 +36,42 @@ func GetPublications(s *storage.Storage) func(c *gin.Context) {
 		c.JSON(http.StatusOK, response)
 	}
 }
+
+func GetPublication(s *storage.Storage) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		publication, err := s.Publication().GetPublicationById(id)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		response := map[string]interface{}{
+			"publication": publication,
+		}
+		c.JSON(http.StatusOK, response)
+
+	}
+}
+
+func GetPublicationAuthors(s *storage.Storage) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		authors, err := s.Publication().GetPublicationAuthors(id)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		response := map[string]interface{}{
+			"authors": authors,
+		}
+		c.JSON(http.StatusOK, response)
+	}
+}
