@@ -33,11 +33,11 @@ const Publications = () => {
     }, []);
 
     return (
-        <div onClick={() => setSeeFiltered(seeFiltered === false)}>
+        <div onClick={() => {if(seeFiltered === true) setSeeFiltered(false)} }>
             <input className={s.input} placeholder='Search' type="text"/>
             <div className={s.sort}>
-                <div className={s.sort__label} onClick={() => setSeeFiltered(seeFiltered === true)}>
-                    <b>Сортировка по: {filteredValue.seeFiltered}</b>
+                <div className={s.sort__label} >
+                    <b onClick={() => setSeeFiltered(true)}>Сортировка по: {filteredValue.seeFiltered}</b>
                 </div>
                 {seeFiltered === false ? '' : <div className={s.sort__popup}>
                     <ul>
