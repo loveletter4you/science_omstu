@@ -13,7 +13,7 @@ const fetchAuthors = createAsyncThunk(
 const initialState = {
     authors: [],
     pageSize: 20,
-    total_authors: 1070,
+    total_authors: 1,
     currentPage: 1
 };
 
