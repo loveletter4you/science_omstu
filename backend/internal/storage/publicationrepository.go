@@ -90,6 +90,51 @@ func (pr *PublicationRepository) GetPublications(page int, limit int) ([]*model.
 	return publications, nil
 }
 
+func (pr *PublicationRepository) GetPublicationById(id int) (*model.Publication, error) {
+	publication := &model.Publication{
+		Type:   &model.PublicationType{},
+		Source: &model.Source{},
+	}
+	query := fmt.Sprintf("SELECT id, type_id, source_id, title, publication_date"+
+		" FROM publications WHERE id = %d", id)
+	err := pr.storage.db.QueryRow(query).Scan(&publication.Id, &publication.Type.Id, &publication.Source.Id,
+		&publication.Title, &publication.PublicationDate)
+	if err != nil {
+		return nil, err
+	}
+	publication.Type, err = pr.GetPublicationType(publication.Type.Id)
+	if err != nil {
+		return nil, err
+	}
+	publication.Source, err = pr.storage.Source().GetSourceById(publication.Source.Id)
+	if err != nil {
+		return nil, err
+	}
+	return publication, nil
+}
+
+func (pr *PublicationRepository) GetPublicationAuthors(pubId int) ([]*model.Author, error) {
+	authors := make([]*model.Author, 0)
+	query := fmt.Sprintf("SELECT author_id FROM author_publication WHERE publication_id = %d", pubId)
+	rows, err := pr.storage.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var authorId int
+		if err := rows.Scan(&authorId); err != nil {
+			return nil, err
+		}
+		author, err := pr.storage.Author().GetAuthorById(authorId)
+		if err != nil {
+			return nil, err
+		}
+		authors = append(authors, author)
+	}
+	return authors, nil
+}
+
 func (pr *PublicationRepository) GetPublicationType(id int) (*model.PublicationType, error) {
 	publicationType := &model.PublicationType{Id: id}
 	query := fmt.Sprintf("SELECT name FROM publication_types WHERE id = %d", id)

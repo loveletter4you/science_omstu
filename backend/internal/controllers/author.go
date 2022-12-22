@@ -64,3 +64,22 @@ func GetAuthorById(s *storage.Storage) func(c *gin.Context) {
 		c.JSON(http.StatusOK, response)
 	}
 }
+
+func GetAuthorPublications(s *storage.Storage) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		publications, err := s.Author().GetAuthorPublicationsById(id)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		response := map[string]interface{}{
+			"publications": publications,
+		}
+		c.JSON(http.StatusOK, response)
+	}
+}

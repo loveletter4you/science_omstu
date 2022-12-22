@@ -94,6 +94,28 @@ func (ar *AuthorRepository) GetAuthors(page int, limit int) ([]*model.Author, er
 	return authors, nil
 }
 
+func (ar *AuthorRepository) GetAuthorPublicationsById(authorId int) ([]*model.Publication, error) {
+	publications := make([]*model.Publication, 0)
+	query := fmt.Sprintf("SELECT publication_id FROM author_publication WHERE author_id = %d", authorId)
+	rows, err := ar.storage.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var publicationId int
+		if err := rows.Scan(&publicationId); err != nil {
+			return nil, err
+		}
+		publication, err := ar.storage.Publication().GetPublicationById(publicationId)
+		if err != nil {
+			return nil, err
+		}
+		publications = append(publications, publication)
+	}
+	return publications, nil
+}
+
 func (ar *AuthorRepository) GetAuthorsCount() (int, error) {
 	var count int
 	query := "SELECT count(*) FROM authors"
