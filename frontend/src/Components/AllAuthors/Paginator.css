@@ -17,10 +17,15 @@
 }
 
 .pagination li:hover{
-    background-color:#5AB1BB;
+    background-color:#858597;
     color:#fff;
+    border-radius: 10px;
+
 }
 
 .pagination li.selected{
-    background-color: #1bab95;
+    background-color: #282830;
+    color: #fff;
+    border-radius: 10px;
+
 }

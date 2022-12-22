@@ -21,7 +21,7 @@ const AllAuthors = () => {
 
     const handlePageClick = (e) => {
         const fetchAuthors = async () => {
-            const res = await axios.get(`//localhost/api/authors?page=${e.selected}&limit=20`);
+            const res = await axios.get(`/api/authors?page=${e.selected}&limit=20`);
             dispatch(setData(res.data));
         }
         fetchAuthors();
@@ -29,7 +29,7 @@ const AllAuthors = () => {
 
     React.useEffect(() => {
         const fetchAuthors = async () => {
-            const res = await axios.get(`//localhost/api/authors?page=0&limit=20`);
+            const res = await axios.get(`/api/authors?page=0&limit=20`);
             dispatch(setData(res.data));
         }
         fetchAuthors();

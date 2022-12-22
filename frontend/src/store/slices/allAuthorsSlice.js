@@ -5,7 +5,7 @@ import axios from "axios";
 const fetchAuthors = createAsyncThunk(
     'authors/fetchAuthorsAll',
     async (userId, thunkAPI) => {
-        const {data} = await axios.get(`//localhost/api/authors?page=0&limit=20`);
+        const {data} = await axios.get(`/api/authors?page=0&limit=20`);
         return data;
     }
 )
