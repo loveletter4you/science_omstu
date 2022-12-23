@@ -3,7 +3,8 @@ import {NavLink, useParams} from "react-router-dom";
 import axios from "axios";
 import s from './Author.module.css'
 import {useDispatch, useSelector} from "react-redux";
-import {setAuthor} from "../../store/slices/authorSlice";
+import {setAuthor, setPublic} from "../../store/slices/authorSlice";
+import avatar from "./../../assets/img/avatar.svg"
 
 const Author = () => {
 
@@ -13,32 +14,46 @@ const Author = () => {
 
     const dispatch = useDispatch();
     const author = useSelector(state => state.author);
+    const publication = author.publications;
     const identifiers = author.identifiers;
-    console.log(author);
 
     React.useEffect(() => {
-        const fecthAuthor = async () => {
+        const fetchAuthor = async () => {
             const res = await axios.get(`/api/author/${params.id}`);
             dispatch(setAuthor(res.data));
         }
 
-        fecthAuthor();
+        fetchAuthor();
+    }, [])
+
+    React.useEffect(() => {
+        const fetchPublic = async () => {
+            const res = await axios.get(`/api/author/${params.id}/publications`);
+            dispatch(setPublic(res.data));
+        }
+        fetchPublic();
     }, [])
 
     return (<div>
             {author === undefined ? 'Ну подождите пж' : <>
                 <div className={s.block}>
                     <img className={s.block__image}
-                         src="https://yt3.ggpht.com/ytc/AKedOLT51aPd9DvTdZwDGPIek8Q0dyfxdZ0iaqok41yx1RQ=s900-c-k-c0x00ffffff-no-rj"
+                         src={avatar}
                          alt=""/>
                     <div className={s.block__info}>
                         <p className={s.block__text}>{author.surname} {author.name} {author.patronymic}</p>
-
                         { identifiers === undefined ? '' :identifiers.map(i => <p className={s.block__identifiers}>
                             {i.identifier_info.name}: {i.identifier}
                         </p>)}
                     </div>
                 </div>
+                Публикации:
+                <div>{publication === undefined? ' ' : publication.map(p => <div className={s.public}>
+                    <p>{p.type.name}</p>
+                    <NavLink to={"/publication/" + p.id}><p>{p.title}</p></NavLink>
+                    <p>{p.source.Name}</p>
+                    <p>{p.publication_date}</p>
+                </div>)}</div>
             </>
             }
         </div>

@@ -10,11 +10,14 @@ const fetchPublications = createAsyncThunk(
     }
 )
 
+
 const initialState = {
     publications: [],
     pageSize: 20,
     total_publications: 1070,
-    currentPage: 1
+    currentPage: 1,
+    authors: []
+
 };
 
 const publicationsSlice = createSlice({
@@ -26,11 +29,15 @@ const publicationsSlice = createSlice({
             state.publications = publications;
             state.total_publications = total_publications;
         },
+        setAuthors(state, action) {
+            const authors = action.payload.authors;
+            state.authors = authors;
+        }
     }
 });
 
 
-export const {setData} = publicationsSlice.actions;
+export const {setData, setAuthors} = publicationsSlice.actions;
 
 export default publicationsSlice.reducer;
 

@@ -8,6 +8,8 @@ import Author from "./Components/Authors/Author";
 import Publications from "./Components/Publications/Publications";
 import Auth from "./Components/Auth/Auth";
 import SignUp from "./Components/Auth/SignUp";
+import OnePublication from "./Components/OnePublication/OnePublication";
+import AuthorsOfPublication from "./Components/Publications/AuthorsOfPublication";
 
 function App(props) {
     return <div className='app-wrapper'>
@@ -19,8 +21,12 @@ function App(props) {
                            element={<Author/>}/>
                     <Route path='/authors'
                            element={<AllAuthors/>}/>
+                    <Route path={'/publication/:id/authors'}
+                           element={<AuthorsOfPublication/>}/>
                     <Route path='/publications'
                            element={<Publications/>}/>
+                    <Route path='/publication/:id'
+                           element={<OnePublication/>}/>
                     <Route path = '/login'
                            element={<Auth/>}/>
                     <Route path = '/registration'

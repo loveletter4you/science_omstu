@@ -9,7 +9,7 @@ const Auth = () => {
         reset();
     }
     return <div className={s.form}>
-        <h1>Войти</h1>
+        <h1>Вход</h1>
         <div className={s.inp}>
         <form onSubmit = {handleSubmit(onSubmit)}>
             <div className={s.log}>

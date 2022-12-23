@@ -3,6 +3,7 @@ import allAuthorsReducer from "./slices/allAuthorsSlice";
 import authorReducer from "./slices/authorSlice";
 import sortReducer from "./slices/sortSlice";
 import publicationsSlice from "./slices/publicationsSlice";
+import onePublicSlice from "./slices/onePublicSlice";
 
 
 const store = configureStore({
@@ -10,8 +11,9 @@ const store = configureStore({
         allAuthors: allAuthorsReducer,
         author: authorReducer,
         sort: sortReducer,
-        publications: publicationsSlice
-    },
+        publications: publicationsSlice,
+        onePublic: onePublicSlice
+    }
 })
 
 
