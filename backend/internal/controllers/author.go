@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/loveletter4u/cris/internal/model"
 	"github.com/loveletter4u/cris/internal/storage"
 	"net/http"
 	"strconv"
@@ -22,15 +23,31 @@ func GetAuthors(s *storage.Storage) func(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		authors, err := s.Author().GetAuthors(page, limit)
-		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
-			return
-		}
-		authorCount, err := s.Author().GetAuthorsCount()
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
+		search := c.DefaultQuery("search", "")
+		var authors []*model.Author
+		var authorCount int
+		if search == "" {
+			authors, err = s.Author().GetAuthors(page, limit)
+			if err != nil {
+				c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+				return
+			}
+			authorCount, err = s.Author().GetAuthorsCount()
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				return
+			}
+		} else {
+			authors, err = s.Author().GetAuthorsSearch(page, limit, search)
+			if err != nil {
+				c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+				return
+			}
+			authorCount, err = s.Author().GetAuthorsSearchCount(search)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				return
+			}
 		}
 		response := map[string]interface{}{
 			"authors":       authors,

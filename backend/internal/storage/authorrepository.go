@@ -94,6 +94,27 @@ func (ar *AuthorRepository) GetAuthors(page int, limit int) ([]*model.Author, er
 	return authors, nil
 }
 
+func (ar *AuthorRepository) GetAuthorsSearch(page int, limit int, search string) ([]*model.Author, error) {
+	offset := page * limit
+	authors := make([]*model.Author, 0)
+	query := fmt.Sprintf("SELECT id, name, surname, patronymic, user_id FROM authors"+
+		" WHERE lower(name) LIKE '%%%s%%' OR lower(surname) LIKE '%%%s%%' OFFSET %d LIMIT %d",
+		search, search, offset, limit)
+	rows, err := ar.storage.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		author := &model.Author{}
+		if err := rows.Scan(&author.Id, &author.Name, &author.Surname, &author.Patronymic, &author.UserID); err != nil {
+			return nil, err
+		}
+		authors = append(authors, author)
+	}
+	return authors, nil
+}
+
 func (ar *AuthorRepository) GetAuthorPublicationsById(authorId int) ([]*model.Publication, error) {
 	publications := make([]*model.Publication, 0)
 	query := fmt.Sprintf("SELECT publication_id FROM author_publication WHERE author_id = %d", authorId)
@@ -114,6 +135,14 @@ func (ar *AuthorRepository) GetAuthorPublicationsById(authorId int) ([]*model.Pu
 		publications = append(publications, publication)
 	}
 	return publications, nil
+}
+
+func (ar *AuthorRepository) GetAuthorsSearchCount(search string) (int, error) {
+	var count int
+	query := fmt.Sprintf("SELECT count(*) FROM authors  WHERE lower(name) "+
+		"LIKE '%%%s%%' OR lower(surname) LIKE '%%%s%%'", search, search)
+	err := ar.storage.db.QueryRow(query).Scan(&count)
+	return count, err
 }
 
 func (ar *AuthorRepository) GetAuthorsCount() (int, error) {
