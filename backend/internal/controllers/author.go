@@ -6,6 +6,7 @@ import (
 	"github.com/loveletter4u/cris/internal/storage"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 // Контролеры для роутов, тут обращаемся к методам сторейджа,
@@ -38,6 +39,7 @@ func GetAuthors(s *storage.Storage) func(c *gin.Context) {
 				return
 			}
 		} else {
+			search = strings.ToLower(search)
 			authors, err = s.Author().GetAuthorsSearch(page, limit, search)
 			if err != nil {
 				c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
