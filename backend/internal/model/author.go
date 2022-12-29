@@ -20,12 +20,12 @@ type AuthorIdentifier struct {
 }
 
 type Interest struct {
-	Id   int
-	Name string
+	Id   int    `json:"id"`
+	Name string `json:"name"`
 }
 
 type AuthorInterest struct {
-	Id       int64
-	Interest *Interest
-	Author   *Author
+	Id       int64     `json:"id"`
+	Interest *Interest `json:"interest"`
+	Author   *Author   `json:"author"`
 }

@@ -17,16 +17,16 @@ type PublicationType struct {
 }
 
 type KeywordPublication struct {
-	Id          int64
-	Publication *Publication
-	Keyword     *Keyword
+	Id          int64        `json:"id"`
+	Publication *Publication `json:"publication"`
+	Keyword     *Keyword     `json:"keyword"`
 }
 
 type PublicationLink struct {
-	Id          int64
-	Publication *Publication
-	LinkType    *PublicationLinkType
-	Link        string
+	Id          int64                `json:"id"`
+	Publication *Publication         `json:"publication"`
+	LinkType    *PublicationLinkType `json:"linkType"`
+	Link        string               `json:"link"`
 }
 
 type PublicationLinkType struct {

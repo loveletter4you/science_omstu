@@ -37,6 +37,20 @@ func GetPublications(s *storage.Storage) func(c *gin.Context) {
 	}
 }
 
+func GetPublicationsType(s *storage.Storage) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		publicationTypes, err := s.Publication().GetPublicationTypes()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		response := map[string]interface{}{
+			"publication_types": publicationTypes,
+		}
+		c.JSON(http.StatusOK, response)
+	}
+}
+
 func GetPublication(s *storage.Storage) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))

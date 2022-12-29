@@ -1,14 +1,14 @@
 package model
 
 type Organization struct {
-	Id      int
-	Name    string
-	Country string
-	City    string
+	Id      int    `json:"id"`
+	Name    string `json:"name"`
+	Country string `json:"country"`
+	City    string `json:"city"`
 }
 
 type AuthorPublicationOrganization struct {
-	Id                int
-	AuthorPublication *AuthorPublication
-	Organization      *Organization
+	Id                int                `json:"id"`
+	AuthorPublication *AuthorPublication `json:"author_publication"`
+	Organization      *Organization      `json:"organization"`
 }

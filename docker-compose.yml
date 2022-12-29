@@ -44,7 +44,10 @@ services:
     build: 
       context: nginx/
       dockerfile: Dockerfile
-    restart: on-failure
+    restart: always
+    depends_on:
+      - "backend"
+      - "frontend"
     volumes:
       - ./nginx:/etc/nginx/
     ports:

@@ -135,6 +135,24 @@ func (pr *PublicationRepository) GetPublicationAuthors(pubId int) ([]*model.Auth
 	return authors, nil
 }
 
+func (pr *PublicationRepository) GetPublicationTypes() ([]*model.PublicationType, error) {
+	publicationTypes := make([]*model.PublicationType, 0)
+	query := "SELECT id, name FROM publication_types"
+	rows, err := pr.storage.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		publicationType := &model.PublicationType{}
+		if err := rows.Scan(&publicationType.Id, &publicationType.Name); err != nil {
+			return nil, err
+		}
+		publicationTypes = append(publicationTypes, publicationType)
+	}
+	return publicationTypes, nil
+}
+
 func (pr *PublicationRepository) GetPublicationType(id int) (*model.PublicationType, error) {
 	publicationType := &model.PublicationType{Id: id}
 	query := fmt.Sprintf("SELECT name FROM publication_types WHERE id = %d", id)

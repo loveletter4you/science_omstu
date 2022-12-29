@@ -7,7 +7,7 @@ import s from './Footer.module.css'
 const Footer = () => {
     return <div className={s.footer}>
         <br/><br/>
-        <p>©2022 ОмГТУ</p>
+        <p>©2023 ОмГТУ</p>
 
     </div>
 }

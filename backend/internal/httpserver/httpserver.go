@@ -51,7 +51,7 @@ func (server *HttpServer) Routes() {
 	api.GET("/author/:id", controllers.GetAuthorById(server.storage))
 	api.GET("/author/:id/publications", controllers.GetAuthorPublications(server.storage))
 	api.GET("/publications", controllers.GetPublications(server.storage))
+	api.GET("/publications/types", controllers.GetPublicationsType(server.storage))
 	api.GET("/publication/:id", controllers.GetPublication(server.storage))
 	api.GET("/publication/:id/authors", controllers.GetPublicationAuthors(server.storage))
-
 }

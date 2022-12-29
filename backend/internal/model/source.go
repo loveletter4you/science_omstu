@@ -3,14 +3,14 @@ package model
 import "time"
 
 type Source struct {
-	Id         int
-	SourceType *SourceType
-	Name       string
+	Id         int         `json:"id"`
+	SourceType *SourceType `json:"source_type"`
+	Name       string      `json:"name"`
 }
 
 type SourceType struct {
-	Id   int
-	Name string
+	Id   int    `json:"id"`
+	Name string `json:"name"`
 }
 
 type SourceLinkType struct {
