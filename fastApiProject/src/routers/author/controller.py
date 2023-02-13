@@ -1,7 +1,7 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
-from src.routers.author.service import service_get_authors, service_get_authors_search
+from src.routers.author.service import service_get_authors, service_get_authors_search, service_fill_authors
 
 
 async def controller_get_authors(search: str, page: int, limit: int, db: Session):
@@ -22,5 +22,6 @@ async def controller_get_author_publications(id: int, db: Session):
     return {"asd": id}
 
 
-async def controller_fill_authors(filepath: str, db: Session):
-    return {}
+async def controller_fill_authors(file: UploadFile, db: Session):
+    message = await service_fill_authors(file, db)
+    return message

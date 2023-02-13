@@ -1,6 +1,6 @@
 import shutil
 
-from fastapi import APIRouter, Depends, UploadFile
+from fastapi import APIRouter, Depends, UploadFile, File
 from sqlalchemy.orm import Session
 
 from src.model.database import get_db
@@ -35,10 +35,7 @@ async def get_author_publications(id: int):
 
 
 @router.post('/upload_authors')
-async def authors_fill(file: UploadFile, db: Session = Depends(get_db)):
-    filename = file.filename
-    with open(f'/uploads/{filename}', "wb") as wf:
-        shutil.copyfileobj(file.file, wf)
-        file.file.close()
-    message = await controller_fill_authors(f'/uploads/{filename}', db)
+async def authors_fill(file: UploadFile = File(...), db: Session = Depends(get_db)):
+    message = await controller_fill_authors(file, db)
+    print(message)
     return message
