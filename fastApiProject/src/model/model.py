@@ -27,6 +27,7 @@ class Author(Base):
     name = Column(String, nullable=False)
     surname = Column(String, nullable=False)
     patronymic = Column(String)
+    confirmed = Column(Boolean, nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'))
     author_identifiers = relationship("AuthorIdentifier", backref='author')
     author_publications = relationship("AuthorPublication", backref='author')
@@ -99,7 +100,7 @@ class PublicationType(Base):
     __tablename__ = "publication_type"
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False, unique=True)
-    publications = relationship("Publication")
+    publications = relationship("Publication", backref='publication_type')
 
 
 class Publication(Base):

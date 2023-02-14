@@ -1,28 +1,30 @@
 import pandas as pd
 from fastapi import UploadFile
-from sqlalchemy import or_, and_
+from sqlalchemy import or_, and_, func
 from sqlalchemy.orm import Session
 
 from src.model.model import Author, Identifier, AuthorIdentifier
 
 
 async def service_get_authors(offset: int, limit: int, db: Session):
-    authors_count = db.query(Author).count()
-    authors = db.query(Author).offset(offset).limit(limit).all()
+    authors_count = db.query(Author).filter(Author.confirmed).count()
+    authors = db.query(Author).filter(Author.confirmed).offset(offset).limit(limit).all()
     return dict(authors=authors, authors_count=authors_count)
 
 
 async def service_get_authors_search(search: str, offset: int, limit: int, db: Session):
-    name = search.split(' ')
+    name = search.lower().split(' ')
     if len(name) == 1:
-        authors_query = db.query(Author).filter(or_(Author.name.contains(name[0]), Author.surname.contains(name[0])))
+        authors_query = db.query(Author).filter(Author.confirmed).\
+            filter(or_(func.lower(Author.name).contains(name[0]),
+            func.lower(Author.surname).contains(name[0])))
         authors_count = authors_query.count()
         authors = authors_query.offset(offset).limit(limit).all()
         return dict(authors=authors, authors_count=authors_count)
     else:
-        authors_query = db.query(Author).filter(
-            or_(and_(Author.name.contains(name[0]), Author.surname.contains(name[1])),
-                and_(Author.name.contains(name[1]), Author.surname.contains(name[0]))))
+        authors_query = db.query(Author).filter(Author.confirmed).filter(
+            or_(and_(func.lower(Author.name).contains(name[0]), func.lower(Author.surname).contains(name[1])),
+                and_(func.lower(Author.name).contains(name[1]), func.lower(Author.surname).contains(name[0]))))
         authors_count = authors_query.count()
         authors = authors_query.offset(offset).limit(limit).all()
         return dict(authors=authors, authors_count=authors_count)
@@ -54,7 +56,8 @@ async def service_fill_authors(file: UploadFile, db: Session):
         author = Author(
             name=row['name'],
             surname=row['surname'],
-            patronymic=row['patronymic']
+            patronymic=row['patronymic'],
+            confirmed=True
         )
         db.add(author)
         if str(row['spin']) != "0":

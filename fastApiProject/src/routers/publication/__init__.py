@@ -1,7 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, UploadFile, File, Depends
+from sqlalchemy.orm import Session
 
+from src.model.database import get_db
 from src.routers.publication.controller import controller_get_publications, controller_get_publication_types, \
-    controller_get_publication_by_id, controller_get_publication_authors_by_id
+    controller_get_publication_by_id, controller_get_publication_authors_by_id, controller_fill_scopus
 
 router = APIRouter(
     prefix="/api/publication",
@@ -28,7 +30,13 @@ async def get_publication_by_id(id: int):
     return publication
 
 
-@router.get("/publication/{id}/authors")
+@router.get("/{id}/authors")
 async def get_publication_authors_by_id(id: int):
     authors = await controller_get_publication_authors_by_id(id)
     return authors
+
+
+@router.post("/scopus/fill")
+async def scopus_fill(file: UploadFile = File(...), db: Session = Depends(get_db)):
+    message = await controller_fill_scopus(file, db)
+    return message
