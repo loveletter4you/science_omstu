@@ -2,12 +2,39 @@ import pandas as pd
 import numpy as np
 from fastapi import UploadFile
 from sqlalchemy import and_, or_
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 import datetime
 
 from src.model.model import PublicationLinkType, SourceType, SourceLinkType, Identifier, Source, SourceLink, \
-    PublicationType, Publication, PublicationLink, AuthorIdentifier, AuthorPublication, Author
+    PublicationType, Publication, PublicationLink, AuthorIdentifier, AuthorPublication, Author, \
+    AuthorPublicationOrganization
+
+
+async def service_get_publications(offset: int, limit: int, accepted: bool, db: Session):
+    publications = db.query(Publication)\
+        .filter(Publication.accepted == accepted)\
+        .options(joinedload(Publication.publication_type))\
+        .options(joinedload(Publication.publication_authors).joinedload(AuthorPublication.author))\
+        .offset(offset).limit(limit).all()
+    count = db.query(Publication).filter(Publication.accepted == accepted).count()
+    return dict(publications=publications, count=count)
+
+
+async def service_get_publications_search(search: str, offset: int, limit: int, accepted: bool, db: Session):
+    return
+
+
+async def service_get_publication(id: int, db: Session):
+    publication = db.query(Publication) \
+        .filter(Publication.id == id) \
+        .options(joinedload(Publication.publication_type)) \
+        .options(joinedload(Publication.publication_authors).joinedload(AuthorPublication.author))\
+        .options(joinedload(Publication.publication_authors)
+                 .joinedload(AuthorPublication.author_publication_organizations)
+                 .joinedload(AuthorPublicationOrganization.organization))\
+        .options(joinedload(Publication.source).joinedload(Source.source_type)).first()
+    return dict(publication=publication)
 
 
 async def service_fill_scopus(file: UploadFile, db: Session):

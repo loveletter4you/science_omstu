@@ -13,20 +13,16 @@ router = APIRouter(
 
 
 @router.get("")
-async def get_publications(page: int = 0, limit: int = 20):
-    publications = await controller_get_publications(page, limit)
+async def get_publications(search: str = None,
+                           page: int = 0, limit: int = 20, accepted: bool = True,
+                           db: Session = Depends(get_db)):
+    publications = await controller_get_publications(search, page, limit, accepted, db)
     return publications
 
 
-@router.get("/types")
-async def get_publication_types():
-    publication_types = await controller_get_publication_types()
-    return publication_types
-
-
 @router.get("/{id}")
-async def get_publication_by_id(id: int):
-    publication = await controller_get_publication_by_id(id)
+async def get_publication_by_id(id: int, db: Session = Depends(get_db)):
+    publication = await controller_get_publication_by_id(id, db)
     return publication
 
 
