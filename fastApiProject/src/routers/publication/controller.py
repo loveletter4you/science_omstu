@@ -24,10 +24,6 @@ async def controller_get_publication_by_id(id: int, db: Session):
     return publication
 
 
-async def controller_get_publication_authors_by_id(id: int):
-    return {"asd": id}
-
-
 async def controller_fill_scopus(file: UploadFile, db: Session):
     message = await service_fill_scopus(file, db)
     return message

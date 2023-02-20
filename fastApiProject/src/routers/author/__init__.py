@@ -7,6 +7,7 @@ from src.model.database import get_db
 from src.routers.author.controller import controller_get_authors, controller_get_author, \
     controller_get_author_publications, controller_fill_authors
 
+
 router = APIRouter(
     prefix="/api/author",
     tags=["author"],
