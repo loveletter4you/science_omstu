@@ -1,0 +1,55 @@
+
+
+.item{
+    padding-left: 0px;
+}
+
+.list__item{
+    color:#2e2e2e;
+    font-size: 18px;
+    border: none;
+    outline: none;
+    list-style-type: none;
+    margin-bottom: 5px;
+}
+
+
+
+.list__item a{
+    text-decoration: none;
+    color:inherit;
+}
+
+.list__item a:hover{
+    color: #06c895;
+}
+
+.block{
+    display: flex;
+    flex-direction: column;
+}
+
+.block__item{
+    display: flex;
+    justify-content: space-between;
+}
+
+.size{
+    padding-top: 15px;
+}
+
+.size ul{
+    list-style: none;
+    display: inline;
+    padding-inline-start: 0;
+    font-size: 18px;
+}
+.size ul li {
+    display: inline-block;
+    padding: 5px;
+}
+.size li:active{
+    color: #06c895;
+    font-family: 'Aeroport-Bold';
+    font-weight: bold;
+}

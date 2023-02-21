@@ -1,0 +1,25 @@
+.block{
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #000;
+    padding: 10px;
+    margin: 15px 0;
+    font-size: 16px;
+    border-radius: 10px;
+}
+
+.authors{
+    font-size: 16px;
+    padding: 10px;
+    margin: 15px 0;
+    border: 1px solid #000;
+    border-radius: 10px;
+}
+
+.authors a{
+    color: black;
+    text-decoration: none;
+}
+.authors a:hover{
+    color: #06c895;
+}

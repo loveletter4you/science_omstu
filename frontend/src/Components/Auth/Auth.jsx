@@ -24,16 +24,19 @@ const Auth = () => {
                     {required: true, minLength: 6, maxLength: 30}))} />
             </div>
             <div className={s.rem}>
+                <label className={s.container}>
                 <input className={s.inp} type={"checkbox"}/> Запомнить меня
-
+                    <span className={s.highload}></span>
+                </label>
             </div>
             <div>
                 <button className={s.btn}>Войти</button>
             </div>
+            <div className={s.reg}><NavLink to={"/registration"}>Зарегистрироваться</NavLink></div>
+            <div className= {s.reg}><NavLink to={"/recovery"}>Забыли пароль?</NavLink></div>
         </form>
         </div>
-        <div className={s.reg}><NavLink to={"/registration"}>Зарегистрироваться</NavLink></div>
-        <div className= {s.reg}><NavLink to={"/recovery"}>Забыли пароль?</NavLink></div>
+
     </div>
 }
 

@@ -1,23 +1,33 @@
 .app-wrapper {
-    width: 100%;
-    /*background-color: rgba(79, 143, 154, 0.27);*/
     padding-top: 12px;
-    height: 100vh;
-    font-family: 'Roboto', sans-serif;
+    font-size: 18px;
+    box-sizing: border-box;
+    transition: .5s ease-in-out;
+
+}
+
+.main {
+    min-height: 1px;
 }
 
 .app-wrapper__container{
-    width: 1200px;
+    min-width: 390px;
     margin: 0 auto;
-    background-color: white;
-    padding: 15px 20px;
-
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+    max-width: 1200px;
+    display: grid;
+    grid-template-areas:
+            'header' 'content' 'footer';
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
 }
 
 .app-wrapper-content {
-    flex: 1 1;
+    grid-area: content;
+}
+
+@media (max-width: 991px) {
+.app-wrapper__container{
+    margin-left: 10px;
+    margin-right: 10px;
+}
 }
 

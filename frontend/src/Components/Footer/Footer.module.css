@@ -1,8 +1,17 @@
 .footer {
-    background-color: #282830;
-    font-size: 17px;
-    color: white;
+    grid-area: footer;
+    font-size: 14px;
     padding: 10px 20px;
+    background: #FFFFFF;
+    border-width: 2px 1px 1px 1px;
+    border-style: solid;
+    border-color: #000000;
     border-radius: 10px;
-    margin-bottom: 50px;
+    margin-bottom: 15px;
+}
+
+@media (max-width: 991px) {
+    .footer{
+       min-width: 350px;
+    }
 }

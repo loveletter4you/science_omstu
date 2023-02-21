@@ -1,8 +1,27 @@
 .header {
+    grid-area: header;
+    min-width: 310px;
+    max-width: 1200px;
+    box-shadow: 3px 3px 1px rgba(0, 0, 0, .05);
+    margin-bottom: 30px;
+    position: relative;
     display: flex;
+    font-size: 50px;
     justify-content: space-between;
     padding: 20px 30px;
-    background-color: white;
-    box-shadow: 0px 0px 5px #000000;
+    background: #FFFFFF;
+    border-width: 1px 1px 2px 1px;
+    border-style: solid;
+    border-color: #000000;
     border-radius: 10px;
+}
+.head{
+    font-family: 'Rajdhani';
+}
+@media (max-width: 991px) {
+    .header{
+        height: 50px;
+        font-size: 40px;
+        margin-bottom: 10px;
+    }
 }

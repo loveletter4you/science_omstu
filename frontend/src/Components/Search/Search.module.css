@@ -1,0 +1,27 @@
+.search{
+    grid-area: search;
+    align-self: center;
+    width: 660px;
+    padding: 5px 10px;
+    font-size: 16px;
+    outline: none;
+    border: 1px solid #000;
+    border-radius: 10px;
+    margin-right: 270px;
+    margin-left: 270px;
+}
+.search::placeholder{
+    font-size: 16px;
+}
+
+.search:focus{
+    border: 2px solid #000;
+}
+@media (max-width: 991px) {
+    .search{
+        align-self: normal;
+        width: auto;
+        min-width: 350px;
+        margin: 0;
+    }
+}

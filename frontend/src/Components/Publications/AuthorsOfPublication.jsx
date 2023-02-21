@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {NavLink, useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import axios from "axios";
-import {setAuthors} from "../../store/slices/publicationsSlice";
+import {setAuthors} from "../../store/slices/PublicationsSlice";
 
 const AuthorsOfPublication = (props) => {
 

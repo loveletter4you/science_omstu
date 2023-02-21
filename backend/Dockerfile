@@ -1,13 +1,6 @@
-FROM golang:1.19.3-alpine AS builder
-
+FROM python:3.10
+RUN apt-get update -y && apt-get install -y build-essential
 WORKDIR /backend
-COPY go.mod go.sum ./
-RUN go mod download
-COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o /main ./cmd/httpserver/httpserver.go
-
-FROM scratch
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder main /bin/main
-
-ENTRYPOINT ["/bin/main"]
+COPY ./requirements.txt /backend/requirements.txt
+RUN pip install --no-cache-dir --upgrade -r /backend/requirements.txt
+COPY ./app /backend
