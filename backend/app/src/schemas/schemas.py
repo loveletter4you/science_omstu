@@ -88,7 +88,7 @@ class SchemePublication(BaseModel):
     source: SchemeSource
     title: str
     publication_date: date
-    publication_authors: List[SchemeAuthorPublicationWithOrgs]
+    publication_authors: List[SchemeAuthorPublication]
 
     class Config:
         orm_mode = True
@@ -130,6 +130,7 @@ class SchemePublicationPage(SchemePublication):
     accepted: bool
     keyword_publications: List[SchemeKeywordPublication]
     publication_links: List[SchemePublicationLink]
+    publication_authors: List[SchemeAuthorPublicationWithOrgs]
 
     class Config:
         orm_mode = True

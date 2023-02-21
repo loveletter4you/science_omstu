@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 from src.model.database import get_db
 from src.routers.publication.controller import controller_get_publications, controller_get_publication_types, \
     controller_get_publication_by_id, controller_fill_scopus
-from src.schemas.schemas import SchemePublication
+from src.schemas.routers import SchemePublicationsRouter
+
 
 router = APIRouter(
     prefix="/api/publication",
@@ -13,7 +14,7 @@ router = APIRouter(
 )
 
 
-@router.get("")
+@router.get("", response_model=SchemePublicationsRouter)
 async def get_publications(search: str = None,
                            page: int = 0, limit: int = 20, accepted: bool = True,
                            db: Session = Depends(get_db)):

@@ -8,6 +8,7 @@ from src.routers.author.controller import controller_get_authors, controller_get
     controller_get_author_publications, controller_fill_authors
 
 
+
 router = APIRouter(
     prefix="/api/author",
     tags=["author"],
