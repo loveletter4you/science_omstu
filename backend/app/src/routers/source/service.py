@@ -10,7 +10,7 @@ async def service_get_sources(offset: int, limit: int, db: Session):
     sources = query.offset(offset).limit(limit).all()
     count = query.count()
     scheme_sources = [SchemeSourceWithType.from_orm(source) for source in sources]
-    return dict(sources=scheme_sources, sources_count=count)
+    return dict(sources=scheme_sources, count=count)
 
 
 async def service_get_sources_search(search: str, offset: int, limit: int, db: Session):
@@ -18,7 +18,7 @@ async def service_get_sources_search(search: str, offset: int, limit: int, db: S
     sources = query.offset(offset).limit(limit).all()
     count = query.count()
     scheme_sources = [SchemeSourceWithType.from_orm(source) for source in sources]
-    return dict(sources=scheme_sources, sources_count=count)
+    return dict(sources=scheme_sources, count=count)
 
 
 async def service_get_source(id: int, db: Session):
