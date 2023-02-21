@@ -12,7 +12,7 @@ async def service_get_authors(offset: int, limit: int, confirmed: bool, db: Sess
     authors_count = query.count()
     authors = query.offset(offset).limit(limit).all()
     scheme_authors = [SchemeAuthor.from_orm(author) for author in authors]
-    return dict(authors=scheme_authors, authors_count=authors_count)
+    return dict(authors=scheme_authors, count=authors_count)
 
 
 async def service_get_authors_search(search: str, offset: int, limit: int, confirmed: bool, db: Session):
@@ -24,7 +24,7 @@ async def service_get_authors_search(search: str, offset: int, limit: int, confi
         authors_count = authors_query.count()
         authors = authors_query.offset(offset).limit(limit).all()
         scheme_authors = [SchemeAuthor.from_orm(author) for author in authors]
-        return dict(authors=scheme_authors, authors_count=authors_count)
+        return dict(authors=scheme_authors, count=authors_count)
     else:
         authors_query = db.query(Author).filter(or_(Author.confirmed, Author.confirmed == confirmed)).filter(
             or_(and_(func.lower(Author.name).contains(name[0]), func.lower(Author.surname).contains(name[1])),
@@ -32,7 +32,7 @@ async def service_get_authors_search(search: str, offset: int, limit: int, confi
         authors_count = authors_query.count()
         authors = authors_query.offset(offset).limit(limit).all()
         scheme_authors = [SchemeAuthor.from_orm(author) for author in authors]
-        return dict(authors=scheme_authors, authors_count=authors_count)
+        return dict(authors=scheme_authors, count=authors_count)
 
 
 async def service_get_author(id: int, db: Session):
