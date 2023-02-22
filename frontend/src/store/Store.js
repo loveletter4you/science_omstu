@@ -6,7 +6,8 @@ import publicationsSlice from "./slices/PublicationsSlice";
 import publicationSlice from "./slices/PublicationSlice";
 import SourceSlice from "./slices/SourseSlise";
 import SourcesSlice from "./slices/SoursesSlise";
-import AuthorsPublicationsSlice from "./slices/AuthorsPublications";
+
+
 
 
 const store = configureStore({
@@ -18,7 +19,7 @@ const store = configureStore({
         publication: publicationSlice,
         source: SourceSlice,
         sources: SourcesSlice,
-        AuthorsPublications: AuthorsPublicationsSlice
+
     }
 })
 

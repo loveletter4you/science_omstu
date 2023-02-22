@@ -1,11 +1,13 @@
-import React, {useState} from 'react';
-import {NavLink, useParams} from "react-router-dom";
+import React from 'react';
+import {useParams} from "react-router-dom";
 import axios from "axios";
 import s from './Author.module.css'
 import {useDispatch, useSelector} from "react-redux";
 import {setAuthor} from "../../store/slices/AuthorSlice";
 import avatar from "../../assets/img/avatar.svg"
-import {setPublic} from "../../store/slices/AuthorsPublications";
+import AuthorsPublications from "./AuthorsPublications";
+import {setData} from "../../store/slices/PublicationsSlice";
+import {getAuthor, getAuthorPublication} from "../api";
 
 const Author = () => {
 
@@ -13,23 +15,25 @@ const Author = () => {
     const params = useParams();
     const dispatch = useDispatch();
     const author = useSelector(state => state.author);
-    const publications = useSelector(state => state.AuthorsPublications)
+    const {publications, pageSize, count} = useSelector(state => state.publications);
+
 
     React.useEffect(() => {
         const fetchAuthor = async () => {
-            const res = await axios.get(`/api/author/${params.id}`);
+            const res = await getAuthor(params.id);
             dispatch(setAuthor(res.data));
         }
         fetchAuthor();
     }, [])
 
+
     React.useEffect(() => {
-        const fetchPublic = async () => {
-            const res = await axios.get(`/api/author/${params.id}/publications`);
-            dispatch(setPublic(res.data));
+        const fetchPublications = async () => {
+            const res = await getAuthorPublication(params.id);
+            dispatch(setData(res.data));
         }
-        fetchPublic();
-    }, [])
+        fetchPublications();
+    }, [pageSize]);
 
     return (<div>
             {author === undefined ? 'Подождите пожалуйста' : <>
@@ -47,7 +51,8 @@ const Author = () => {
                 <div className={s.title}>
                 Публикации:
                 </div>
-                
+                <AuthorsPublications id = {author.id}/>
+
             </>
             }
         </div>

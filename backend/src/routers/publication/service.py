@@ -149,6 +149,8 @@ async def service_fill_scopus(file: UploadFile, db: Session):
             db.add(link_doi)
         authors_orgs = row['Authors with affiliations'].split(';')
         authors_scopus = row['Author(s) ID'].split(';')
+        if len(author_orgs) != len(authors_scopus):
+            continue
         for i, author_row in enumerate(authors_orgs):
             author_data = author_row.split(', ')
             identifier = db.query(AuthorIdentifier).\

@@ -8,15 +8,22 @@ import {useDispatch, useSelector} from "react-redux";
 import {setData, setSize} from "../../store/slices/AuthorsSlice";
 import Search from "../Search/Search";
 
+
 const Authors = () => {
 
     const {authors, currentPage,pageSize, count} = useSelector(state => state.authors);
     const dispatch = useDispatch();
     let pageCount = Math.ceil(count / pageSize);
+    const [search, setSearch] = useState('');
+
+    const onSearchChange = (e) => {
+        const { value } = e.target
+        setSearch(value)
+    }
 
     const handlePageClick = (e) => {
         const fetchAuthors = async () => {
-            const res = await axios.get(`/api/author?page=${e.selected}&limit=${pageSize}`);
+            const res = await axios.get(`/api/author?search=${search}&page=${e.selected}&limit=${pageSize}`);
             dispatch(setData(res.data));
         }
         fetchAuthors();
@@ -26,17 +33,17 @@ const Authors = () => {
 
     React.useEffect(() => {
         const fetchAuthors = async () => {
-            const res = await axios.get(`/api/author?page=0&limit=${pageSize}`);
+            const res = await axios.get(`/api/author?search=${search}&page=0&limit=${pageSize}`);
             dispatch(setData(res.data));
         }
         fetchAuthors();
-    }, [pageSize]);
+    }, [pageSize, search]);
 
 
     return (
         <div>
             <div className={s.block}>
-                <Search/>
+                <input placeholder='Поиск' type="text" value={search} onChange={onSearchChange}/>
                 <div className={s.size}>
                     Отображать по:
                         <ul>

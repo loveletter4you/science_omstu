@@ -40,13 +40,13 @@ const Publications = () => {
             {publications === undefined ? 'Подождите пожалуйста' : publications.map(p => <div>
                 <div key={p.id} className={s.blocks}>
                     <div>{p.publication_type.name}</div>
+                    <div>{p.source.name}</div>
                     <NavLink to={"/publication/" + p.id}>
                         <div>{p.title}</div>
                     </NavLink>
-                    <div>{p.source.name}</div>
                     <div>{p.publication_date}</div>
                     <div>{p.publication_authors.map(a=> <div>
-                        <NavLink to={'/author/' + a.author.id}>{a.author.name} {a.author.surname} {a.author.patronymic}</NavLink>
+                        <NavLink to={'/author/' + a.author.id}>{a.author.name} {a.author.surname}</NavLink>
                         </div>
                     )}</div>
                 </div>
