@@ -156,11 +156,19 @@ async def service_fill_scopus(file: UploadFile, db: Session):
                        AuthorIdentifier.identifier_value == authors_scopus[i])).first()
             author: Author
             if identifier is None:
-                author = Author(
-                    name=author_data[1],
-                    surname=author_data[0],
-                    confirmed=False
-                )
+                author: Author
+                if len(author_data) > 1:
+                    author = Author(
+                        name=author_data[1],
+                        surname=author_data[0],
+                        confirmed=False
+                    )
+                else:
+                    author = Author(
+                        name='-',
+                        surname=author_data[0],
+                        confirmed=False
+                    )
                 author_identifier = AuthorIdentifier(
                     author=author,
                     identifier=identifier_scopus,
@@ -193,7 +201,7 @@ async def service_fill_scopus(file: UploadFile, db: Session):
                 db.add(author_publication_organization)
             db.commit()
         if row['Author Keywords'] != "":
-            keywords = row['Author Keywords'].split('; ')
+            keywords = set(row['Author Keywords'].split('; '))
             for keyword_value in keywords:
                 keyword = db.query(Keyword).filter(Keyword.keyword == keyword_value).first()
                 if keyword is None:
