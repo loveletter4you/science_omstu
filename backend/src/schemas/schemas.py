@@ -165,5 +165,22 @@ class SchemeSourceRating(BaseModel):
         orm_mode = True
 
 
+class SchemeSourceLinkType(BaseModel):
+    id: int
+    name: str
+
+    class Config:
+        orm_mode = True
+
+
+class SchemeSourceLink(BaseModel):
+    source_link_type: SchemeSourceLinkType
+    link: str
+
+    class Config:
+        orm_mode = True
+
+
 class SchemeSourceWithRating(SchemeSourceWithType):
     source_ratings: List[SchemeSourceRating]
+    source_links: List[SchemeSourceLink]
