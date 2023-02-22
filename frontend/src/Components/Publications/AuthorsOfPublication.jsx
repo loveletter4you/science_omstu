@@ -1,3 +1,4 @@
+/*
 import React, {useState} from "react";
 import {NavLink, useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
@@ -30,4 +31,4 @@ const AuthorsOfPublication = (props) => {
 
 }
 
-export default AuthorsOfPublication;
+export default AuthorsOfPublication;*/

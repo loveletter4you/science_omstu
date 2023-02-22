@@ -1,13 +1,11 @@
 import {createSlice} from "@reduxjs/toolkit";
 
 const initialState = {
-    id: null,
-    name: null,
-    surname: null,
-    patronymic: null,
-    identifiers: [],
-    publications: []
-
+        id: null,
+        name: null,
+        surname: null,
+        patronymic: null,
+        author_identifiers: []
 };
 
 const authorSlice = createSlice({
@@ -15,21 +13,16 @@ const authorSlice = createSlice({
     initialState,
     reducers: {
         setAuthor(state, action) {
-            const {id, name, surname, patronymic} = action.payload.author;
-            const identifiers = action.payload.identifiers;
+            const {id, name, surname, patronymic, author_identifiers} = action.payload.author;
             state.id = id;
             state.name = name;
             state.surname = surname;
             state.patronymic = patronymic;
-            state.identifiers = identifiers;
+            state.author_identifiers = author_identifiers;
         },
-        setPublic(state, action) {
-            const publications = action.payload.publications;
-            state.publications = publications;
-        }
     }
 });
 
-export const {setAuthor, setPublic} = authorSlice.actions;
+export const {setAuthor} = authorSlice.actions;
 
 export default authorSlice.reducer;
