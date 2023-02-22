@@ -4,20 +4,18 @@ import {useDispatch, useSelector} from "react-redux";
 import axios from "axios";
 import {setData} from "../../store/slices/PublicationsSlice";
 import ReactPaginate from "react-paginate";
-import {setValue} from "../../store/slices/SortSlice";
-import {NavLink, useParams} from "react-router-dom";
+import {NavLink} from "react-router-dom";
 import Search from "../Search/Search";
-import {setSize} from "../../store/slices/PublicationsSlice";
 import PublicationFilter from "../Filters/PublicationFilter";
 
 
 const Publications = () => {
 
 
-    const {publications, currentPage, pageSize, total_publications} = useSelector(state => state.publications);
+    const {publications, currentPage, pageSize, count} = useSelector(state => state.publications);
     const dispatch = useDispatch();
 
-    let pageCount = Math.ceil(total_publications / pageSize);
+    let pageCount = Math.ceil(count / pageSize);
 
     const handlePageClick = (e) => {
         const fetchPublications = async () => {
@@ -35,19 +33,22 @@ const Publications = () => {
         fetchPublications();
     }, [pageSize]);
 
-
     return (<div className={s.container}>
             <PublicationFilter/>
             <Search/>
             <div className={s.block}>
             {publications === undefined ? 'Подождите пожалуйста' : publications.map(p => <div>
                 <div key={p.id} className={s.blocks}>
-                    <div>{p.type.name}</div>
+                    <div>{p.publication_type.name}</div>
                     <NavLink to={"/publication/" + p.id}>
                         <div>{p.title}</div>
                     </NavLink>
-                    <div>{p.source.Name}</div>
+                    <div>{p.source.name}</div>
                     <div>{p.publication_date}</div>
+                    <div>{p.publication_authors.map(a=> <div>
+                        <NavLink to={'/author/' + a.author.id}>{a.author.name} {a.author.surname} {a.author.patronymic}</NavLink>
+                        </div>
+                    )}</div>
                 </div>
             </div>)}
             </div>

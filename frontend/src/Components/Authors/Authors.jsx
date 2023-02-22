@@ -8,17 +8,15 @@ import {useDispatch, useSelector} from "react-redux";
 import {setData, setSize} from "../../store/slices/AuthorsSlice";
 import Search from "../Search/Search";
 
-
-
 const Authors = () => {
 
-    const {authors, currentPage,pageSize, total_authors} = useSelector(state => state.authors);
+    const {authors, currentPage,pageSize, count} = useSelector(state => state.authors);
     const dispatch = useDispatch();
-    let pageCount = Math.ceil(total_authors / pageSize);
+    let pageCount = Math.ceil(count / pageSize);
 
     const handlePageClick = (e) => {
         const fetchAuthors = async () => {
-            const res = await axios.get(`/api/authors?page=${e.selected}&limit=${pageSize}`);
+            const res = await axios.get(`/api/author?page=${e.selected}&limit=${pageSize}`);
             dispatch(setData(res.data));
         }
         fetchAuthors();
@@ -28,7 +26,7 @@ const Authors = () => {
 
     React.useEffect(() => {
         const fetchAuthors = async () => {
-            const res = await axios.get(`/api/authors?page=0&limit=${pageSize}`);
+            const res = await axios.get(`/api/author?page=0&limit=${pageSize}`);
             dispatch(setData(res.data));
         }
         fetchAuthors();

@@ -5,7 +5,7 @@ import { createSlice} from "@reduxjs/toolkit";
 const initialState = {
     authors: [],
     pageSize: 30,
-    total_authors: 1,
+    count: 1,
     currentPage: 1
 };
 
@@ -14,9 +14,9 @@ const authorsSlice = createSlice({
     initialState,
     reducers: {
         setData(state, action) {
-            const {authors, total_authors} = action.payload;
+            const {authors, count} = action.payload;
             state.authors = authors;
-            state.total_authors = total_authors;
+            state.count = count;
         },
         setSize(state, action) {
             state.pageSize = action.payload;

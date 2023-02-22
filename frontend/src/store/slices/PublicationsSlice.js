@@ -1,22 +1,24 @@
-import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
-import axios from "axios";
+import {createSlice} from "@reduxjs/toolkit";
 
-
-const fetchPublications = createAsyncThunk(
-    'publications/fetchPublications',
-    async (userId, thunkAPI) => {
-        const {data} = await axios.get(`/api/publications?page=0&limit=20`);
-        return data;
-    }
-)
 
 
 const initialState = {
-    publications: [],
+    publications: [{
+        publication_type:{
+            id: 0,
+            name: null
+        },
+        source: {
+            id: 0,
+            name: null
+        },
+        title: null,
+        publication_date: null,
+        publication_authors: []
+    }],
     pageSize: 20,
-    total_publications: 1070,
+    count: 1070,
     currentPage: 1,
-    authors: []
 
 };
 
@@ -25,13 +27,9 @@ const publicationsSlice = createSlice({
     initialState,
     reducers: {
         setData(state, action) {
-            const {publications, total_publications} = action.payload;
+            const {publications, count} = action.payload;
             state.publications = publications;
-            state.total_publications = total_publications;
-        },
-        setAuthors(state, action) {
-            const authors = action.payload.authors;
-            state.authors = authors;
+            state.count = count;
         },
         setSize(state, action) {
             state.pageSize = action.payload;
@@ -41,7 +39,7 @@ const publicationsSlice = createSlice({
 });
 
 
-export const {setData, setAuthors,setSize} = publicationsSlice.actions;
+export const {setData,setSize} = publicationsSlice.actions;
 
 export default publicationsSlice.reducer;
 

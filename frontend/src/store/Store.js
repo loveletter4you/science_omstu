@@ -3,9 +3,10 @@ import allAuthorsReducer from "./slices/AuthorsSlice";
 import authorReducer from "./slices/AuthorSlice";
 import sortReducer from "./slices/SortSlice";
 import publicationsSlice from "./slices/PublicationsSlice";
-import onePublicSlice from "./slices/PublicationSlice";
-import SourseSlise from "./slices/SourseSlise";
-import SoursesSlise from "./slices/SoursesSlise";
+import publicationSlice from "./slices/PublicationSlice";
+import SourceSlice from "./slices/SourseSlise";
+import SourcesSlice from "./slices/SoursesSlise";
+import AuthorsPublicationsSlice from "./slices/AuthorsPublications";
 
 
 const store = configureStore({
@@ -14,9 +15,10 @@ const store = configureStore({
         author: authorReducer,
         sort: sortReducer,
         publications: publicationsSlice,
-        publication: onePublicSlice,
-        source: SourseSlise,
-        sources: SoursesSlise
+        publication: publicationSlice,
+        source: SourceSlice,
+        sources: SourcesSlice,
+        AuthorsPublications: AuthorsPublicationsSlice
     }
 })
 

@@ -22,11 +22,9 @@ function App(props) {
                 <Routes>
                     <Route path='/author/:id'
                            element={<Author/>}/>
-                    <Route path='/authors'
+                    <Route path='/author'
                            element={<Authors/>}/>
-                    <Route path={'/publication/:id/authors'}
-                           element={<AuthorsOfPublication/>}/>
-                    <Route path='/publications'
+                    <Route path='/publication'
                            element={<Publications/>}/>
                     <Route path='/publication/:id'
                            element={<Publication/>}/>
@@ -34,7 +32,7 @@ function App(props) {
                            element={<Auth/>}/>
                     <Route path = '/registration'
                            element={<SignUp/>}/>
-                    <Route path = '/sources'
+                    <Route path = '/source'
                            element={<Sources/>}/>
                     <Route path = '/source/:id'
                            element={<Source/>}/>

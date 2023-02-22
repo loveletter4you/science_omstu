@@ -31,15 +31,15 @@ const Navbar = () => {
             <div className={Active? n.back: null}>
             <div className={Active? n.menu+" "+n.active :n.menu}>
                     <div className={n.item} onClick={toggle}>
-                        <NavLink to="/publications"
+                        <NavLink to="/publication"
                                  className={navData => navData.isActive ? n.active : null}>Публикации</NavLink>
                     </div>
                     <div className={n.item} onClick={toggle}>
-                        <NavLink to="/authors"
+                        <NavLink to="/author"
                                  className={navData => navData.isActive ? n.active : null}>Персоналии</NavLink>
                     </div>
                     <div className={n.item} onClick={toggle}>
-                        <NavLink to="/sources"
+                        <NavLink to="/source"
                                  className={navData => navData.isActive ? n.active : null}>Источники</NavLink>
                     </div>
                     <NavLink to="/login">

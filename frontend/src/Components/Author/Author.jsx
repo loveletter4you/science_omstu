@@ -3,26 +3,23 @@ import {NavLink, useParams} from "react-router-dom";
 import axios from "axios";
 import s from './Author.module.css'
 import {useDispatch, useSelector} from "react-redux";
-import {setAuthor, setPublic} from "../../store/slices/AuthorSlice";
+import {setAuthor} from "../../store/slices/AuthorSlice";
 import avatar from "../../assets/img/avatar.svg"
+import {setPublic} from "../../store/slices/AuthorsPublications";
 
 const Author = () => {
 
 
     const params = useParams();
-    // const [author, setAuthor] = useState([]);
-
     const dispatch = useDispatch();
     const author = useSelector(state => state.author);
-    const publication = author.publications;
-    const identifiers = author.identifiers;
+    const publications = useSelector(state => state.AuthorsPublications)
 
     React.useEffect(() => {
         const fetchAuthor = async () => {
             const res = await axios.get(`/api/author/${params.id}`);
             dispatch(setAuthor(res.data));
         }
-
         fetchAuthor();
     }, [])
 
@@ -42,20 +39,15 @@ const Author = () => {
                          alt=""/>
                     <div className={s.block__info}>
                         <p className={s.block__text}>{author.surname} {author.name} {author.patronymic}</p>
-                        { identifiers === undefined ? '' :identifiers.map(i => <p className={s.block__identifiers}>
-                            {i.identifier_info.name}: {i.identifier}
-                        </p>)}
+                        {author.author_identifiers.map(a=><div>
+                            {a.identifier.name}: {a.identifier_value}
+                        </div>)}
                     </div>
                 </div>
                 <div className={s.title}>
                 Публикации:
                 </div>
-                <div>{publication === undefined? ' ' : publication.map(p => <div className={s.public}>
-                    <p>{p.type.name}</p>
-                    <NavLink to={"/publication/" + p.id}><p>{p.title}</p></NavLink>
-                    <p>{p.source.Name}</p>
-                    <p>{p.publication_date}</p>
-                </div>)}</div>
+                
             </>
             }
         </div>
