@@ -1,6 +1,6 @@
 import pandas as pd
 from fastapi import UploadFile
-from sqlalchemy import or_, and_, func
+from sqlalchemy import or_, and_, func, desc
 from sqlalchemy.orm import Session, joinedload
 
 from src.model.model import Author, Identifier, AuthorIdentifier, AuthorPublication, Publication
@@ -42,7 +42,8 @@ async def service_get_author(id: int, db: Session):
 
 
 async def service_get_author_publications(id: int, offset: int, limit: int, db: Session):
-    query = db.query(Publication).join(AuthorPublication).filter(AuthorPublication.author_id == id)
+    query = db.query(Publication).join(AuthorPublication).filter(AuthorPublication.author_id == id)\
+        .order_by(desc(Publication.publication_date))
     publications = query.offset(offset).limit(limit).all()
     scheme_publications = [SchemePublication.from_orm(publication) for publication in publications]
     count = query.count()

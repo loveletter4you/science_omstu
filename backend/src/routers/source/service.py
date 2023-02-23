@@ -1,4 +1,4 @@
-from sqlalchemy import func
+from sqlalchemy import func, desc
 from sqlalchemy.orm import Session
 
 from src.model.model import Source, Publication
@@ -28,7 +28,7 @@ async def service_get_source(id: int, db: Session):
 
 
 async def service_get_source_publications(id: int, offset: int, limit: int, db: Session):
-    query = db.query(Publication).join(Source).filter(Source.id == id)
+    query = db.query(Publication).join(Source).filter(Source.id == id).order_by(desc(Publication.publication_date))
     publications = query.offset(offset).limit(limit).all()
     scheme_publications = [SchemePublication.from_orm(publication) for publication in publications]
     count = query.count()
