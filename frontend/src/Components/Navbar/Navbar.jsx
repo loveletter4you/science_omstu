@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from "react";
 import n from "./Navbar.module.css"
 import {NavLink} from "react-router-dom";
+import BugTracker from "../Bugtracker/Bugtracker";
 
 
 const Navbar = () => {
@@ -13,10 +14,9 @@ const Navbar = () => {
     }
 
     useEffect(() => {
-        if(Active===true && window.innerWidth < 991){
+        if (Active === true && window.innerWidth < 991) {
             document.body.style.overflow = 'hidden';
-        }
-        else {
+        } else {
             document.body.style.overflow = 'unset';
         }
     }, [Active]);
@@ -25,11 +25,11 @@ const Navbar = () => {
     return (
         <div className={n.appWrapperNavbar}>
 
-            <div className={n.burger } onClick={toggle}>
+            <div className={n.burger} onClick={toggle}>
                 <span></span>
             </div>
-            <div className={Active? n.back: null}>
-            <div className={Active? n.menu+" "+n.active :n.menu}>
+            <div className={Active ? n.back : null}>
+                <div className={Active ? n.menu + " " + n.active : n.menu}>
                     <div className={n.item} onClick={toggle}>
                         <NavLink to="/publication"
                                  className={navData => navData.isActive ? n.active : null}>Публикации</NavLink>
@@ -41,6 +41,9 @@ const Navbar = () => {
                     <div className={n.item} onClick={toggle}>
                         <NavLink to="/source"
                                  className={navData => navData.isActive ? n.active : null}>Источники</NavLink>
+                    </div>
+                    <div className={n.item}>
+                    <BugTracker/>
                     </div>
                     <NavLink to="/login">
                         <button className={n.btn} onClick={toggle}>Войти</button>

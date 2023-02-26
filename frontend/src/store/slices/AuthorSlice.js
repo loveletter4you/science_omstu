@@ -5,7 +5,7 @@ const initialState = {
         name: null,
         surname: null,
         patronymic: null,
-        author_identifiers: []
+        author_identifiers: [],
 };
 
 const authorSlice = createSlice({

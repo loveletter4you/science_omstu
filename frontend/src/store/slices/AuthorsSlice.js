@@ -6,7 +6,7 @@ const initialState = {
     authors: [],
     pageSize: 30,
     count: 1,
-    currentPage: 1
+    currentPage: 1,
 };
 
 const authorsSlice = createSlice({

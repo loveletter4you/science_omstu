@@ -14,7 +14,8 @@ const initialState = {
     abstract: null,
     accepted: false,
     keyword_publications: [],
-    publication_links: []
+    publication_links: [],
+
 
 };
 

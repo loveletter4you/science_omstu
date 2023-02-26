@@ -9,7 +9,6 @@ import Publications from "./Components/Publications/Publications";
 import Auth from "./Components/Auth/Auth";
 import SignUp from "./Components/Auth/SignUp";
 import Publication from "./Components/Publication/Publication";
-import AuthorsOfPublication from "./Components/Publications/AuthorsOfPublication";
 import Sources from "./Components/Sources/Sourses";
 import Source from "./Components/Source/Sourse";
 import AuthorsPublications from "./Components/Author/AuthorsPublications";

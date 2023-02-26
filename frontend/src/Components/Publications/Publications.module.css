@@ -3,7 +3,7 @@
     display: flex;
     flex-direction: column;
     grid-area: publications;
-    margin-top: 10px;;
+    margin-top: 10px;
 }
 
 .blocks {
@@ -21,6 +21,14 @@
 
 .block a:hover {
     color: #06c895;
+}
+
+.authors .author{
+    display: inline-block;
+}
+
+.author a:not(:last-child):after{
+    content: ', ';
 }
 
 
