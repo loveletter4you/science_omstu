@@ -1,4 +1,9 @@
-
+.theme{
+    color: var(--color-font);
+}
+.theme a{
+    color: var(--color-font);
+}
 .block__image{
     width: 30%;
     max-width: 300px;
@@ -11,14 +16,13 @@
     padding: 10px;
     margin-top: 10px;
     margin-bottom: 10px;
-    border: 1px solid #000;
+    border: 1px solid;
     font-size: 16px;
     border-radius: 10px;
 
 }
 .public a{
     text-decoration: none;
-    color: black;
 }
 p{
     margin: 0px;
@@ -30,7 +34,6 @@ p{
 .block{
     display: flex;
     padding-bottom: 15px;
-    color: black;
     font-size: 18px;
 }
 

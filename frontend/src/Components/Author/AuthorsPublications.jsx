@@ -36,7 +36,7 @@ const AuthorsPublications = (props) => {
         fetchPublications();
     }, [props.id]);
 
-    return <div>
+    return <div className={s.theme}>
         {isFetching === true ? <img src={preloader} alt=""/> :
             <div>
                 <div className={s.block}>

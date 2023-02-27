@@ -3,13 +3,12 @@ import n from "./Navbar.module.css"
 import {NavLink} from "react-router-dom";
 import BugTracker from "../Bugtracker/Bugtracker";
 import {useColorTheme} from "../Theme/Theme";
-
+import theme from "./../../assets/img/theme-dark.png"
 
 const Navbar = () => {
 
 
     const [Active, setActive] = useState(false);
-
     const toggle = () => {
         setActive(!Active);
     }
@@ -53,8 +52,9 @@ const Navbar = () => {
                     <BugTracker/>
                     </div>
                     <div className={n.item}>
-                            <button onClick={onChangeTheme}>Change theme</button>
+                        <img src = {theme} className={n.image} onClick={onChangeTheme}/>
                     </div>
+
                     <NavLink to="/login">
                         <button className={n.btn} onClick={toggle}>Войти</button>
                     </NavLink>

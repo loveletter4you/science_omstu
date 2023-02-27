@@ -39,7 +39,7 @@ const Author = () => {
         fetchPublications();
     }, [pageSize]);
 
-    return (<div>
+    return (<div className={s.theme}>
             {isFetching === true? <img src={preloader} alt=""/> :
             <div>
                 {author === undefined ? 'Подождите пожалуйста' : <>

@@ -49,6 +49,8 @@
     border: 1px solid;
     padding: 8px 20px;
     border-radius: 10px;
+    background: none;
+    color: var(--color-font);
 }
 
 .menu {
@@ -59,6 +61,33 @@
 .burger {
     display: none;
 }
+
+.image{
+    width: 20px;
+    height: 20px;
+    filter: var(--filter);
+
+}
+
+/*.sun{
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    z-index: 3;
+}
+.sun:before, .sun:after{
+    contant:'';
+    display: block;
+}
+
+.sun span{
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    box-shadow: var(--moon-shadow);
+    margin: var(--moon-margin);
+}*/
 
 @media (max-width: 991px) {
 
@@ -76,6 +105,7 @@
         width: 100%;
         height: 2px;
         top: 9px;
+        background-color: var(--background);
     }
 
     .burger:before,
@@ -84,6 +114,7 @@
         position: absolute;
         width: 100%;
         height: 2px;
+        background-color: var(--background);
     }
 
     .burger:before {
@@ -103,6 +134,8 @@
         height: 100%;
         padding: 20px 0px 0px 50px;
         transition: all 0.3s ease 0s;
+        background-color: var(--color-background);
+        color: var(--color-font);
     }
 
     .menu.active {

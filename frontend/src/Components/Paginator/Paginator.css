@@ -8,25 +8,24 @@
     gap: 5px;
     margin-bottom: 20px;
     grid-area: pagination;
+    color: var(--color-font);
 }
 
 
 .pagination li:hover {
     background-color: #06c895;
-    color: #fff;
     border-radius: 10px;
+    color: var(--color-font);
 
 }
 
 .pagination li.selected {
-    background-color: #282830;
-    color: white;
-    border-radius: 10px
+    border-radius: 10px;
+    color: var(--color-font);
 }
 
 .page-item.active .page-link {
     background-color: #06c895;
-    color: white;
     border-color: #06c895;
 }
 

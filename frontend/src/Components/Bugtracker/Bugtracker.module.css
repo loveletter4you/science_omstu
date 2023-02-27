@@ -22,11 +22,14 @@
 .image {
     width: 20px;
     height: 20px;
+    filter: var(--filter);
+    border-radius: 0px;
 }
 
 .modal__content {
     padding: 20px;
     border: 1px solid black;
+    color: black;
     border-radius: 10px;
     background-color: white;
     width: 50vw;
@@ -37,4 +40,5 @@
 
 .modal__content.active {
     transform: scale(1);
+
 }
