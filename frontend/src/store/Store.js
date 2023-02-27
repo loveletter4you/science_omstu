@@ -6,6 +6,7 @@ import publicationsSlice from "./slices/PublicationsSlice";
 import publicationSlice from "./slices/PublicationSlice";
 import SourceSlice from "./slices/SourceSlice";
 import SourcesSlice from "./slices/SourcesSlice";
+import {CaptchaSlice} from "./slices/ReCaptchaSlice";
 
 
 
@@ -19,6 +20,8 @@ const store = configureStore({
         publication: publicationSlice,
         source: SourceSlice,
         sources: SourcesSlice,
+        captcha: CaptchaSlice,
+
     }
 })
 

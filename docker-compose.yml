@@ -24,7 +24,8 @@ services:
       - "./frontend:/frontend"
       - "/frontend/node_modules"
     environment:
-      CHOKIDAR_USEPOLLING: "true"
+      - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_SITE_KEY=6LfKXLgkAAAAAH2yOQPNzkpKEe9J4H8eLqpXKh54
   db:
     image: postgres:14.2
     restart: always
