@@ -4,9 +4,10 @@ import authorReducer from "./slices/AuthorSlice";
 import sortReducer from "./slices/SortSlice";
 import publicationsSlice from "./slices/PublicationsSlice";
 import publicationSlice from "./slices/PublicationSlice";
-import SourceSlice from "./slices/SourseSlise";
-import SourcesSlice from "./slices/SoursesSlise";
-import AuthorsPublicationsSlice from "./slices/AuthorsPublications";
+import SourceSlice from "./slices/SourceSlice";
+import SourcesSlice from "./slices/SourcesSlice";
+
+
 
 
 const store = configureStore({
@@ -18,7 +19,6 @@ const store = configureStore({
         publication: publicationSlice,
         source: SourceSlice,
         sources: SourcesSlice,
-        AuthorsPublications: AuthorsPublicationsSlice
     }
 })
 

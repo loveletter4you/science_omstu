@@ -17,7 +17,7 @@ const initialState = {
         publication_authors: []
     }],
     pageSize: 20,
-    count: 1070,
+    count: 1,
     currentPage: 1,
 
 };

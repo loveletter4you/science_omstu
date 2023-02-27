@@ -9,9 +9,9 @@ import Publications from "./Components/Publications/Publications";
 import Auth from "./Components/Auth/Auth";
 import SignUp from "./Components/Auth/SignUp";
 import Publication from "./Components/Publication/Publication";
-import AuthorsOfPublication from "./Components/Publications/AuthorsOfPublication";
 import Sources from "./Components/Sources/Sourses";
 import Source from "./Components/Source/Sourse";
+import AuthorsPublications from "./Components/Author/AuthorsPublications";
 
 function App(props) {
     return <div className='app-wrapper'>
@@ -36,6 +36,8 @@ function App(props) {
                            element={<Sources/>}/>
                     <Route path = '/source/:id'
                            element={<Source/>}/>
+                    <Route path='/author/:id/publications'
+                           element={<AuthorsPublications/>}/>
                 </Routes>
             </div>
             <Footer/>

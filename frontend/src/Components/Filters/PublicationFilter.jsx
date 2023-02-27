@@ -41,7 +41,7 @@ const PublicationFilter = () => {
                         </li>
                     </ul>
                 </div>
-                <div className={s.sort}>
+                {/*<div className={s.sort}>
                     <div className={s.sort__label}>
                         <b onClick={() => setSeeFiltered(true)}>Сортировка по: {filteredValue.seeFiltered}</b>
                     </div>
@@ -56,7 +56,7 @@ const PublicationFilter = () => {
                         </nav>
                     </div>
                     }
-                </div>
+                </div>*/}
             </div>
         </div>
     </div>

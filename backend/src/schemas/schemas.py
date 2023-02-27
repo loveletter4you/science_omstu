@@ -184,3 +184,12 @@ class SchemeSourceLink(BaseModel):
 class SchemeSourceWithRating(SchemeSourceWithType):
     source_ratings: List[SchemeSourceRating]
     source_links: List[SchemeSourceLink]
+
+
+class SchemeFeedback(BaseModel):
+    name: str
+    mail: str
+    message: str
+
+    class Config:
+        orm_mode = True

@@ -3,7 +3,7 @@ import datetime
 import pandas as pd
 import numpy as np
 from fastapi import UploadFile
-from sqlalchemy import and_, or_, func
+from sqlalchemy import and_, or_, func, desc
 from sqlalchemy.orm import Session
 
 import datetime
@@ -15,7 +15,7 @@ from src.schemas.schemas import SchemePublication, SchemePublicationPage
 
 
 async def service_get_publications(offset: int, limit: int, accepted: bool, db: Session):
-    query = db.query(Publication).filter(Publication.accepted == accepted)
+    query = db.query(Publication).filter(Publication.accepted == accepted).order_by(desc(Publication.publication_date))
     publications = query.offset(offset).limit(limit).all()
     scheme_publications = [SchemePublication.from_orm(publication) for publication in publications]
     count = query.count()
@@ -24,7 +24,8 @@ async def service_get_publications(offset: int, limit: int, accepted: bool, db: 
 
 async def service_get_publications_search(search: str, offset: int, limit: int, accepted: bool, db: Session):
     query = db.query(Publication).filter(Publication.accepted == accepted).filter(func.lower(Publication.title)
-                                                                                  .contains(search.lower()))
+                                                                                  .contains(search.lower()))\
+        .order_by(desc(Publication.publication_date))
     publications = query.offset(offset).limit(limit).all()
     scheme_publications = [SchemePublication.from_orm(publication) for publication in publications]
     count = query.count()
@@ -150,23 +151,33 @@ async def service_fill_scopus(file: UploadFile, db: Session):
         authors_orgs = row['Authors with affiliations'].split(';')
         authors_scopus = row['Author(s) ID'].split(';')
         for i, author_row in enumerate(authors_orgs):
+            if i >= len(authors_scopus):
+                continue
             author_data = author_row.split(', ')
             identifier = db.query(AuthorIdentifier).\
                 filter(and_(AuthorIdentifier.identifier_id == identifier_scopus.id,
                        AuthorIdentifier.identifier_value == authors_scopus[i])).first()
             author: Author
             if identifier is None:
-                author = Author(
-                    name=author_data[1],
-                    surname=author_data[0],
-                    confirmed=False
-                )
+                author: Author
+                if len(author_data) > 1:
+                    author = Author(
+                        name=author_data[1],
+                        surname=author_data[0],
+                        confirmed=False
+                    )
+                else:
+                    author = Author(
+                        name='-',
+                        surname=author_data[0],
+                        confirmed=False
+                    )
+                db.add(author)
                 author_identifier = AuthorIdentifier(
                     author=author,
                     identifier=identifier_scopus,
                     identifier_value=authors_scopus[i]
                 )
-                db.add(author)
                 db.add(author_identifier)
             else:
                 author = identifier.author
@@ -193,7 +204,7 @@ async def service_fill_scopus(file: UploadFile, db: Session):
                 db.add(author_publication_organization)
             db.commit()
         if row['Author Keywords'] != "":
-            keywords = row['Author Keywords'].split('; ')
+            keywords = set(row['Author Keywords'].split('; '))
             for keyword_value in keywords:
                 keyword = db.query(Keyword).filter(Keyword.keyword == keyword_value).first()
                 if keyword is None:
