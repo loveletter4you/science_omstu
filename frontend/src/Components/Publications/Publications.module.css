@@ -7,7 +7,7 @@
 }
 
 .blocks {
-    border: 1px solid #000;
+    border: 1px solid;
     padding: 10px;
     margin-bottom: 5px;
     font-size: 16px;
@@ -16,7 +16,6 @@
 
 .block a {
     text-decoration: none;
-    color: black;
 }
 
 .block a:hover {
@@ -40,6 +39,12 @@
             'pagination pagination';
     grid-auto-columns: 270px 930px;
     grid-auto-flow: dense;
+
+    color: var(--color-font);
+}
+
+.container a{
+    color: var(--color-font);
 }
 @media (max-width: 991px) {
     .container {

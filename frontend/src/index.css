@@ -25,6 +25,19 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+:root {
+  --color-background: white;
+  --color-font: black;
+
+}
+
+html[data-theme="dark"] {
+  --color-background: black;
+  --color-font: white;
+
+}
+
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;

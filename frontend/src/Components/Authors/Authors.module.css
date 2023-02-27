@@ -1,4 +1,7 @@
-
+.theme{
+    color: var(--color-font);
+    border-color: var(--border-colors);
+}
 
 .item{
     padding-left: 0px;

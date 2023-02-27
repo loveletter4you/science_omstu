@@ -58,7 +58,7 @@ const Authors = () => {
     }, [pageSize, debouncedSearch[0]]);
 
 
-    return (<div>
+    return (<div color={s.theme}>
         <div className={s.block}>
             <input className={c.search} placeholder='Поиск' type="text" value={search} onChange={onSearchChange}/>
         </div>

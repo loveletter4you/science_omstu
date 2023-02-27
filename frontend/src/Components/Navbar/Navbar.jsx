@@ -2,6 +2,7 @@ import React, {useState, useEffect} from "react";
 import n from "./Navbar.module.css"
 import {NavLink} from "react-router-dom";
 import BugTracker from "../Bugtracker/Bugtracker";
+import {useColorTheme} from "../Theme/Theme";
 
 
 const Navbar = () => {
@@ -12,6 +13,12 @@ const Navbar = () => {
     const toggle = () => {
         setActive(!Active);
     }
+
+    const { colorTheme, toggleColorTheme } = useColorTheme();
+
+    const onChangeTheme = () => {
+        toggleColorTheme();
+    };
 
     useEffect(() => {
         if (Active === true && window.innerWidth < 991) {
@@ -44,6 +51,9 @@ const Navbar = () => {
                     </div>
                     <div className={n.item}>
                     <BugTracker/>
+                    </div>
+                    <div className={n.item}>
+                            <button onClick={onChangeTheme}>Change theme</button>
                     </div>
                     <NavLink to="/login">
                         <button className={n.btn} onClick={toggle}>Войти</button>
