@@ -1,3 +1,4 @@
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from src.routers.source.service import service_get_sources, service_get_sources_search, service_get_source, \
@@ -16,6 +17,8 @@ async def controller_get_sources(search: str, page: int, limit: int, db: Session
 
 async def controller_get_source(id: int, db: Session):
     source = await service_get_source(id, db)
+    if not source:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return source
 
 

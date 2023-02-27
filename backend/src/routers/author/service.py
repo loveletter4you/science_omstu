@@ -37,6 +37,8 @@ async def service_get_authors_search(search: str, offset: int, limit: int, confi
 
 async def service_get_author(id: int, db: Session):
     author = db.query(Author).filter(Author.id == id).first()
+    if author is None:
+        return False
     scheme_author = SchemeAuthorProfile.from_orm(author)
     return dict(author=scheme_author)
 

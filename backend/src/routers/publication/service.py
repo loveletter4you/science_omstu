@@ -34,6 +34,8 @@ async def service_get_publications_search(search: str, offset: int, limit: int, 
 
 async def service_get_publication(id: int, db: Session):
     publication = db.query(Publication).filter(Publication.id == id).first()
+    if publication is None:
+        return False
     scheme_publication = SchemePublicationPage.from_orm(publication)
     return dict(publication=scheme_publication)
 

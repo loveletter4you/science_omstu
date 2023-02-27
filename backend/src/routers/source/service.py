@@ -23,6 +23,8 @@ async def service_get_sources_search(search: str, offset: int, limit: int, db: S
 
 async def service_get_source(id: int, db: Session):
     source = db.query(Source).filter(Source.id == id).first()
+    if source is None:
+        return False
     scheme_source = SchemeSourceWithRating.from_orm(source)
     return dict(source=scheme_source)
 

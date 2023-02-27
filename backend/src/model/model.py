@@ -168,3 +168,13 @@ class PublicationLink(Base):
     publication_id = Column(Integer, ForeignKey("publication.id"), nullable=False)
     link_type_id = Column(Integer, ForeignKey("publication_link_type.id"), nullable=False)
     link = Column(String, nullable=False)
+
+
+class Feedback(Base):
+    __tablename__ = "feedback"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    mail = Column(String, nullable=False)
+    message = Column(String, nullable=False)
+    date = Column(Date, nullable=False)
+    solved = Column(Boolean, nullable=False)

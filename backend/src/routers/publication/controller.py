@@ -1,4 +1,4 @@
-from fastapi import HTTPException, UploadFile
+from fastapi import HTTPException, status, UploadFile
 from sqlalchemy.orm import Session
 
 from src.routers.publication.service import service_fill_scopus, service_get_publications, \
@@ -15,12 +15,10 @@ async def controller_get_publications(search: str, page: int, limit: int, accept
         return publications
 
 
-async def controller_get_publication_types():
-    return {'asd': 'asd'}
-
-
 async def controller_get_publication_by_id(id: int, db: Session):
     publication = await service_get_publication(id, db)
+    if not publication:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return publication
 
 
