@@ -23,8 +23,8 @@ const Publication = () => {
         }
         fetchPublic();
     }, [])
-debugger
-    return (<div>
+
+    return (<div className={s.theme}>
             {isFetching === true ? <img src={preloader} alt=""/> :
                 <div>
                     <div className={s.block}>

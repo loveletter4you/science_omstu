@@ -1,8 +1,14 @@
 .block{
     flex-direction: column;
-    border: 1px solid #000;
+    border: 1px solid;
     padding: 10px;
     margin: 10px 0;
     font-size: 16px;
     border-radius: 10px;
+}
+.theme{
+    color: var(--color-font);
+}
+.theme a{
+    color: var(--color-font);
 }

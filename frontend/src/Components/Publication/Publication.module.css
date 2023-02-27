@@ -1,7 +1,7 @@
 .block{
     display: flex;
     flex-direction: column;
-    border: 1px solid #000;
+    border: 1px solid;
     padding: 10px;
     margin: 15px 0;
     font-size: 16px;
@@ -9,7 +9,6 @@
 }
 .block a{
     text-decoration: none;
-    color: black;
 }
 
 .block a:hover{
@@ -20,12 +19,11 @@
     font-size: 16px;
     padding: 10px;
     margin: 15px 0;
-    border: 1px solid #000;
+    border: 1px solid ;
     border-radius: 10px;
 }
 
 .authors a{
-    color: black;
     text-decoration: none;
 }
 .authors a:hover{
@@ -40,3 +38,9 @@
     display: inline-block;
 }
 
+.theme{
+    color: var(--color-font);
+}
+.theme a{
+    color: var(--color-font);
+}

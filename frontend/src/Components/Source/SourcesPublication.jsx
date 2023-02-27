@@ -6,6 +6,7 @@ import axios from "axios";
 import {useDispatch, useSelector} from "react-redux";
 import s from "../Publications/Publications.module.css";
 import preloader from "../../assets/img/preloader.svg";
+import c from "./Source.module.css"
 
 
 const SourcePublications = (props) => {
@@ -36,7 +37,7 @@ const SourcePublications = (props) => {
         fetchPublications();
     }, [props.id]);
 
-    return (<div>
+    return (<div className={c.theme}>
             {isFetching === true ? <img src={preloader} alt=""/> :
                 <div>
                     <div className={s.block}>
