@@ -4,41 +4,42 @@ import s from "./Bugtracker.module.css"
 import Modal from "./BugtrackerWindow";
 import ReCAPTCHA from "react-google-recaptcha";
 import axios from "axios";
-import {useDispatch, useSelector} from "react-redux";
-import {setCaptcha} from "../../store/slices/ReCaptchaSlice";
+import {useDispatch} from "react-redux";
 
 const BugTracker = () => {
     const [isModal, setModal] = useState(false);
     const captchaRef = useRef(null);
-    const captcha = useSelector(state => state.captcha)
     const dispatch = useDispatch();
 
 
     const handleSubmit = (e) =>{
         e.preventDefault();
+        const message = document.getElementById("message").value;
         const token = captchaRef.current.getValue();
-        dispatch(setCaptcha(token));
         captchaRef.current.reset();
-        console.log(token)
-        /*const postToken = async() =>{
-            const res = await axios.post("/api/feedback" )
+        const name = document.getElementsByTagName("input")[0].value;
+        const mail = document.getElementsByTagName("input")[1].value;
+        
+        const postToken = async() =>{
+            const res = await axios.post("/api/feedback", {token: token, feedback:{name: name, mail: mail, message: message}} );
         }
-        postToken();*/
+        debugger
+        postToken();
     }
 
 
-debugger
+
     return (<div>
             <img src={bugtracker} className={s.image} onClick={() => setModal(true)}/>
             {isModal ? <Modal visible={true} active={isModal} setActive={setModal}>
                <form onSubmit={handleSubmit}>
                 <div>Форма обратной связи</div>
                 <div>Имя</div>
-                <div><input type={"text"} /></div>
+                <div><input type="text" name ="name" /></div>
                 <div>Почта</div>
-                <div><input type={"text"} /></div>
+                <div><input type="text" name = "mail" /></div>
                 <div>Сообщение</div>
-                <div><textarea type={"text"} cols="40" rows="3" /></div>
+                <div><textarea id = "message" name="message" cols="40" rows="3" /></div>
                 <ReCAPTCHA
                     sitekey={process.env.REACT_APP_SITE_KEY}
                     ref={captchaRef}
