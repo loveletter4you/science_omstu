@@ -10,3 +10,8 @@ DB_NAME: str = os.environ.get("DB_NAME")
 
 RECAPTCHA_SITE_KEY: str = os.environ.get("RECAPTCHA_SITE_KEY")
 RECAPTCHA_SECRET_KEY: str = os.environ.get("RECAPTCHA_SECRET_KEY")
+
+ADMIN_LOGIN: str = os.environ.get("ADMIN_LOGIN")
+ADMIN_PASSWORD: str = os.environ.get("ADMIN_PASSWORD")
+
+SECRET_KEY: str = os.environ.get("SECRET_KEY")

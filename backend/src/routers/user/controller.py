@@ -1,0 +1,48 @@
+from fastapi import security, HTTPException, status, Depends
+from sqlalchemy.orm import Session
+import jwt as _jwt
+
+from settings_env import SECRET_KEY
+from src.model.database import get_db
+from src.routers.user.service import service_get_user_by_login, service_create_token, service_create_admin, \
+    service_oauth2scheme, service_get_user_by_id, service_admin_check, service_get_feedbacks
+from src.schemas.schemas import SchemeUser
+
+
+async def controller_create_admin(db: Session):
+    message = await service_create_admin(db)
+    return message
+
+
+async def controller_generate_token(form_data: security.OAuth2PasswordRequestForm, db: Session):
+    user = await controller_auth_user(form_data.username, form_data.password, db)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Данные неверны")
+    token = await service_create_token(user)
+    return token
+
+
+async def controller_auth_user(login: str, password: str, db: Session):
+    user = await service_get_user_by_login(login, db)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Пользователь не найден")
+    if not user.verify_password(password):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Логин или пароль введены некорректно")
+    return user
+
+
+async def controller_get_current_user(token: str = Depends(service_oauth2scheme()), db: Session = Depends(get_db)):
+    try:
+        payload = _jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        user = await service_get_user_by_id(payload["id"], db)
+    except:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Ошибка в логине или пароле")
+    return SchemeUser.from_orm(user)
+
+
+async def controller_get_feedbacks(page: int, limit: int, solved: bool, user: SchemeUser, db: Session):
+    if not service_admin_check(user, db):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Доступ запрещен")
+    offset = page * limit
+    feedbacks = await service_get_feedbacks(offset, limit, solved, db)
+    return feedbacks
