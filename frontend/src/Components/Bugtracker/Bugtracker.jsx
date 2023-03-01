@@ -23,7 +23,6 @@ const BugTracker = () => {
         const postToken = async() =>{
             const res = await axios.post("/api/feedback", {token: token, feedback:{name: name, mail: mail, message: message}} );
         }
-        debugger
         postToken();
     }
 
