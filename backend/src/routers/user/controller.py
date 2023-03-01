@@ -4,14 +4,9 @@ import jwt as _jwt
 
 from settings_env import SECRET_KEY
 from src.model.database import get_db
-from src.routers.user.service import service_get_user_by_login, service_create_token, service_create_admin, \
-    service_oauth2scheme, service_get_user_by_id, service_admin_check, service_get_feedbacks
+from src.routers.user.service import service_get_user_by_login, service_create_token, \
+    service_oauth2scheme, service_get_user_by_id
 from src.schemas.schemas import SchemeUser
-
-
-async def controller_create_admin(db: Session):
-    message = await service_create_admin(db)
-    return message
 
 
 async def controller_generate_token(form_data: security.OAuth2PasswordRequestForm, db: Session):
@@ -39,10 +34,3 @@ async def controller_get_current_user(token: str = Depends(service_oauth2scheme(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Ошибка в логине или пароле")
     return SchemeUser.from_orm(user)
 
-
-async def controller_get_feedbacks(page: int, limit: int, solved: bool, user: SchemeUser, db: Session):
-    if not service_admin_check(user, db):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Доступ запрещен")
-    offset = page * limit
-    feedbacks = await service_get_feedbacks(offset, limit, solved, db)
-    return feedbacks
