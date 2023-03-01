@@ -193,3 +193,16 @@ class SchemeFeedback(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class SchemeFeedbackOutput(SchemeFeedback):
+    date: date
+    solved: bool
+
+
+class SchemeUser(BaseModel):
+    id: int
+    role_id: int
+
+    class Config:
+        orm_mode = True

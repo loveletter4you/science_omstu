@@ -1,5 +1,6 @@
 from sqlalchemy import Column, String, Boolean, Integer, Date, ForeignKey
 from sqlalchemy.orm import relationship
+from passlib.hash import bcrypt
 
 from src.model.database import Base
 
@@ -8,17 +9,20 @@ class Role(Base):
     __tablename__ = "role"
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True)
-    users = relationship("User")
+    users = relationship("User", backref='role')
 
 
 class User(Base):
     __tablename__ = "user"
     id = Column(Integer, primary_key=True)
-    email = Column(String, nullable=False)
+    email = Column(String)
     login = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
     role_id = Column(Integer, ForeignKey('role.id'))
     author = relationship("Author", uselist=False)
+
+    def verify_password(self, password: str):
+        return bcrypt.verify(password, self.password)
 
 
 class Author(Base):
