@@ -1,9 +1,8 @@
-from fastapi import APIRouter, UploadFile, File, Depends
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from src.model.database import get_db
-from src.routers.publication.controller import controller_get_publications, controller_get_publication_by_id, \
-    controller_fill_scopus
+from src.routers.publication.controller import controller_get_publications, controller_get_publication_by_id
 from src.schemas.routers import SchemePublicationsRouter, SchemePublicationRouter
 
 
@@ -26,9 +25,3 @@ async def get_publications(search: str = None,
 async def get_publication_by_id(id: int, db: Session = Depends(get_db)):
     publication = await controller_get_publication_by_id(id, db)
     return publication
-
-
-@router.post("/scopus/fill")
-async def scopus_fill(file: UploadFile = File(...), db: Session = Depends(get_db)):
-    message = await controller_fill_scopus(file, db)
-    return message

@@ -1,9 +1,7 @@
-import pandas as pd
-from fastapi import UploadFile
 from sqlalchemy import or_, and_, func, desc
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session
 
-from src.model.model import Author, Identifier, AuthorIdentifier, AuthorPublication, Publication
+from src.model.model import Author, AuthorPublication, Publication
 from src.schemas.schemas import SchemePublication, SchemeAuthor, SchemeAuthorProfile
 
 
@@ -50,61 +48,3 @@ async def service_get_author_publications(id: int, offset: int, limit: int, db: 
     scheme_publications = [SchemePublication.from_orm(publication) for publication in publications]
     count = query.count()
     return dict(publications=scheme_publications, count=count)
-
-
-async def service_fill_authors(file: UploadFile, db: Session):
-    author_df = pd.read_csv(file.file)
-    identifier_spin = db.query(Identifier).filter(Identifier.name == "SPIN-код").first()
-    if identifier_spin is None:
-        identifier_spin = Identifier(name="SPIN-код")
-        db.add(identifier_spin)
-    identifier_orcid = db.query(Identifier).filter(Identifier.name == "ORCID").first()
-    if identifier_orcid is None:
-        identifier_orcid = Identifier(name="ORCID")
-        db.add(identifier_orcid)
-    identifier_scopus = db.query(Identifier).filter(Identifier.name == "Scopus Author ID").first()
-    if identifier_scopus is None:
-        identifier_scopus = Identifier(name="Scopus Author ID")
-        db.add(identifier_scopus)
-    identifier_researcher = db.query(Identifier).filter(Identifier.name == "ResearcherID").first()
-    if identifier_researcher is None:
-        identifier_researcher = Identifier(name="ResearcherID")
-        db.add(identifier_researcher)
-    for _, row in author_df.iterrows():
-        author = Author(
-            name=row['name'],
-            surname=row['surname'],
-            patronymic=row['patronymic'],
-            confirmed=True
-        )
-        db.add(author)
-        if str(row['spin']) != "0":
-            author_identifier_spin = AuthorIdentifier(
-                author=author,
-                identifier=identifier_spin,
-                identifier_value=row['spin']
-            )
-            db.add(author_identifier_spin)
-        if str(row['orcid']) != "0":
-            author_identifier_orcid = AuthorIdentifier(
-                author=author,
-                identifier=identifier_orcid,
-                identifier_value=row['orcid']
-            )
-            db.add(author_identifier_orcid)
-        if str(row['scopus author id']) != "0":
-            author_identifier_scopus = AuthorIdentifier(
-                author=author,
-                identifier=identifier_scopus,
-                identifier_value=row['scopus author id']
-            )
-            db.add(author_identifier_scopus)
-        if str(row['researcher id']) != "0":
-            author_identifier_researcher = AuthorIdentifier(
-                author=author,
-                identifier=identifier_researcher,
-                identifier_value=row['researcher id']
-            )
-            db.add(author_identifier_researcher)
-    db.commit()
-    return {"message": "OK"}
