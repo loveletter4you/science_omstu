@@ -6,7 +6,8 @@ import publicationsSlice from "./slices/PublicationsSlice";
 import publicationSlice from "./slices/PublicationSlice";
 import SourceSlice from "./slices/SourceSlice";
 import SourcesSlice from "./slices/SourcesSlice";
-import {signInSlice} from "./slices/SignInSlice";
+import signInSlice from "./slices/SignInSlice";
+import feedbackSlice from "./slices/FeedbackSlice";
 
 
 
@@ -20,7 +21,8 @@ const store = configureStore({
         publication: publicationSlice,
         source: SourceSlice,
         sources: SourcesSlice,
-        signIn: signInSlice
+        signIn: signInSlice,
+        feedbacks: feedbackSlice
     }
 })
 

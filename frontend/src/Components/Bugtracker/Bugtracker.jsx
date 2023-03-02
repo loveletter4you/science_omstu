@@ -7,6 +7,7 @@ import axios from "axios";
 import {useDispatch} from "react-redux";
 
 const BugTracker = () => {
+
     const [isModal, setModal] = useState(false);
     const captchaRef = useRef(null);
     const dispatch = useDispatch();

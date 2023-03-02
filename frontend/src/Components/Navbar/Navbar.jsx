@@ -4,16 +4,19 @@ import {NavLink} from "react-router-dom";
 import BugTracker from "../Bugtracker/Bugtracker";
 import {useColorTheme} from "../Theme/Theme";
 import theme from "./../../assets/img/theme-dark.png"
+import {useSelector} from "react-redux";
+import Source from "../Source/Sourse";
+import SignOut from "../Auth/SignOut";
 
 const Navbar = () => {
 
-
+    const signIn = useSelector(state => state.signIn)
     const [Active, setActive] = useState(false);
     const toggle = () => {
         setActive(!Active);
     }
 
-    const { colorTheme, toggleColorTheme } = useColorTheme();
+    const {colorTheme, toggleColorTheme} = useColorTheme();
 
     const onChangeTheme = () => {
         toggleColorTheme();
@@ -48,16 +51,23 @@ const Navbar = () => {
                         <NavLink to="/source"
                                  className={navData => navData.isActive ? n.active : null}>Источники</NavLink>
                     </div>
+                    {signIn.isAuth? <div className={n.item} onClick={toggle}>
+                        <NavLink to = "/admin/feedbacks">Администратор</NavLink>
+                    </div>: null}
                     <div className={n.item}>
-                    <BugTracker/>
+                        <BugTracker/>
                     </div>
                     <div className={n.item}>
-                        <img src = {theme} className={n.image} onClick={onChangeTheme}/>
+                        <img src={theme} className={n.image} onClick={onChangeTheme}/>
                     </div>
-
-                    <NavLink to="/login">
-                        <button className={n.btn} onClick={toggle}>Войти</button>
-                    </NavLink>
+                    <div>
+                    {signIn.isAuth ?
+                        <div onClick={toggle}><SignOut/></div> :
+                        <NavLink to="/login">
+                            <button className={n.btn} onClick={toggle}>Войти</button>
+                        </NavLink>
+                    }
+                    </div>
                 </div>
             </div>
         </div>
