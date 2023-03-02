@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from src.model.database import get_db
 from src.routers.admin.controller import controller_create_admin, controller_get_feedbacks, controller_fill_authors, \
-    controller_fill_scopus
+    controller_fill_scopus, controller_fill_white_list
 from src.routers.user import controller_get_current_user
 from src.schemas.routers import SchemeFeedbacksGetRouter
 from src.schemas.schemas import SchemeUser
@@ -40,4 +40,11 @@ async def authors_fill(file: UploadFile = File(...),
 async def scopus_fill(file: UploadFile = File(...),
                       user: SchemeUser = Depends(controller_get_current_user), db: Session = Depends(get_db)):
     message = await controller_fill_scopus(file, user, db)
+    return message
+
+
+@router.post("/upload/white_list")
+async def scopus_fill(file: UploadFile = File(...),
+                      user: SchemeUser = Depends(controller_get_current_user), db: Session = Depends(get_db)):
+    message = await controller_fill_white_list(file, user, db)
     return message
