@@ -6,7 +6,7 @@ import {Route, Routes} from "react-router-dom";
 import Authors from "./Components/Authors/Authors";
 import Author from "./Components/Author/Author";
 import Publications from "./Components/Publications/Publications";
-import Auth from "./Components/Auth/Auth";
+import SignIn from "./Components/Auth/SignIn";
 import SignUp from "./Components/Auth/SignUp";
 import Publication from "./Components/Publication/Publication";
 import Sources from "./Components/Sources/Sourses";
@@ -29,7 +29,7 @@ function App(props) {
                     <Route path='/publication/:id'
                            element={<Publication/>}/>
                     <Route path = '/login'
-                           element={<Auth/>}/>
+                           element={<SignIn/>}/>
                     <Route path = '/registration'
                            element={<SignUp/>}/>
                     <Route path = '/source'
