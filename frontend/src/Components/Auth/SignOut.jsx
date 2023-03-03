@@ -1,21 +1,24 @@
-import React, {useState, useRef} from "react";
-import axios from "axios";
+import React from "react";
 import {useDispatch, useSelector} from "react-redux";
 import n from "../Navbar/Navbar.module.css";
-import {NavLink} from "react-router-dom";
-import {setIsAuth, setUserData} from "../../store/slices/SignInSlice";
+import {setIsAuth, setToken, setUserData} from "../../store/slices/SignInSlice";
+import { useCookies } from 'react-cookie';
 
 
 const SignOut = () => {
+    const signIn = useSelector(state => state.signIn)
     const dispatch = useDispatch();
+    const [cookies, setCookie, removeCookie] = useCookies(['token']);
     const logout = () =>{
         dispatch(setIsAuth(false));
-        dispatch(setUserData(null));
-        /*Cookies.remove("user");*/
+        removeCookie('token', {path:'/'});
+        dispatch(setToken(cookies.token));
+
     }
 
     return (<div>
             <button className={n.btn} onClick={logout}>Выйти</button>
+
         </div>
     );
 }

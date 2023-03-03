@@ -4,7 +4,8 @@ import { createSlice } from '@reduxjs/toolkit'
 const initialState = {
     username: null,
     password: null,
-    isAuth: false
+    isAuth: false,
+    token: {}
 
 };
 
@@ -19,11 +20,14 @@ export const signInSlice = createSlice({
             const {username, password} = action.payload;
             state.username = username;
             state.password = password;
+        },
+        setToken(state, action){
+            state.token = action.payload;
         }
     }
 })
 
-export const { setUserData, setIsAuth } = signInSlice.actions;
+export const { setUserData, setIsAuth, setToken } = signInSlice.actions;
 
 export default signInSlice.reducer;
 

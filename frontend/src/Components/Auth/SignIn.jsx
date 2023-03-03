@@ -3,7 +3,7 @@ import s from './SignIn.module.css'
 import {useForm} from "react-hook-form";
 import axios from "axios";
 import {useDispatch, useSelector} from "react-redux";
-import {setUserData, setIsAuth} from "../../store/slices/SignInSlice";
+import {setUserData, setIsAuth, setToken} from "../../store/slices/SignInSlice";
 import {Navigate} from "react-router-dom";
 import { useCookies } from 'react-cookie';
 
@@ -14,7 +14,7 @@ const SignIn = () => {
     const headers = {
         'Content-Type': 'application/x-www-form-urlencoded'
     }
-    const [_, setCookie] = useCookies(['token']);
+    const [cookies, setCookie, removeCookie] = useCookies(['token']);
 
     const onSubmit = (data) => {
         dispatch(setUserData(data));
@@ -25,11 +25,14 @@ const SignIn = () => {
             if (res.status === 200) {
                 dispatch(setIsAuth(true));
             }
-            setCookie('token', res.data, { path: '/', maxAge: 600});
+            setCookie('token', res.data, { path: '/' });
+            dispatch(setToken(cookies.token));
+            console.log(cookies.token)
+            removeCookie('token', {path: '/'});
+            console.log(cookies.token)
         }
         postUser();
     };
-
 
     return (<div>
             {signIn.isAuth ? <Navigate to={"/publication"}/> :
