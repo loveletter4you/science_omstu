@@ -12,8 +12,11 @@ import Publication from "./Components/Publication/Publication";
 import Sources from "./Components/Sources/Sourses";
 import Source from "./Components/Source/Sourse";
 import AuthorsPublications from "./Components/Author/AuthorsPublications";
+import Feedback from "./Components/Feedback/Feedback";
+import { withCookies } from 'react-cookie';
 
 function App(props) {
+
     return <div className='app-wrapper'>
         <main className="main">
         <div className="app-wrapper__container">
@@ -38,6 +41,8 @@ function App(props) {
                            element={<Source/>}/>
                     <Route path='/author/:id/publications'
                            element={<AuthorsPublications/>}/>
+                    <Route path= '/admin/feedbacks'
+                            element={<Feedback/>}/>
                 </Routes>
             </div>
             <Footer/>
@@ -46,4 +51,4 @@ function App(props) {
     </div>
 }
 
-export default App;
+export default withCookies(App);
