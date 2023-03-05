@@ -2,6 +2,8 @@
     grid-area: filter;
     margin: 10px 10px 0 0;
     padding-left: 10px;
+    color: var(--color-font);
+
 }
 .sort {
     position: relative;
@@ -62,7 +64,6 @@
 .sort ul li {
     padding: 10px;
     cursor: pointer;
-    background-color: white;
 }
 
 
@@ -91,10 +92,6 @@ nav ul li {
     border-left: 3px solid #06c895;
 }
 
-nav ul li:hover {
-    background: #f2f2f2;
-}
-
 nav ul li a {
     display: block;
     color: #06c895;
@@ -121,7 +118,6 @@ nav ul ul li a {
 
 nav ul ul li a:hover {
     background: #06c895;
-    color: #fff;
 }
 
 .burger {
@@ -134,7 +130,7 @@ nav ul ul li a:hover {
     }
     .container{
         margin-right: 0;
-        margin-bottom: 15px;
+        margin-bottom: 10px;
         border: 0px;
         padding-left: 0;
     }
@@ -145,25 +141,23 @@ nav ul ul li a:hover {
         width: 30px;
         height: 20px;
         z-index: 3;
-        margin-bottom: 5px;
-        margin-left: 5px;
     }
 
     .burger span {
         position: absolute;
-        background-color: black;
         width: 100%;
         height: 2px;
         top: 9px;
+        background-color: var(--background);
     }
 
     .burger:before,
     .burger:after {
         content: '';
-        background-color: black;
         position: absolute;
         width: 100%;
         height: 2px;
+        background-color: var(--background);
     }
 
     .burger:before {
@@ -184,7 +178,7 @@ nav ul ul li a:hover {
     .menu.active {
         top:0;
         position: static;
-        border: 1px solid black;
+        border: 1px solid;
         border-radius: 10px;
         margin: 15px 0px 0 0;
         padding-left: 10px;

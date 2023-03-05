@@ -9,6 +9,9 @@ import {setSize} from "../../store/slices/SourcesSlice";
 import {NavLink} from "react-router-dom";
 import preloader from "../../assets/img/preloader.svg";
 import {useDebounce} from "use-debounce";
+import {SourcesAPI} from "../api";
+import {useCookies} from "react-cookie";
+import Preloader from "../Preloader/Preloader";
 
 const Sources = () => {
 
@@ -18,6 +21,7 @@ const Sources = () => {
     const [search, setSearch] = useState('');
     const [isFetching, toggleIsFetching] = useState(false);
     const debouncedSearch = useDebounce(search, 500);
+    const [cookies, setCookies, removeCookies] = useCookies(['token'])
 
     const onSearchChange = (e) => {
         const {value} = e.target
@@ -28,7 +32,7 @@ const Sources = () => {
     const handlePageClick = (e) => {
         toggleIsFetching(true);
         const fetchAuthors = async () => {
-            const res = await axios.get(`/api/source?search=${search}&page=${e.selected}&limit=${pageSize}`);
+            const res = await SourcesAPI.getSourcesSearch(search, e.selected, pageSize);
             dispatch(setSource(res.data));
             toggleIsFetching(false);
         }
@@ -40,7 +44,7 @@ const Sources = () => {
         if(debouncedSearch[0] !== '') {
             toggleIsFetching(true);
             const fetchPublications = async () => {
-                const res = await axios.get(`/api/source?search=${search}&page=0&limit=${pageSize}`);
+                const res = await SourcesAPI.getSourcesSearch(search, 0, pageSize);
                 toggleIsFetching(false);
                 dispatch(setSource(res.data));
             }
@@ -49,7 +53,7 @@ const Sources = () => {
         else {
             toggleIsFetching(true);
             const fetchPublications = async () => {
-                const res = await axios.get(`/api/source?page=0&limit=${pageSize}`);
+                const res = await SourcesAPI.getSources(0, pageSize)
                 toggleIsFetching(false);
                 dispatch(setSource(res.data));
             }
@@ -77,7 +81,7 @@ const Sources = () => {
                 </li>
             </ul>
         </div>
-        {isFetching === true ? <img src={preloader} alt=""/> :
+        {isFetching === true ? <Preloader/> :
             <div className={s.block}>
                 {sources.map(source => <div>
                     <div className={s.source}>

@@ -12,6 +12,7 @@
     opacity: 0;
     pointer-events: none;
     transition: 0.5s;
+    z-index: 99;
 }
 
 .modal.active {
@@ -32,7 +33,7 @@
     color: black;
     border-radius: 10px;
     background-color: white;
-    width: 50vw;
+    width: 35vw;
     transform: scale(0.5);
     transition: 0.4s all;
 
@@ -41,4 +42,50 @@
 .modal__content.active {
     transform: scale(1);
 
+}
+
+.input {
+    border: 1px solid;
+    border-radius: 10px;
+    padding: 15px;
+    box-sizing: border-box;
+    background-color: white;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.form{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+.line{
+    display: inline-flex;
+    justify-content: space-between;
+}
+.title{
+    text-align: center;
+}
+@media (max-width: 991px) {
+    .form{
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+    }
+    .title{
+        text-align: left;
+    }
+    .input{
+        width: 60vw;
+    }
+
+    .line{
+        display: inline-flex;
+        justify-content: space-between;
+        flex-wrap: wrap
+
+    }
+    .modal__content {
+        width: 60vw;
+    }
 }

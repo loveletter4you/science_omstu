@@ -1,15 +1,15 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {NavLink} from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import {setData} from "../../store/slices/PublicationsSlice";
-import axios from "axios";
 import {useDispatch, useSelector} from "react-redux";
 import s from "../Publications/Publications.module.css";
-import preloader from "../../assets/img/preloader.svg";
+import {AuthorAPI} from "../api";
+import Preloader from "../Preloader/Preloader";
 
 
-const AuthorsPublications = (props) => {
-
+const AuthorsPublications = () => {
+    const author = useSelector(state => state.author);
     const dispatch = useDispatch();
     const {publications, pageSize, count} = useSelector(state => state.publications);
     let pageCount = Math.ceil(count / pageSize);
@@ -18,27 +18,35 @@ const AuthorsPublications = (props) => {
 
     const handlePageClick = (e) => {
         toggleIsFetching(true);
-        const fetchPublications = async () => {
-            const res = await axios.get(`/api/author/${props.id}/publications?page=${e.selected}&limit=${pageSize}`);
-            dispatch(setData(res.data));
-            toggleIsFetching(false);
+        try {
+            const fetchPublications = async () => {
+                const res = await AuthorAPI.getAuthorPageSize(author.id, e.selected, pageSize);
+                dispatch(setData(res.data));
+                toggleIsFetching(false);
+            }
+            fetchPublications();
+        } catch (e) {
+            console.log(e);
         }
-        fetchPublications();
     }
 
-    React.useEffect(() => {
+    useEffect(() => {
         toggleIsFetching(true);
-        const fetchPublications = async () => {
-            const res = await axios.get(`/api/author/${props.id}/publications?page=0&limit=${pageSize}`);
-            dispatch(setData(res.data));
-            toggleIsFetching(false);
+        try {
+            const fetchPublications = async () => {
+                const res = await AuthorAPI.getAuthorPageSize(author.id, 0, pageSize);
+                dispatch(setData(res.data));
+                toggleIsFetching(false);
+            }
+            fetchPublications();
+        } catch (e) {
+            console.log(e);
         }
-        fetchPublications();
-    }, [props.id]);
+    }, [author.id]);
 
-    return <div className={s.theme}>
-        {isFetching === true ? <img src={preloader} alt=""/> :
-            <div>
+    return <div>
+        {isFetching === true ? <Preloader/> :
+            <div className={s.theme}>
                 <div className={s.block}>
                     {publications === undefined ? 'Подождите пожалуйста' : publications.map(p => <div>
                         <div key={p.id} className={s.blocks}>
@@ -58,29 +66,28 @@ const AuthorsPublications = (props) => {
                         </div>
                     </div>)}
                 </div>
-
-                <ReactPaginate
-                    breakLabel="..."
-                    nextLabel="->"
-                    onPageChange={handlePageClick}
-                    pageRangeDisplayed={5}
-                    pageCount={pageCount}
-                    previousLabel="<-"
-                    renderOnZeroPageCount={null}
-
-                    pageClassName="page-item"
-                    pageLinkClassName="page-link"
-                    previousClassName="page-item"
-                    previousLinkClassName="page-link"
-                    nextClassName="page-item"
-                    nextLinkClassName="page-link"
-                    breakClassName="page-item"
-                    breakLinkClassName="page-link"
-                    containerClassName="pagination"
-                    activeClassName="active"
-                />
             </div>
         }
+        <ReactPaginate
+            breakLabel="..."
+            nextLabel="->"
+            onPageChange={handlePageClick}
+            pageRangeDisplayed={5}
+            pageCount={pageCount}
+            previousLabel="<-"
+            renderOnZeroPageCount={null}
+
+            pageClassName="page-item"
+            pageLinkClassName="page-link"
+            previousClassName="page-item"
+            previousLinkClassName="page-link"
+            nextClassName="page-item"
+            nextLinkClassName="page-link"
+            breakClassName="page-item"
+            breakLinkClassName="page-link"
+            containerClassName="pagination"
+            activeClassName="active"
+        />
     </div>
 }
 

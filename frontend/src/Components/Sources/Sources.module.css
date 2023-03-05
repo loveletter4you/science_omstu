@@ -46,3 +46,9 @@
     color: #06c895;
     font-weight: bold;
 }
+@media (max-width: 991px) {
+    .container {
+        display: flex;
+        flex-direction: column;
+    }
+}

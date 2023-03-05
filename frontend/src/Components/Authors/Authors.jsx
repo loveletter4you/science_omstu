@@ -9,6 +9,9 @@ import {useDispatch, useSelector} from "react-redux";
 import {setData, setSize} from "../../store/slices/AuthorsSlice";
 import preloader from "../../assets/img/preloader.svg";
 import {useDebounce} from "use-debounce";
+import {AuthorsAPI} from "../api";
+import {useCookies} from "react-cookie";
+import Preloader from "../Preloader/Preloader";
 
 
 const Authors = () => {
@@ -27,42 +30,48 @@ const Authors = () => {
 
     const handlePageClick = (e) => {
         toggleIsFetching(true);
-        const fetchAuthors = async () => {
-            const res = await axios.get(`/api/author?search=${search}&page=${e.selected}&limit=${pageSize}`);
-            dispatch(setData(res.data));
-            toggleIsFetching(false);
+        try {
+            const fetchAuthors = async () => {
+                const res = await AuthorsAPI.getAuthors(e.selected, pageSize);
+                dispatch(setData(res.data));
+                toggleIsFetching(false);
+            }
+            fetchAuthors();
+        } catch (e) {
+            console.log(e);
         }
-        fetchAuthors();
     }
 
 
     React.useEffect(() => {
-        if(debouncedSearch[0] !== '') {
-            toggleIsFetching(true);
-            const fetchPublications = async () => {
-                const res = await axios.get(`/api/author?search=${search}&page=0&limit=${pageSize}`);
-                toggleIsFetching(false);
-                dispatch(setData(res.data));
+        try {
+            if (debouncedSearch[0] !== '') {
+                toggleIsFetching(true);
+                const fetchPublications = async () => {
+                    const res = await AuthorsAPI.getAuthorsSearch(search, 0, pageSize);
+                    toggleIsFetching(false);
+                    dispatch(setData(res.data));
+                }
+                fetchPublications();
+            } else {
+                toggleIsFetching(true);
+                const fetchPublications = async () => {
+                    const res = await AuthorsAPI.getAuthors(0, pageSize)
+                    toggleIsFetching(false);
+                    dispatch(setData(res.data));
+                }
+                fetchPublications();
             }
-            fetchPublications();
-        }
-        else {
-            toggleIsFetching(true);
-            const fetchPublications = async () => {
-                const res = await axios.get(`/api/author?page=0&limit=${pageSize}`);
-                toggleIsFetching(false);
-                dispatch(setData(res.data));
-            }
-            fetchPublications();
+        } catch (e) {
+            console.log(e);
         }
     }, [pageSize, debouncedSearch[0]]);
-
 
     return (<div color={s.theme}>
         <div className={s.block}>
             <input className={c.search} placeholder='Поиск' type="text" value={search} onChange={onSearchChange}/>
         </div>
-            {isFetching === true ? <img src={preloader} alt=""/> :
+            {isFetching === true ? <Preloader/> :
                 <div>
                     <div className={s.block}>
 

@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import {Provider} from "react-redux";
-import { CookiesProvider } from 'react-cookie';
+import {Cookies, CookiesProvider} from 'react-cookie';
 import {BrowserRouter} from "react-router-dom";
 import store from "./store/Store";
 
@@ -12,13 +12,13 @@ import store from "./store/Store";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
+    <CookiesProvider>
     <BrowserRouter>
         <Provider store={store}>
-            <CookiesProvider>
             <App/>
-            </CookiesProvider>
         </Provider>
     </BrowserRouter>
+    </CookiesProvider>
 );
 
 reportWebVitals();

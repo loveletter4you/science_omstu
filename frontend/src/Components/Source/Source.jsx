@@ -6,6 +6,9 @@ import {setSource} from "../../store/slices/SourceSlice";
 import s from "./Source.module.css"
 import preloader from "../../assets/img/preloader.svg";
 import SourcePublications from "../Source/SourcesPublication";
+import {SourceAPI} from "../api";
+import {useCookies} from "react-cookie";
+import Preloader from "../Preloader/Preloader";
 
 const Source = () => {
 
@@ -14,11 +17,12 @@ const Source = () => {
     const source = useSelector(state => state.source)
     const {publications, pageSize, count} = useSelector(state => state.publications);
     const [isFetching, toggleIsFetching] = useState(false);
+    const [cookies, setCookies, removeCookies] = useCookies(['token'])
 
     React.useEffect(() => {
         toggleIsFetching(true);
         const fetchSource = async () => {
-            const res = await axios.get(`/api/source/${params.id}/`);
+            const res = await SourceAPI.getSource(params.id);
             dispatch(setSource(res.data));
             toggleIsFetching(false);
         }
@@ -28,7 +32,7 @@ const Source = () => {
     React.useEffect(() => {
         toggleIsFetching(true);
         const fetchSource = async () => {
-            const res = await axios.get(`/api/source/${params.id}/publications?page=0&limit=${pageSize}`);
+            const res = await SourceAPI.getSourcePageSize(params.id, 0,pageSize);
             dispatch(setSource(res.data));
             toggleIsFetching(false);
         }
@@ -36,7 +40,7 @@ const Source = () => {
     }, [pageSize]);
 
     return <div className={s.theme}>
-        {isFetching === true ? <img src={preloader} alt=""/> :
+        {isFetching === true ? <Preloader/> :
             <div>
                 <div className={s.block}>
                     <div>{source.source_type.name}</div>
@@ -47,14 +51,14 @@ const Source = () => {
                         {l.source_link_type.name}{l.link === null ? '' : ':'} {l.link}
                     </div>)}</div>
                 </div>
-                <div className={s.block}>
-                    <div>{source.source_ratings.map(r => <div>
+                <div>
+                    <div className={s.lineBlock}>{source.source_ratings.map(r => <div className={s.blockRating}>
                         <div>{r.source_rating_type.name}</div>
                         <div>{r.rating}</div>
                         <div>{r.rating_date}</div>
                     </div>)}</div>
                 </div>
-                <SourcePublications id={source.id}/>
+                <SourcePublications/>
             </div>
         }
     </div>

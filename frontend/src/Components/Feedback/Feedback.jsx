@@ -1,57 +1,62 @@
 import React, {useState}  from "react";
 import {setData} from "../../store/slices/FeedbackSlice";
 import {useDispatch, useSelector} from "react-redux";
-import axios from "axios";
 import ReactPaginate from "react-paginate";
-import { useCookies } from 'react-cookie';
+import {FeedbackAPI} from "../api";
+import s from "./Feedback.module.css"
+import {useCookies} from "react-cookie";
+import Preloader from "../Preloader/Preloader";
 
 const Feedback = () => {
     const signIn = useSelector(state => state.signIn)
-
+    const [cookies, setCookies, removeCookies] = useCookies(['token'])
     const {feedbacks, currentPage, pageSize, count} = useSelector(state => state.feedbacks);
     const dispatch = useDispatch();
     let pageCount = Math.ceil(count / pageSize);
     const [isFetching, toggleIsFetching] = useState(false);
-    const [cookies, _] = useCookies(['token']);
-    const headers = {
-        'Authorization': 'Bearer ' + cookies.token["access_token"]
-    }
+
     const handlePageClick = (e) => {
         toggleIsFetching(true);
-        const fetchFeedback = async () => {
-            const res = await axios.get(`/api/admin/feedbacks&page=${e.selected}&limit=${pageSize}`, {
-                headers: headers
-            });
-            dispatch(setData(res.data));
-            toggleIsFetching(false);
+        try {
+            const fetchFeedback = async () => {
+                const res = await FeedbackAPI.getFeedback(e.selected, pageSize, cookies.token);
+                dispatch(setData(res.data));
+                toggleIsFetching(false);
+                console.log(cookies.token)
+            }
+            fetchFeedback();
+        } catch (e) {
+            console.log(e);
         }
-        fetchFeedback();
     }
 
     React.useEffect(() => {
-
             toggleIsFetching(true);
-            const fetchFeedback = async () => {
-                const res = await axios.get(`/api/admin/feedbacks?page=0&limit=${pageSize}`, {
-                    headers: headers
-                });
-                toggleIsFetching(false);
-                dispatch(setData(res.data));
+            try {
+                const fetchFeedback = async () => {
+                    const res = await FeedbackAPI.getFeedback(0, pageSize, cookies.token);
+                    toggleIsFetching(false);
+                    dispatch(setData(res.data));
+                }
+                fetchFeedback();
+            }catch (e){
+                console.log(e);
             }
-        fetchFeedback();
 
     }, [pageSize]);
 
 
     return <div>
-        {cookies.token["access_token"] === signIn.token?<div><div>
-            {feedbacks.map(f=> <div>
-                <div>{f.name}</div>
-                <div>{f.mail}</div>
-                <div>{f.message}</div>
-                <div>{f.data}</div>
+        {isFetching === true ? <Preloader/> :
+        <div>
+        {signIn.isAuth? <div>
+            {feedbacks.map(f=> <div className={s.block}>
+                <div>Имя: {f.name}</div>
+                <div>Почта: {f.mail}</div>
+                <div>Сообщение: {f.message}</div>
+                <div>Дата: {f.date}</div>
             </div>)}
-        </div>
+
             <ReactPaginate
                 breakLabel="..."
                 nextLabel="->"
@@ -71,7 +76,9 @@ const Feedback = () => {
                 breakLinkClassName="page-link"
                 containerClassName="pagination"
                 activeClassName="active"
-            /></div> : null}
+            /> </div>: null}
+        </div>
+        }
     </div>
 }
 

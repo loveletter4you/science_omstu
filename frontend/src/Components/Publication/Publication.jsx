@@ -6,6 +6,8 @@ import {setPublic} from "../../store/slices/PublicationSlice";
 import s from "./Publication.module.css"
 import {NavLink} from "react-router-dom";
 import preloader from "../../assets/img/preloader.svg";
+import {PublicationAPI} from "../api";
+import Preloader from "../Preloader/Preloader";
 
 const Publication = () => {
     const params = useParams();
@@ -17,7 +19,7 @@ const Publication = () => {
     React.useEffect(() => {
         toggleIsFetching(true);
         const fetchPublic = async () => {
-            const res = await axios.get(`/api/publication/${params.id}`);
+            const res = await PublicationAPI.getPublication(params.id);
             dispatch(setPublic(res.data));
             toggleIsFetching(false);
         }
@@ -25,7 +27,7 @@ const Publication = () => {
     }, [])
 
     return (<div className={s.theme}>
-            {isFetching === true ? <img src={preloader} alt=""/> :
+            {isFetching === true ? <Preloader/> :
                 <div>
                     <div className={s.block}>
                         <div>{publication.publication_type.name}</div>
