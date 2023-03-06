@@ -11,8 +11,3 @@
 
 }
 
-@media (max-width: 991px) {
-    .footer{
-       min-width: 350px;
-    }
-}

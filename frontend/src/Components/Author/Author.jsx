@@ -1,16 +1,18 @@
 import React, {useState} from 'react';
 import {useParams} from "react-router-dom";
-import axios from "axios";
 import s from './Author.module.css'
 import {useDispatch, useSelector} from "react-redux";
 import {setAuthor} from "../../store/slices/AuthorSlice";
 import avatar from "../../assets/img/avatar.svg"
 import AuthorsPublications from "./AuthorsPublications";
 import {setData} from "../../store/slices/PublicationsSlice";
-import preloader from "./../../assets/img/preloader.svg"
+import {AuthorAPI, getAuthor, getAuthorPageSize} from "../api";
+import {useCookies} from "react-cookie";
+import Preloader from "../Preloader/Preloader";
 
 const Author = () => {
 
+    const [cookies, setCookies, removeCookies] = useCookies(['token'])
 
     const params = useParams();
     const dispatch = useDispatch();
@@ -20,27 +22,35 @@ const Author = () => {
 
     React.useEffect(() => {
        toggleIsFetching(true);
-        const fetchAuthor = async () => {
-            const res = await axios.get(`/api/author/${params.id}/`);
-            dispatch(setAuthor(res.data));
-            toggleIsFetching(false);
-        }
-        fetchAuthor();
+       try {
+           const fetchAuthor = async () => {
+               const res = await AuthorAPI.getAuthor(params.id);
+               dispatch(setAuthor(res.data));
+               toggleIsFetching(false);
+           }
+           fetchAuthor();
+       } catch (e) {
+           console.log(e);
+       }
     }, [params.id])
 
 
     React.useEffect(() => {
         toggleIsFetching(true);
-        const fetchPublications = async () => {
-            const res = await axios.get(`/api/author/${params.id}/publications?page=0&limit=${pageSize}`);
-            dispatch(setData(res.data));
-            toggleIsFetching(false);
+        try {
+            const fetchPublications = async () => {
+                const res = await AuthorAPI.getAuthorPageSize(params.id, 0, pageSize)
+                dispatch(setData(res.data));
+                toggleIsFetching(false);
+            }
+            fetchPublications();
+        } catch (e) {
+            console.log(e);
         }
-        fetchPublications();
     }, [pageSize]);
 
     return (<div className={s.theme}>
-            {isFetching === true? <img src={preloader} alt=""/> :
+            {isFetching === true? <Preloader/> :
             <div>
                 {author === undefined ? 'Подождите пожалуйста' : <>
                     <div className={s.block}>
@@ -56,7 +66,7 @@ const Author = () => {
                     </div>
                     <div className={s.title}>
                     </div>
-                    <AuthorsPublications id={author.id}/>
+                    <AuthorsPublications/>
 
                 </>
                 }

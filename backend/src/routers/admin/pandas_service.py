@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from fastapi import UploadFile
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, or_, func
 from sqlalchemy.orm import Session
 
 import datetime
@@ -11,7 +11,7 @@ from src.model.model import PublicationLinkType, SourceType, SourceLinkType, Ide
     AuthorPublicationOrganization, Keyword, KeywordPublication, SourceRatingType, SourceRating, Organization
 
 
-async def service_fill_scopus(file: UploadFile, db: Session):
+async def service_fill_scopus(date: datetime.date, file: UploadFile, db: Session):
     scopus_df = pd.read_csv(file.file, on_bad_lines='skip')
     scopus_df = scopus_df.replace(np.nan, "")
     pub_link_type_doi = db.query(PublicationLinkType).filter(PublicationLinkType.name == "DOI").first()
@@ -60,7 +60,11 @@ async def service_fill_scopus(file: UploadFile, db: Session):
         db.add(organization_omstu)
 
     for _, row in scopus_df.iterrows():
-        source = db.query(Source).filter(Source.name == row['Source title']).first()
+        issn = str(row['ISSN']).rjust(8, '0')
+        issn = issn[:4] + '-' + issn[4:]
+        source = db.query(Source).filter(func.lower(Source.name) == str(row['Source title']).lower()).first()
+        if source is None:
+            source = db.query(Source).join(SourceLink).filter(SourceLink.link == issn).first()
         if source is None:
             source = Source(name=row['Source title'])
             if row['Document Type'] == "Conference Paper":
@@ -72,14 +76,14 @@ async def service_fill_scopus(file: UploadFile, db: Session):
                 source_rating_type=scopus_rating_type,
                 source=source,
                 rating="Входит",
-                rating_date=datetime.date(year=2023, month=1, day=1)
+                rating_date=date
             )
             db.add(source_rating_scopus)
             if row['ISSN'] != "":
                 source_link = SourceLink(
                     source=source,
                     source_link_type=source_link_type_issn,
-                    link=row['ISSN']
+                    link=issn
                 )
                 db.add(source_link)
             db.commit()
@@ -197,6 +201,7 @@ async def service_fill_scopus(file: UploadFile, db: Session):
 
 async def service_fill_authors(file: UploadFile, db: Session):
     author_df = pd.read_csv(file.file)
+    author_df = author_df.replace(np.nan, "")
     identifier_spin = db.query(Identifier).filter(Identifier.name == "SPIN-код").first()
     if identifier_spin is None:
         identifier_spin = Identifier(name="SPIN-код")
@@ -214,6 +219,11 @@ async def service_fill_authors(file: UploadFile, db: Session):
         identifier_researcher = Identifier(name="ResearcherID")
         db.add(identifier_researcher)
     for _, row in author_df.iterrows():
+        author = db.query(Author).filter(and_(Author.name == row['name'],
+                                              Author.surname == row['surname'],
+                                              Author.patronymic == row['patronymic'])).first()
+        if not (author is None):
+            continue
         author = Author(
             name=row['name'],
             surname=row['surname'],
@@ -249,5 +259,157 @@ async def service_fill_authors(file: UploadFile, db: Session):
                 identifier_value=row['researcher id']
             )
             db.add(author_identifier_researcher)
-    db.commit()
+        db.commit()
     return {"message": "OK"}
+
+
+async def service_white_list_fill(date: datetime.date, file: UploadFile, db: Session):
+    white_list_df = pd.read_csv(file.file, on_bad_lines='skip', sep='\t')
+    white_list_df = white_list_df.replace(np.nan, "")
+    white_list_rating_type = db.query(SourceRatingType).filter(SourceRatingType.name == '«Белый список» РЦНИ').first()
+    if white_list_rating_type is None:
+        white_list_rating_type = SourceRatingType(name='«Белый список» РЦНИ')
+        db.add(white_list_rating_type)
+    source_link_type_issn = db.query(SourceLinkType).filter(SourceLinkType.name == "ISSN").first()
+    if source_link_type_issn is None:
+        source_link_type_issn = SourceLinkType(name="ISSN")
+        db.add(source_link_type_issn)
+    source_link_type_eissn = db.query(SourceLinkType).filter(SourceLinkType.name == "eISSN").first()
+    if source_link_type_eissn is None:
+        source_link_type_eissn = SourceLinkType(name="eISSN")
+        db.add(source_link_type_eissn)
+    source_type_journal = db.query(SourceType).filter(SourceType.name == "Журнал").first()
+    if source_type_journal is None:
+        source_type_journal = SourceType(name="Журнал")
+        db.add(source_type_journal)
+    for _, row in white_list_df.iterrows():
+        source = db.query(Source).filter(func.lower(Source.name) == str(row['Title']).lower()).first()
+        if not (source is None):
+            source_rating_white_list = SourceRating(
+                source_rating_type=white_list_rating_type,
+                source=source,
+                rating="Входит",
+                rating_date=date
+            )
+            db.add(source_rating_white_list)
+            continue
+        issns = row['ISSN'].split('|')
+        for issn in issns:
+            source_link = db.query(SourceLink).filter(SourceLink.link == issn).first()
+            if not (source_link is None):
+                source = source_link.source
+                source_rating_white_list = SourceRating(
+                    source_rating_type=white_list_rating_type,
+                    source=source,
+                    rating="Входит",
+                    rating_date=date
+                )
+                db.add(source_rating_white_list)
+                break
+        if source is None:
+            source = Source(
+                name=row['Title'],
+                source_type=source_type_journal
+            )
+            db.add(source)
+            source_rating_white_list = SourceRating(
+                source_rating_type=white_list_rating_type,
+                source=source,
+                rating="Входит",
+                rating_date=date
+            )
+            db.add(source_rating_white_list)
+            if len(issns) > 1:
+                source_link_issn = SourceLink(
+                    source=source,
+                    source_link_type=source_link_type_issn,
+                    link=issns[0]
+                )
+                db.add(source_link_issn)
+                source_link_eissn = SourceLink(
+                    source=source,
+                    source_link_type=source_link_type_eissn,
+                    link=issns[1]
+                )
+                db.add(source_link_eissn)
+            else:
+                source_link_issn = SourceLink(
+                    source=source,
+                    source_link_type=source_link_type_issn,
+                    link=issns[0]
+                )
+                db.add(source_link_issn)
+    db.commit()
+    return dict(message="OK")
+
+
+async def service_jcr_list_fill(date: datetime.date, file: UploadFile, db: Session):
+    jcr_df = pd.read_excel(file.file)
+    jcr_df = jcr_df.replace(np.nan, "")
+    jcr_rating_type = db.query(SourceRatingType).filter(SourceRatingType.name == 'Journal Citation Reports WoS').first()
+    if jcr_rating_type is None:
+        jcr_rating_type = SourceRatingType(name='Journal Citation Reports WoS')
+        db.add(jcr_rating_type)
+    source_link_type_issn = db.query(SourceLinkType).filter(SourceLinkType.name == "ISSN").first()
+    if source_link_type_issn is None:
+        source_link_type_issn = SourceLinkType(name="ISSN")
+        db.add(source_link_type_issn)
+    source_link_type_eissn = db.query(SourceLinkType).filter(SourceLinkType.name == "eISSN").first()
+    if source_link_type_eissn is None:
+        source_link_type_eissn = SourceLinkType(name="eISSN")
+        db.add(source_link_type_eissn)
+    source_type_journal = db.query(SourceType).filter(SourceType.name == "Журнал").first()
+    if source_type_journal is None:
+        source_type_journal = SourceType(name="Журнал")
+        db.add(source_type_journal)
+    for _, row in jcr_df.iterrows():
+        source = db.query(Source).filter(func.lower(Source.name) == str(row['journal name']).lower()).first()
+        if not (source is None):
+            source_rating_white_list = SourceRating(
+                source_rating_type=jcr_rating_type,
+                source=source,
+                rating=row['category'],
+                rating_date=date
+            )
+            db.add(source_rating_white_list)
+            continue
+        source_link = db.query(SourceLink)\
+            .filter(or_(SourceLink.link == row['issn'], SourceLink.link == row['eissn'])).first()
+        if not (source_link is None):
+            source = source_link.source
+            source_rating_white_list = SourceRating(
+                source_rating_type=jcr_rating_type,
+                source=source,
+                rating=row['category'],
+                rating_date=date
+            )
+            db.add(source_rating_white_list)
+            continue
+        source = Source(
+            name=row['journal name'],
+            source_type=source_type_journal
+        )
+        db.add(source)
+        source_rating_white_list = SourceRating(
+            source_rating_type=jcr_rating_type,
+            source=source,
+            rating=row['category'],
+            rating_date=date
+        )
+        db.add(source_rating_white_list)
+        if row['issn'] != "N/A":
+            source_link_issn = SourceLink(
+                source=source,
+                source_link_type=source_link_type_issn,
+                link=row['issn']
+            )
+            db.add(source_link_issn)
+        if row['eissn'] != "N/A":
+            source_link_issn = SourceLink(
+                source=source,
+                source_link_type=source_link_type_eissn,
+                link=row['eissn']
+            )
+            db.add(source_link_issn)
+    db.commit()
+    return dict(message="OK")

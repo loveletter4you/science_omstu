@@ -6,19 +6,16 @@ import { useCookies } from 'react-cookie';
 
 
 const SignOut = () => {
+    const [cookies, setCookies, removeCookies] = useCookies(['token'])
     const signIn = useSelector(state => state.signIn)
     const dispatch = useDispatch();
-    const [cookies, setCookie, removeCookie] = useCookies(['token']);
     const logout = () =>{
         dispatch(setIsAuth(false));
-        removeCookie('token', {path:'/'});
-        dispatch(setToken(cookies.token));
+        removeCookies('token', {path: '/'});
 
     }
-
     return (<div>
             <button className={n.btn} onClick={logout}>Выйти</button>
-
         </div>
     );
 }

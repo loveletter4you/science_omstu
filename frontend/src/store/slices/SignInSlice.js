@@ -5,7 +5,7 @@ const initialState = {
     username: null,
     password: null,
     isAuth: false,
-    token: {}
+    error: null
 
 };
 
@@ -21,13 +21,13 @@ export const signInSlice = createSlice({
             state.username = username;
             state.password = password;
         },
-        setToken(state, action){
-            state.token = action.payload;
+        setError(state,action){
+            state.error = action.payload;
         }
     }
 })
 
-export const { setUserData, setIsAuth, setToken } = signInSlice.actions;
+export const { setUserData, setIsAuth, setError } = signInSlice.actions;
 
 export default signInSlice.reducer;
 

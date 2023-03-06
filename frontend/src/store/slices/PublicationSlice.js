@@ -1,21 +1,22 @@
-import {createSlice} from "@reduxjs/toolkit";
+import { createSlice} from "@reduxjs/toolkit";
+
+
 
 const initialState = {
-    id: null,
-    publication_type: [],
-    source: [],
-    title: null,
-    publication_date: null,
-    publication_authors: [{
-        author: {},
-        author_publication_organizations:[],
+        id: null,
+        publication_type: [],
+        source: [],
+        title: null,
+        publication_date: null,
+        publication_authors: [{
+            author: {},
+            author_publication_organizations: [],
 
-    }],
-    abstract: null,
-    accepted: false,
-    keyword_publications: [],
-    publication_links: [],
-
+        }],
+        abstract: null,
+        accepted: false,
+        keyword_publications: [],
+        publication_links: [],
 
 };
 
@@ -24,9 +25,11 @@ const publicationSlice = createSlice({
     initialState,
     reducers: {
         setPublic(state, action) {
-            const {id, publication_type, source, title, publication_date,
-                publication_authors, abstract, accepted , keyword_publications,
-                publication_links} = action.payload.publication;
+            const {
+                id, publication_type, source, title, publication_date,
+                publication_authors, abstract, accepted, keyword_publications,
+                publication_links
+            } = action.payload.publication;
             state.id = id;
             state.publication_type = publication_type;
             state.source = source;
@@ -38,7 +41,7 @@ const publicationSlice = createSlice({
             state.keyword_publications = keyword_publications;
             state.publication_links = publication_links;
         }
-    }
+    },
 });
 
 

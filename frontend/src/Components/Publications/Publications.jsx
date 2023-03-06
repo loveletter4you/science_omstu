@@ -2,13 +2,14 @@ import React, {useState} from 'react';
 import s from './Publications.module.css';
 import c from './../Search/Search.module.css';
 import {useDispatch, useSelector} from "react-redux";
-import axios from "axios";
 import {setData} from "../../store/slices/PublicationsSlice";
 import ReactPaginate from "react-paginate";
 import {NavLink} from "react-router-dom";
 import PublicationFilter from "../Filters/PublicationFilter";
-import preloader from "../../assets/img/preloader.svg";
 import {useDebounce} from "use-debounce";
+import {PublicationsAPI} from "../api";
+import {useCookies} from "react-cookie";
+import Preloader from "../Preloader/Preloader";
 
 const Publications = () => {
 
@@ -19,6 +20,7 @@ const Publications = () => {
     const [search, setSearch] = useState('');
     const [isFetching, toggleIsFetching] = useState(false);
     const debouncedSearch = useDebounce(search, 500);
+    const [cookies, setCookies, removeCookies] = useCookies(['token'])
 
 
     const onSearchChange = (e) => {
@@ -28,19 +30,23 @@ const Publications = () => {
 
     const handlePageClick = (e) => {
         toggleIsFetching(true);
+        try{
         const fetchPublications = async () => {
-            const res = await axios.get(`/api/publication?search=${search}&page=${e.selected}&limit=${pageSize}`);
+            const res = await PublicationsAPI.getPublicationsSearch(search, e.selected, pageSize);
             dispatch(setData(res.data));
             toggleIsFetching(false);
         }
         fetchPublications();
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     React.useEffect(() => {
         if(debouncedSearch[0] !== '') {
             toggleIsFetching(true);
             const fetchPublications = async () => {
-                const res = await axios.get(`/api/publication?search=${search}&page=0&limit=${pageSize}`);
+                const res = await PublicationsAPI.getPublicationsSearch(search, 0, pageSize);
                 toggleIsFetching(false);
                 dispatch(setData(res.data));
             }
@@ -49,7 +55,7 @@ const Publications = () => {
         else {
             toggleIsFetching(true);
             const fetchPublications = async () => {
-                const res = await axios.get(`/api/publication?page=0&limit=${pageSize}`);
+                const res = await PublicationsAPI.getPublications(0, pageSize)
                 toggleIsFetching(false);
                 dispatch(setData(res.data));
             }
@@ -61,7 +67,7 @@ const Publications = () => {
             <input className={c.search} placeholder='Поиск' type="text" value={search} onChange={onSearchChange}/>
 
             <PublicationFilter/>
-            {isFetching === true ? <img src={preloader} alt=""/> :
+            {isFetching === true ? <Preloader/> :
                 <div>
                     <div className={s.block}>
                         {publications === undefined ? 'Подождите пожалуйста' : publications.map(p => <div>

@@ -5,8 +5,8 @@ import BugTracker from "../Bugtracker/Bugtracker";
 import {useColorTheme} from "../Theme/Theme";
 import theme from "./../../assets/img/theme-dark.png"
 import {useSelector} from "react-redux";
-import Source from "../Source/Sourse";
 import SignOut from "../Auth/SignOut";
+import {useCookies} from "react-cookie";
 
 const Navbar = () => {
 
@@ -17,7 +17,6 @@ const Navbar = () => {
     }
 
     const {colorTheme, toggleColorTheme} = useColorTheme();
-
     const onChangeTheme = () => {
         toggleColorTheme();
     };
