@@ -4,6 +4,7 @@
     font-size: 18px;
     line-height: 28px;
     color: var(--color-font);
+
 }
 .appWrapperNavbar a{
     color: var(--color-font);
@@ -69,26 +70,6 @@
 
 }
 
-/*.sun{
-    position: relative;
-    display: inline-block;
-    vertical-align: middle;
-    z-index: 3;
-}
-.sun:before, .sun:after{
-    contant:'';
-    display: block;
-}
-
-.sun span{
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    box-shadow: var(--moon-shadow);
-    margin: var(--moon-margin);
-}*/
-
 @media (max-width: 991px) {
 
 
@@ -136,12 +117,14 @@
         transition: all 0.3s ease 0s;
         background-color: var(--color-background);
         color: var(--color-font);
+        z-index: 5;
     }
 
     .menu.active {
         right: 0;
         opacity: 1;
-        visibility: visible;
+        pointer-events: all;
+
     }
 
 
@@ -157,6 +140,7 @@
         left: 0;
         width: 100%;
         height: 100%;
+        background-color: var(--color-background-menu);
         transition: all 0.3s ease 0s;
     }
 

@@ -27,7 +27,9 @@ body {
 
 :root {
   --color-background: #FFFFFF;
-  --color-font: #000000;
+  --color-background-menu: rgba(0, 0, 0, 0.4);;
+  --color-font: #202124;
+  --font-color: #BDC1C6;
   --filter:invert(0%);
   --background: #000000;
   --moon-shadow: 5px 5px 0 0 #202124;
@@ -41,6 +43,7 @@ html[data-theme="dark"] {
   --background: #FFFFFF;
   --moon-margin: none;
   --moon-shadow: #BDC1C6;
+  --font-color: #202124;
 }
 
 

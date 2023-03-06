@@ -36,7 +36,6 @@
     width: 35vw;
     transform: scale(0.5);
     transition: 0.4s all;
-
 }
 
 .modal__content.active {

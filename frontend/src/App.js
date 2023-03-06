@@ -33,7 +33,7 @@ function App(props) {
         }
     }, [])
 
-    return <div className='app-wrapper'>
+    return <div className='app-wrapper' id = 'app-wrapper'>
         <main className="main">
             <div className="app-wrapper__container">
                 <Header/>
