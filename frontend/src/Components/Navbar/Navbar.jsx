@@ -15,9 +15,16 @@ const Navbar = () => {
     const toggle = () => {
         setActive(!Active);
     }
-
+    const [cookiesTheme, setCookiesTheme] = useCookies(['theme']);
     const {colorTheme, toggleColorTheme} = useColorTheme();
+
+    useEffect(()=>{
+        if(cookiesTheme.theme !== colorTheme){
+            toggleColorTheme();
+        }
+    },[])
     const onChangeTheme = () => {
+        document.getElementById("app-wrapper").style.transition = '.5s ease-in-out';
         toggleColorTheme();
     };
 
@@ -56,8 +63,8 @@ const Navbar = () => {
                     <div className={n.item}>
                         <BugTracker/>
                     </div>
-                    <div className={n.item}>
-                        <img src={theme} className={n.image} onClick={onChangeTheme}/>
+                    <div className={n.item} onClick={onChangeTheme}>
+                        <img src={theme} className={n.image} />
                     </div>
                     <div>
                     {signIn.isAuth ?

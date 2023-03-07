@@ -20,6 +20,7 @@
     text-decoration: none;
 }
 .source {
+    display: flex;
     flex-direction: column;
     border: 1px solid;
     padding: 10px;
@@ -46,7 +47,7 @@
     color: #06c895;
     font-weight: bold;
 }
-@media (max-width: 991px) {
+@media (max-width: 1201px) {
     .container {
         display: flex;
         flex-direction: column;

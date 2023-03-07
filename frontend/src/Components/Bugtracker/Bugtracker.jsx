@@ -10,10 +10,10 @@ const BugTracker = () => {
 
     const [isModal, setModal] = useState(false);
     const captchaRef = useRef(null);
-    const dispatch = useDispatch();
 
 
     const handleSubmit = (e) => {
+        setModal(false)
         e.preventDefault();
         const message = document.getElementById("message").value;
         const token = captchaRef.current.getValue();
@@ -30,21 +30,20 @@ const BugTracker = () => {
         postToken();
     }
 
-
     return (<div>
             <img src={bugtracker} className={s.image} onClick={() => setModal(true)}/>
             {isModal ? <Modal visible={true} active={isModal} setActive={setModal}>
                 <form onSubmit={handleSubmit} className={s.form}>
                     <div className={s.title}>Форма обратной связи</div>
                     <div className={s.line}>
-                    <div>
-                        <div>Имя</div>
-                        <input type="text" name="name" className={s.input}/>
-                    </div>
-                    <div>
-                    <div>Почта</div>
-                    <input type="text" name="mail" className={s.input}/>
-                    </div>
+                        <div>
+                            <div>Имя</div>
+                            <input type="text" name="name" className={s.input}/>
+                        </div>
+                        <div>
+                            <div>Почта</div>
+                            <input type="text" name="mail" className={s.input}/>
+                        </div>
                     </div>
                     <div>Сообщение</div>
                     <textarea className={s.input} id="message" name="message"/>

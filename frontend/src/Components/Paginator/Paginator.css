@@ -27,6 +27,7 @@
 .page-item.active .page-link {
     background-color: #06c895;
     border-color: #06c895;
+    color: var(--font-color);
 }
 
 .page-link{

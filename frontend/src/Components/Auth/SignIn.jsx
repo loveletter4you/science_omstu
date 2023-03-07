@@ -15,6 +15,8 @@ const SignIn = () => {
     const [cookies, setCookies, removeCookies] = useCookies(['token'])
 
     const onSubmit = (data) => {
+        console.log(data)
+        dispatch(setUserData(data));
         const postUser = async () => {
             try {
                 const res = await postSignIn(data);
@@ -23,8 +25,9 @@ const SignIn = () => {
                 if (res.status === 200) {
                     dispatch(setIsAuth(true));
                 }
+                data.checkbox === true?setCookies('token', res.data.access_token, {path: '/', maxAge: 60 * 60 * 24 * 30, secure: true}):
+                    setCookies('token', res.data.access_token, {path: '/', maxAge: 1800, secure: true})
 
-                setCookies('token', res.data.access_token, {path: '/', maxAge: 60 * 60 * 24 * 30})
                 console.log(signIn)
             } catch (e) {
                 dispatch(setError(e.response.status));
@@ -47,7 +50,7 @@ const SignIn = () => {
                                    aria-invalid={errors.password ? "true" : "false"}/>
                             {errors.password?.type === 'required' && <p role="alert">Password is required</p>}
                             <div>
-                                <input className={s.input} type={"checkbox"}/> Запомнить меня
+                                <input className={s.input} type={"checkbox"} {...register("checkbox")}/> Запомнить меня
                             </div>
                             <input className={s.input} type="submit"/>
                         </div>

@@ -55,6 +55,7 @@ const Feedback = () => {
                 <div>Почта: {f.mail}</div>
                 <div>Сообщение: {f.message}</div>
                 <div>Дата: {f.date}</div>
+                <div>{f.solved?'Решено':'Не решено'}</div>
             </div>)}
 
             <ReactPaginate

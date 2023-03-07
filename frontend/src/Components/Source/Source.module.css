@@ -8,15 +8,16 @@
 .blockRating{
     border: 1px solid;
     padding: 10px;
-    margin: 10px 0;
     font-size: 16px;
     border-radius: 10px;
     width: 42vw;
+    flex-basis: 47.7%;
 }
 .lineBlock{
     display: flex;
-    flex-wrap: wrap;
+    gap: 10px;
     justify-content: space-between;
+    flex-wrap: wrap;
 }
 .theme{
     color: var(--color-font);
@@ -24,12 +25,15 @@
 .theme a{
     color: var(--color-font);
 }
-@media (max-width: 991px) {
+@media (max-width: 1201px) {
     .blockRating{
         width: 100vw;
-        margin: 5px 0;
+        flex-basis: 100%;
     }
     .block{
         margin: 5px 0;
+    }
+    .lineBlock{
+        flex-wrap: wrap;
     }
 }

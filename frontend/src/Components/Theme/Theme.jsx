@@ -20,11 +20,11 @@ export const useColorTheme = () => {
     const toggleColorTheme = useCallback(() => {
         if (colorTheme === COLOR_THEME.light) {
             changeColorTheme(COLOR_THEME.dark)
-            setCookiesTheme('theme', COLOR_THEME.dark, {path: '/', maxAge: 60 * 60 * 24 * 30});
+            setCookiesTheme('theme', COLOR_THEME.dark, {path: '/', maxAge: 60 * 60 * 24 * 30, secure: true});
         }
         else {
             changeColorTheme(COLOR_THEME.light);
-            setCookiesTheme('theme', COLOR_THEME.light, {path: '/', maxAge: 60 * 60 * 24 * 30});
+            setCookiesTheme('theme', COLOR_THEME.light, {path: '/', maxAge: 60 * 60 * 24 * 30, secure: true});
         }
     }, [colorTheme, changeColorTheme]);
 
