@@ -52,12 +52,14 @@ const Source = () => {
                     </div>)}</div>
                 </div>
                 <div>
+
                     <div className={s.lineBlock}>{source.source_ratings.map(r => <div className={s.blockRating}>
                         <div>{r.source_rating_type.name}</div>
                         <div>{r.rating}</div>
                         <div>{r.rating_date}</div>
                     </div>)}</div>
                 </div>
+
                 <SourcePublications/>
             </div>
         }

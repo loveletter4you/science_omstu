@@ -33,7 +33,7 @@
     color: black;
     border-radius: 10px;
     background-color: white;
-    width: 35vw;
+    width: 410px;
     transform: scale(0.5);
     transition: 0.4s all;
 }
@@ -60,12 +60,12 @@
 }
 .line{
     display: inline-flex;
-    justify-content: space-between;
+    gap: 10px;
 }
 .title{
     text-align: center;
 }
-@media (max-width: 991px) {
+@media (max-width: 1201px) {
     .form{
         display: flex;
         flex-wrap: wrap;
