@@ -20,7 +20,7 @@ const AuthorsPublications = () => {
         toggleIsFetching(true);
         try {
             const fetchPublications = async () => {
-                const res = await AuthorAPI.getAuthorPageSize(author.id, e.selected, pageSize);
+                const res = await AuthorAPI.getAuthorPublication(author.id, e.selected, pageSize);
                 dispatch(setData(res.data));
                 toggleIsFetching(false);
             }
@@ -34,7 +34,7 @@ const AuthorsPublications = () => {
         toggleIsFetching(true);
         try {
             const fetchPublications = async () => {
-                const res = await AuthorAPI.getAuthorPageSize(author.id, 0, pageSize);
+                const res = await AuthorAPI.getAuthorPublication(author.id, 0, pageSize);
                 dispatch(setData(res.data));
                 toggleIsFetching(false);
             }
@@ -46,9 +46,9 @@ const AuthorsPublications = () => {
 
     return <div>
         {isFetching === true ? <Preloader/> :
-            <div className={s.theme}>
+            <div className={s.theme} >
                 <div className={s.block}>
-                    {publications === undefined ? 'Подождите пожалуйста' : publications.map(p => <div>
+                    {publications === undefined ? 'Подождите пожалуйста' : publications.map(p => <div key={p.id}>
                         <div key={p.id} className={s.blocks}>
                             <div>{p.publication_type.name}</div>
                             <div><NavLink to={'/source/' + p.source.id}>{p.source.name}</NavLink></div>

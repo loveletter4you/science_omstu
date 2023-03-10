@@ -21,7 +21,6 @@ const Sources = () => {
     const [search, setSearch] = useState('');
     const [isFetching, toggleIsFetching] = useState(false);
     const debouncedSearch = useDebounce(search, 500);
-    const [cookies, setCookies, removeCookies] = useCookies(['token'])
 
     const onSearchChange = (e) => {
         const {value} = e.target

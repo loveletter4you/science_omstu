@@ -18,7 +18,7 @@ export const AuthorAPI = {
     getAuthor(id,) {
         return instance.get(`/api/author/${id}`)
     },
-    getAuthorPageSize(id, page, pageSize) {
+    getAuthorPublication(id, page, pageSize) {
         return instance.get(`/api/author/${id}/publications?page=${page}&limit=${pageSize}`)
     }
 }

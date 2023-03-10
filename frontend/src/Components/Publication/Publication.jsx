@@ -1,12 +1,11 @@
 import React, {useState} from "react";
 import {useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
-import axios from "axios";
-import {setPublic} from "../../store/slices/PublicationSlice";
+
+import {fetchPublication, setPublic} from "../../store/slices/PublicationSlice";
 import s from "./Publication.module.css"
 import {NavLink} from "react-router-dom";
-import preloader from "../../assets/img/preloader.svg";
-import {PublicationAPI} from "../api";
+
 import Preloader from "../Preloader/Preloader";
 
 const Publication = () => {
@@ -16,18 +15,12 @@ const Publication = () => {
     const [isFetching, toggleIsFetching] = useState(false);
     const keywords = [];
 
-    React.useEffect(() => {
-        toggleIsFetching(true);
-        const fetchPublic = async () => {
-            const res = await PublicationAPI.getPublication(params.id);
-            dispatch(setPublic(res.data));
-            toggleIsFetching(false);
-        }
-        fetchPublic();
-    }, [])
+    React.useEffect(()=>{
+        dispatch(fetchPublication(params.id))
+    },[])
 
     return (<div className={s.theme}>
-            {isFetching === true ? <Preloader/> :
+            {publication.isFetching === true ? <Preloader/> :
                 <div>
                     <div className={s.block}>
                         <div>{publication.publication_type.name}</div>

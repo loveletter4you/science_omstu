@@ -21,17 +21,17 @@ const Author = () => {
     const [isFetching, toggleIsFetching] = useState(false);
 
     React.useEffect(() => {
-       toggleIsFetching(true);
-       try {
-           const fetchAuthor = async () => {
-               const res = await AuthorAPI.getAuthor(params.id);
-               dispatch(setAuthor(res.data));
-               toggleIsFetching(false);
-           }
-           fetchAuthor();
-       } catch (e) {
-           console.log(e);
-       }
+        toggleIsFetching(true);
+        try {
+            const fetchAuthor = async () => {
+                const res = await AuthorAPI.getAuthor(params.id);
+                dispatch(setAuthor(res.data));
+                toggleIsFetching(false);
+            }
+            fetchAuthor();
+        } catch (e) {
+            console.log(e);
+        }
     }, [params.id])
 
 
@@ -39,7 +39,7 @@ const Author = () => {
         toggleIsFetching(true);
         try {
             const fetchPublications = async () => {
-                const res = await AuthorAPI.getAuthorPageSize(params.id, 0, pageSize)
+                const res = await AuthorAPI.getAuthorPublication(params.id, 0, pageSize)
                 dispatch(setData(res.data));
                 toggleIsFetching(false);
             }
@@ -51,30 +51,29 @@ const Author = () => {
 
     return (<div className={s.theme}>
             {isFetching === true? <Preloader/> :
-            <div>
-                {author === undefined ? 'Подождите пожалуйста' : <>
-                    <div className={s.block}>
-                        <img className={s.block__image}
-                             src={avatar}
-                             alt=""/>
-                        <div className={s.block__info}>
-                            <p className={s.block__text}>{author.surname} {author.name} {author.patronymic}</p>
-                            {author.author_identifiers.map(a => <div>
-                                {a.identifier.name}: {a.identifier_value}
-                            </div>)}
+                <div>
+                    {author === undefined ? 'Подождите пожалуйста' : <>
+                        <div className={s.block}>
+                            <img className={s.block__image}
+                                 src={avatar}
+                                 alt=""/>
+                            <div className={s.block__info}>
+                                <p className={s.block__text}>{author.surname} {author.name} {author.patronymic}</p>
+                                {author.author_identifiers.map(a => <div key = {a.id}>
+                                    {a.identifier.name}: {a.identifier_value}
+                                </div>)}
+                            </div>
                         </div>
-                    </div>
-                    <div className={s.title}>
-                    </div>
-                    <AuthorsPublications/>
+                        <div className={s.title}>
+                        </div>
+                        <AuthorsPublications/>
 
-                </>
-                }
-            </div>
+                    </>
+                    }
+                </div>
             }
         </div>
     );
 };
 
 export default Author;
-
