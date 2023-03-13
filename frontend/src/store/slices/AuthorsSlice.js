@@ -1,5 +1,25 @@
-import { createSlice} from "@reduxjs/toolkit";
+import {createSlice, createAsyncThunk} from "@reduxjs/toolkit";
+import {AuthorsAPI} from "../../Components/api";
+import {fetchPublications} from "./PublicationsSlice";
 
+export const fetchAuthor = createAsyncThunk(
+    "authors/fetchAuthor", async ({page, pageSize}, {rejectWithValue}) => {
+        try {
+            const res = await AuthorsAPI.getAuthors(page, pageSize);
+            return res.data;
+        } catch (err) {
+            return rejectWithValue([], err);
+        }
+    });
+export const fetchAuthorSearch = createAsyncThunk(
+    "authors/fetchAuthorSearch", async ({search, page, pageSize}, {rejectWithValue}) => {
+        try {
+            const res = await AuthorsAPI.getAuthorsSearch(search, page, pageSize)
+            return res.data;
+        } catch (err) {
+            return rejectWithValue([], err);
+        }
+    });
 
 
 const initialState = {
@@ -7,6 +27,7 @@ const initialState = {
     pageSize: 30,
     count: 1,
     currentPage: 1,
+    isFetching: false,
 };
 
 const authorsSlice = createSlice({
@@ -22,6 +43,30 @@ const authorsSlice = createSlice({
             state.pageSize = action.payload;
         }
 
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(fetchAuthor.pending, (state) => {
+                state.isFetching = true;
+            })
+            .addCase(fetchAuthorSearch.pending, (state) => {
+                state.isFetching = true;
+            })
+            .addCase(fetchAuthor.fulfilled, (state, action) => {
+                state.isFetching = false;
+                const {authors, count} = action.payload;
+                state.authors = authors;
+                state.count = count;
+            })
+            .addCase(fetchAuthorSearch.fulfilled, (state, action) => {
+                state.isFetching = false;
+                const {authors, count} = action.payload;
+                state.authors = authors;
+                state.count = count;
+            })
+            .addCase(initialState, (state) => {
+                state.isFetching = false;
+            })
     }
 });
 

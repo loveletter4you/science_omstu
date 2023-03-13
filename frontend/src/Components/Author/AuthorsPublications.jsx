@@ -46,7 +46,7 @@ const AuthorsPublications = () => {
 
     return <div>
         {isFetching === true ? <Preloader/> :
-            <div className={s.theme} >
+            <div className={s.theme}>
                 <div className={s.block}>
                     {publications === undefined ? 'Подождите пожалуйста' : publications.map(p => <div key={p.id}>
                         <div key={p.id} className={s.blocks}>

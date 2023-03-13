@@ -6,7 +6,7 @@ import {setAuthor} from "../../store/slices/AuthorSlice";
 import avatar from "../../assets/img/avatar.svg"
 import AuthorsPublications from "./AuthorsPublications";
 import {setData} from "../../store/slices/PublicationsSlice";
-import {AuthorAPI, getAuthor, getAuthorPageSize} from "../api";
+import {AuthorAPI} from "../api";
 import {useCookies} from "react-cookie";
 import Preloader from "../Preloader/Preloader";
 
@@ -50,7 +50,7 @@ const Author = () => {
     }, [pageSize]);
 
     return (<div className={s.theme}>
-            {isFetching === true? <Preloader/> :
+            {isFetching === true ? <Preloader/> :
                 <div>
                     {author === undefined ? 'Подождите пожалуйста' : <>
                         <div className={s.block}>
@@ -59,7 +59,7 @@ const Author = () => {
                                  alt=""/>
                             <div className={s.block__info}>
                                 <p className={s.block__text}>{author.surname} {author.name} {author.patronymic}</p>
-                                {author.author_identifiers.map(a => <div key = {a.id}>
+                                {author.author_identifiers.map(a => <div key={a.id}>
                                     {a.identifier.name}: {a.identifier_value}
                                 </div>)}
                             </div>

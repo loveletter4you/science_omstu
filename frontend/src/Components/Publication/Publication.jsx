@@ -1,8 +1,7 @@
 import React, {useState} from "react";
 import {useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
-
-import {fetchPublication, setPublic} from "../../store/slices/PublicationSlice";
+import {fetchPublication} from "../../store/slices/PublicationSlice";
 import s from "./Publication.module.css"
 import {NavLink} from "react-router-dom";
 
@@ -15,9 +14,9 @@ const Publication = () => {
     const [isFetching, toggleIsFetching] = useState(false);
     const keywords = [];
 
-    React.useEffect(()=>{
+    React.useEffect(() => {
         dispatch(fetchPublication(params.id))
-    },[])
+    }, [])
 
     return (<div className={s.theme}>
             {publication.isFetching === true ? <Preloader/> :
@@ -45,15 +44,17 @@ const Publication = () => {
                     </div>
                     <div className={s.block}>
                         Ключевые слова:
-                        {publication.keyword_publications.map(w =>
-                            {keywords.push(w.keyword.keyword)}
+                        {publication.keyword_publications.map(w => {
+                                keywords.push(w.keyword.keyword)
+                            }
                         )}
                         <div>{keywords.join(", ")}</div>
                     </div>
                     <div className={s.block}>
                         <div>{publication.publication_links.map(l => <div>
                             {l.publication_link_type.name}: {l.publication_link_type.name === "DOI" ?
-                            <a href={"https://www.doi.org/" + l.link} target="_blank">{l.link}</a> : <a href={l.link} target="_blank">{l.link}</a>}
+                            <a href={"https://www.doi.org/" + l.link} target="_blank">{l.link}</a> :
+                            <a href={l.link} target="_blank">{l.link}</a>}
                         </div>)
                         }</div>
                     </div>

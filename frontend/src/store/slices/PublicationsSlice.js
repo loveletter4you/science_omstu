@@ -23,7 +23,7 @@ export const fetchPublicationsSearch = createAsyncThunk(
 
 const initialState = {
     publications: [{
-        publication_type:{
+        publication_type: {
             id: 0,
             name: null
         },
@@ -59,7 +59,7 @@ const publicationsSlice = createSlice({
             .addCase(fetchPublications.pending, (state) => {
                 state.isFetching = true;
             })
-            .addCase(fetchPublicationsSearch.pending, (state) =>{
+            .addCase(fetchPublicationsSearch.pending, (state) => {
                 state.isFetching = true;
             })
             .addCase(fetchPublications.fulfilled, (state, action) => {
@@ -68,7 +68,7 @@ const publicationsSlice = createSlice({
                 state.publications = publications;
                 state.count = count;
             })
-            .addCase(fetchPublicationsSearch.fulfilled, (state, action)=>{
+            .addCase(fetchPublicationsSearch.fulfilled, (state, action) => {
                 state.isFetching = false;
                 const {publications, count} = action.payload;
                 state.publications = publications;
@@ -82,7 +82,7 @@ const publicationsSlice = createSlice({
 });
 
 
-export const {setData,setSize} = publicationsSlice.actions;
+export const {setData, setSize} = publicationsSlice.actions;
 
 export default publicationsSlice.reducer;
 

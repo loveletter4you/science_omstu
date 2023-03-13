@@ -2,10 +2,9 @@ import React, {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import s from "../Filters/PublicationFilter.module.css";
 import {setSize} from "../../store/slices/PublicationsSlice";
-import {setValue} from "../../store/slices/SortSlice";
 
 
-const PublicationFilter = () => {
+const PublicationFilter = (props) => {
     const [seeFiltered, setSeeFiltered] = useState(false);
     const filteredValue = useSelector((state) => state.sort);
     const dispatch = useDispatch();
@@ -28,16 +27,16 @@ const PublicationFilter = () => {
                     Отображать по:
                     <ul>
                         <li onClick={() => {
-                            dispatch(setSize(20));
-                        }}>20
+                            dispatch(setSize(props.min));
+                        }}>{props.min}
                         </li>
                         <li onClick={() => {
-                            dispatch(setSize(40));
-                        }}>40
+                            dispatch(setSize(props.mid));
+                        }}>{props.mid}
                         </li>
                         <li onClick={() => {
-                            dispatch(setSize(80));
-                        }}>80
+                            dispatch(setSize(props.max));
+                        }}>{props.max}
                         </li>
                     </ul>
                 </div>

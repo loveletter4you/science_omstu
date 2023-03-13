@@ -1,6 +1,16 @@
-import {createSlice} from "@reduxjs/toolkit";
+import {createSlice, createAsyncThunk} from "@reduxjs/toolkit";
+import {FeedbackAPI, SourcesAPI} from "../../Components/api";
+import {fetchSources, fetchSourcesSearch} from "./SourcesSlice";
 
-
+export const fetchFeedback = createAsyncThunk(
+    "feedbacks/fetchSources", async ({page, pageSize, token}, {rejectWithValue}) => {
+        try {
+            const res = await FeedbackAPI.getFeedback(page, pageSize, token)
+            return res.data;
+        } catch (err) {
+            return rejectWithValue([], err);
+        }
+    });
 
 const initialState = {
     feedbacks: [{
@@ -13,7 +23,7 @@ const initialState = {
     pageSize: 20,
     count: 1,
     currentPage: 1,
-
+    isFetching: false,
 };
 
 const feedbackSlice = createSlice({
@@ -29,12 +39,23 @@ const feedbackSlice = createSlice({
             state.pageSize = action.payload;
         }
 
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(fetchFeedback.pending, (state) => {
+                state.isFetching = true;
+            })
+            .addCase(fetchFeedback.fulfilled, (state, action) => {
+                state.isFetching = false;
+                const {feedbacks, count} = action.payload;
+                state.feedbacks = feedbacks;
+                state.count = count;
+            })
+            .addCase(initialState, (state) => {
+                state.isFetching = false;
+            })
     }
 });
-
-
-export const {setData,setSize} = feedbackSlice.actions;
-
 export default feedbackSlice.reducer;
 
 

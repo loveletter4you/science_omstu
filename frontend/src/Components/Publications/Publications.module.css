@@ -22,16 +22,16 @@
     color: #06c895;
 }
 
-.authors .author{
+.authors .author {
     display: inline-block;
 }
 
-.author a:not(:last-child):after{
+.author a:not(:last-child):after {
     content: ', ';
 }
 
 
-.container{
+.container {
     display: grid;
     grid-template-areas:
             'search search'
@@ -43,9 +43,10 @@
     color: var(--color-font);
 }
 
-.container a{
+.container a {
     color: var(--color-font);
 }
+
 @media (max-width: 991px) {
     .container {
         display: flex;

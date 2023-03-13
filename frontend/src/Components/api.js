@@ -1,5 +1,4 @@
 import axios from "axios";
-import {Cookies, useCookies} from "react-cookie";
 
 const instance = axios.create({
     withCredentials: true,
@@ -14,8 +13,46 @@ export const postSignIn = (data) => {
     })
 }
 
+export const postAuthorsData = (data) => {
+    return instance.post("/api/admin/upload/authors", data, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+}
+export const DataUploadAPI = {
+    postAuthorsData(data) {
+        return instance.post("/api/admin/upload/authors", data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+    },
+    postScopusData(data) {
+        return instance.post("/api/admin/upload/scopus", data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+    },
+    postWhiteListData(data) {
+        return instance.post("/api/admin/upload/white_list", data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+    },
+    postJCRData(data) {
+        return instance.post("/api/admin/upload/jcr", data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+    },
+}
+
 export const AuthorAPI = {
-    getAuthor(id,) {
+    getAuthor(id) {
         return instance.get(`/api/author/${id}`)
     },
     getAuthorPublication(id, page, pageSize) {
@@ -33,10 +70,10 @@ export const AuthorsAPI = {
 
 export const FeedbackAPI = {
 
-    getFeedback(page, pageSize, header) {
+    getFeedback(page, pageSize, token) {
         return instance.get(`/api/admin/feedbacks?page=${page}&limit=${pageSize}`, {
             headers: {
-                authorization : `Bearer ${header}`
+                authorization: `Bearer ${token}`
             }
         })
     }

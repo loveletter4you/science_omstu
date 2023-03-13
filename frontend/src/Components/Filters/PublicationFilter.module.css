@@ -1,10 +1,11 @@
-.container{
+.container {
     grid-area: filter;
     margin: 10px 10px 0 0;
     padding-left: 10px;
     color: var(--color-font);
 
 }
+
 .sort {
     position: relative;
     display: flex;
@@ -51,11 +52,12 @@
     padding: 5px;
 }
 
-.size li:active{
+.size li:active {
     color: #06c895;
     font-family: 'Aeroport-Bold';
     font-weight: bold;
 }
+
 .sort ul {
     list-style: none;
     position: relative;
@@ -128,7 +130,8 @@ nav ul ul li a:hover {
     .sort {
         position: static;
     }
-    .container{
+
+    .container {
         margin-right: 0;
         margin-bottom: 10px;
         border: 0px;
@@ -176,7 +179,7 @@ nav ul ul li a:hover {
     }
 
     .menu.active {
-        top:0;
+        top: 0;
         position: static;
         border: 1px solid;
         border-radius: 10px;

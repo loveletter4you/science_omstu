@@ -6,7 +6,7 @@ import {useCookies} from "react-cookie";
 const Preloader = () => {
     const [cookiesTheme, setCookiesTheme] = useCookies(['theme']);
     return <div>
-        {cookiesTheme.theme === "dark"? <img src = {preloaderLight} alt=""/> : <img src = {preloaderDark} alt=""/>}
+        {cookiesTheme.theme === "dark" ? <img src={preloaderLight} alt=""/> : <img src={preloaderDark} alt=""/>}
     </div>
 
 }

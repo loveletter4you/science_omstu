@@ -1,12 +1,12 @@
-.theme{
+.theme {
     color: var(--color-font);
 }
 
-.item{
+.item {
     padding-left: 0px;
 }
 
-.list__item{
+.list__item {
     font-size: 18px;
     border: none;
     outline: none;
@@ -14,41 +14,43 @@
     margin-bottom: 5px;
 }
 
-.list__item a{
+.list__item a {
     text-decoration: none;
     color: var(--color-font);
 }
 
-.list__item a:hover{
+.list__item a:hover {
     color: #06c895;
 }
 
-.block{
+.block {
     display: flex;
     flex-direction: column;
 }
 
-.block__item{
+.block__item {
     display: flex;
     justify-content: space-between;
 }
 
-.size{
+.size {
     padding-top: 15px;
     color: var(--color-font);
 }
 
-.size ul{
+.size ul {
     list-style: none;
     display: inline;
     padding-inline-start: 0;
     font-size: 18px;
 }
+
 .size ul li {
     display: inline-block;
     padding: 5px;
 }
-.size li:active{
+
+.size li:active {
     color: #06c895;
     font-family: 'Aeroport-Bold';
     font-weight: bold;

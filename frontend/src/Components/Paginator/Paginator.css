@@ -30,7 +30,7 @@
     color: var(--font-color);
 }
 
-.page-link{
+.page-link {
     padding: 8px 15px;
     cursor: pointer;
     font-weight: 400;
@@ -41,17 +41,19 @@
 }
 
 @media (max-width: 991px) {
-   .pagination{
-       font-size: 16px;
-       flex-wrap: wrap;
-       padding-inline-start: 20px;
-       padding-inline-end: 20px;
+    .pagination {
+        font-size: 16px;
+        flex-wrap: wrap;
+        padding-inline-start: 20px;
+        padding-inline-end: 20px;
 
-   }
-    .page-link{
+    }
+
+    .page-link {
         padding: 8px;
     }
-    .page-link{
+
+    .page-link {
         position: static;
     }
 }

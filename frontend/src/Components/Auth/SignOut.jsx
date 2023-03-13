@@ -1,15 +1,14 @@
 import React from "react";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import n from "../Navbar/Navbar.module.css";
-import {setIsAuth, setToken, setUserData} from "../../store/slices/SignInSlice";
-import { useCookies } from 'react-cookie';
+import {setIsAuth} from "../../store/slices/SignInSlice";
+import {useCookies} from 'react-cookie';
 
 
 const SignOut = () => {
     const [cookies, setCookies, removeCookies] = useCookies(['token'])
-    const signIn = useSelector(state => state.signIn)
     const dispatch = useDispatch();
-    const logout = () =>{
+    const logout = () => {
         dispatch(setIsAuth(false));
         removeCookies('token', {path: '/'});
 
