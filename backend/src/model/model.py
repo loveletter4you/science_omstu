@@ -35,6 +35,31 @@ class Author(Base):
     user_id = Column(Integer, ForeignKey('user.id'))
     author_identifiers = relationship("AuthorIdentifier", backref='author')
     author_publications = relationship("AuthorPublication", backref='author')
+    author_departments = relationship("AuthorDepartment", backref='author')
+
+
+class Faculty(Base):
+    __tablename__ = "faculty"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    departments = relationship("Department", backref='faculty')
+
+
+class Department(Base):
+    __tablename__ = "department"
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    faculty_id = Column(Integer, ForeignKey('faculty.id'), nullable=False)
+    department_authors = relationship("AuthorDepartment", backref='department')
+
+
+class AuthorDepartment(Base):
+    __tablename__ = "author_department"
+    id = Column(Integer, primary_key=True)
+    position = Column(String)
+    author_id = Column(Integer, ForeignKey('author.id'), nullable=False)
+    department_id = Column(Integer, ForeignKey('department.id'), nullable=False)
+
 
 
 class Identifier(Base):

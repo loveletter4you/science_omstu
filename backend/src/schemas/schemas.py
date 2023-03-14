@@ -31,8 +31,32 @@ class SchemeAuthorIdentifier(BaseModel):
         orm_mode = True
 
 
+class SchemeFaculty(BaseModel):
+    name: str
+
+    class Config:
+        orm_mode = True
+
+
+class SchemeDepartment(BaseModel):
+    name: str
+    faculty: SchemeFaculty
+
+    class Config:
+        orm_mode = True
+
+
+class SchemeAuthorDepartment(BaseModel):
+    department: SchemeDepartment
+    position: str
+
+    class Config:
+        orm_mode = True
+
+
 class SchemeAuthorProfile(SchemeAuthor):
     author_identifiers: List[SchemeAuthorIdentifier]
+    author_departments: List[SchemeAuthorDepartment]
 
 
 class SchemeOrganization(BaseModel):
