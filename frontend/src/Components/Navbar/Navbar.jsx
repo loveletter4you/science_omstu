@@ -18,11 +18,11 @@ const Navbar = () => {
     const [cookiesTheme, setCookiesTheme] = useCookies(['theme']);
     const {colorTheme, toggleColorTheme} = useColorTheme();
 
-    useEffect(()=>{
-        if(cookiesTheme.theme !== colorTheme){
+    useEffect(() => {
+        if (cookiesTheme.theme !== colorTheme) {
             toggleColorTheme();
         }
-    },[])
+    }, [])
     const onChangeTheme = () => {
         document.getElementById("app-wrapper").style.transition = '.5s ease-in-out';
         toggleColorTheme();
@@ -57,22 +57,22 @@ const Navbar = () => {
                         <NavLink to="/source"
                                  className={navData => navData.isActive ? n.active : null}>Источники</NavLink>
                     </div>
-                    {signIn.isAuth? <div className={n.item} onClick={toggle}>
-                        <NavLink to = "/admin/feedbacks">Администратор</NavLink>
-                    </div>: null}
+                    {signIn.isAuth ? <div className={n.item} onClick={toggle}>
+                        <NavLink to="/admin/feedbacks">Администратор</NavLink>
+                    </div> : null}
                     <div className={n.item}>
                         <BugTracker/>
                     </div>
                     <div className={n.item} onClick={onChangeTheme}>
-                        <img src={theme} className={n.image} />
+                        <img src={theme} className={n.image}/>
                     </div>
                     <div>
-                    {signIn.isAuth ?
-                        <div onClick={toggle}><SignOut/></div> :
-                        <NavLink to="/login">
-                            <button className={n.btn} onClick={toggle}>Войти</button>
-                        </NavLink>
-                    }
+                        {signIn.isAuth ?
+                            <div onClick={toggle}><SignOut/></div> :
+                            <NavLink to="/login">
+                                <button className={n.btn} onClick={toggle}>Войти</button>
+                            </NavLink>
+                        }
                     </div>
                 </div>
             </div>

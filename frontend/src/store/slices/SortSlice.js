@@ -1,11 +1,9 @@
-import { createSlice } from '@reduxjs/toolkit'
-
+import {createSlice} from '@reduxjs/toolkit'
 
 const initialState = {
     seeFiltered: 'Популярности',
 
 };
-
 
 export const sortSlice = createSlice({
     name: 'sort',
@@ -16,9 +14,7 @@ export const sortSlice = createSlice({
         },
     }
 })
-
-export const { setValue } = sortSlice.actions;
-
+export const {setValue} = sortSlice.actions;
 export default sortSlice.reducer;
 
 

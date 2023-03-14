@@ -4,7 +4,6 @@ import s from "./Bugtracker.module.css"
 import Modal from "./BugtrackerWindow";
 import ReCAPTCHA from "react-google-recaptcha";
 import axios from "axios";
-import {useDispatch} from "react-redux";
 
 const BugTracker = () => {
 
@@ -42,7 +41,7 @@ const BugTracker = () => {
                         </div>
                         <div>
                             <div>Почта</div>
-                            <input type="text" name="mail" className={s.input}/>
+                            <input type="email" name="mail" className={s.input}/>
                         </div>
                     </div>
                     <div>Сообщение</div>

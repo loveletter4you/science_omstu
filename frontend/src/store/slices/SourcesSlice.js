@@ -1,6 +1,25 @@
-import {createSlice} from "@reduxjs/toolkit";
+import {createSlice, createAsyncThunk} from "@reduxjs/toolkit";
+import {SourcesAPI} from "../../Components/api";
+import sources from "../../Components/Sources/Sources";
 
-
+export const fetchSources = createAsyncThunk(
+    "sources/fetchSources", async ({page, pageSize}, {rejectWithValue}) => {
+        try {
+            const res = await SourcesAPI.getSources(page, pageSize);
+            return res.data;
+        } catch (err) {
+            return rejectWithValue([], err);
+        }
+    });
+export const fetchSourcesSearch = createAsyncThunk(
+    "sources/fetchSourcesSearch", async ({search, page, pageSize}, {rejectWithValue}) => {
+        try {
+            const res = await SourcesAPI.getSourcesSearch(search, page, pageSize)
+            return res.data;
+        } catch (err) {
+            return rejectWithValue([], err);
+        }
+    });
 
 const initialState = {
     sources: [{
@@ -12,22 +31,39 @@ const initialState = {
     }],
     pageSize: 30,
     count: 1,
-
+    isFetching: false,
 };
 
 const SourcesSlice = createSlice({
     name: 'sources',
     initialState,
     reducers: {
-        setSource(state, action) {
-            const {sources, count} = action.payload;
-            state.sources = sources;
-            state.count = count;
-        },
         setSize(state, action) {
             state.pageSize = action.payload;
         }
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(fetchSources.pending, (state) => {
+                state.isFetching = true;
+            })
+            .addCase(fetchSourcesSearch.pending, (state) => {
+                state.isFetching = true;
+            })
+            .addCase(fetchSources.fulfilled, (state, action) => {
+                state.isFetching = false;
+                state.sources = action.payload.sources;
+                state.count = action.payload.count;
+            })
+            .addCase(fetchSourcesSearch.fulfilled, (state, action) => {
+                state.isFetching = false;
+                state.sources = action.payload.sources;
+                state.count = action.payload.count;
+            })
+            .addCase(initialState, (state) => {
+                state.isFetching = false;
+            })
     }
 })
-export const {setSource, setSize} = SourcesSlice.actions;
+export const {setSize} = SourcesSlice.actions;
 export default SourcesSlice.reducer;

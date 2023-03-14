@@ -53,37 +53,43 @@
     margin-bottom: 5px;
 }
 
-.form{
+.form {
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
 }
-.line{
+
+.line {
     display: inline-flex;
     gap: 10px;
 }
-.title{
+
+.title {
     text-align: center;
 }
+
 @media (max-width: 1201px) {
-    .form{
+    .form {
         display: flex;
         flex-wrap: wrap;
         flex-direction: column;
     }
-    .title{
+
+    .title {
         text-align: left;
     }
-    .input{
+
+    .input {
         width: 60vw;
     }
 
-    .line{
+    .line {
         display: inline-flex;
         justify-content: space-between;
         flex-wrap: wrap
 
     }
+
     .modal__content {
         width: 60vw;
     }

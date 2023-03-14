@@ -13,11 +13,13 @@
     border-radius: 10px;
     color: var(--color-font);
 }
-.head{
+
+.head {
     font-family: 'Rajdhani';
 }
+
 @media (max-width: 991px) {
-    .header{
+    .header {
         height: 50px;
         font-size: 40px;
         margin-bottom: 10px;

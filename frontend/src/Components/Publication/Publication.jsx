@@ -1,12 +1,10 @@
 import React, {useState} from "react";
 import {useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
-import axios from "axios";
-import {setPublic} from "../../store/slices/PublicationSlice";
+import {fetchPublication} from "../../store/slices/PublicationSlice";
 import s from "./Publication.module.css"
 import {NavLink} from "react-router-dom";
-import preloader from "../../assets/img/preloader.svg";
-import {PublicationAPI} from "../api";
+
 import Preloader from "../Preloader/Preloader";
 
 const Publication = () => {
@@ -17,17 +15,11 @@ const Publication = () => {
     const keywords = [];
 
     React.useEffect(() => {
-        toggleIsFetching(true);
-        const fetchPublic = async () => {
-            const res = await PublicationAPI.getPublication(params.id);
-            dispatch(setPublic(res.data));
-            toggleIsFetching(false);
-        }
-        fetchPublic();
+        dispatch(fetchPublication(params.id))
     }, [])
 
     return (<div className={s.theme}>
-            {isFetching === true ? <Preloader/> :
+            {publication.isFetching === true ? <Preloader/> :
                 <div>
                     <div className={s.block}>
                         <div>{publication.publication_type.name}</div>
@@ -52,15 +44,17 @@ const Publication = () => {
                     </div>
                     <div className={s.block}>
                         Ключевые слова:
-                        {publication.keyword_publications.map(w =>
-                            {keywords.push(w.keyword.keyword)}
+                        {publication.keyword_publications.map(w => {
+                                keywords.push(w.keyword.keyword)
+                            }
                         )}
                         <div>{keywords.join(", ")}</div>
                     </div>
                     <div className={s.block}>
                         <div>{publication.publication_links.map(l => <div>
                             {l.publication_link_type.name}: {l.publication_link_type.name === "DOI" ?
-                            <a href={"https://www.doi.org/" + l.link} target="_blank">{l.link}</a> : <a href={l.link} target="_blank">{l.link}</a>}
+                            <a href={"https://www.doi.org/" + l.link} target="_blank">{l.link}</a> :
+                            <a href={l.link} target="_blank">{l.link}</a>}
                         </div>)
                         }</div>
                     </div>

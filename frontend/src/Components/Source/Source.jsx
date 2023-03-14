@@ -1,10 +1,8 @@
 import React, {useState} from "react";
 import {useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
-import axios from "axios";
 import {setSource} from "../../store/slices/SourceSlice";
 import s from "./Source.module.css"
-import preloader from "../../assets/img/preloader.svg";
 import SourcePublications from "../Source/SourcesPublication";
 import {SourceAPI} from "../api";
 import {useCookies} from "react-cookie";
@@ -32,7 +30,7 @@ const Source = () => {
     React.useEffect(() => {
         toggleIsFetching(true);
         const fetchSource = async () => {
-            const res = await SourceAPI.getSourcePageSize(params.id, 0,pageSize);
+            const res = await SourceAPI.getSourcePageSize(params.id, 0, pageSize);
             dispatch(setSource(res.data));
             toggleIsFetching(false);
         }

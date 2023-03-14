@@ -1,63 +1,36 @@
 import React, {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import axios from "axios";
 import c from "../Search/Search.module.css";
 import ReactPaginate from "react-paginate";
-import {setSource} from "../../store/slices/SourcesSlice";
+import {fetchSources, fetchSourcesSearch} from "../../store/slices/SourcesSlice";
 import s from "./Sources.module.css"
 import {setSize} from "../../store/slices/SourcesSlice";
 import {NavLink} from "react-router-dom";
-import preloader from "../../assets/img/preloader.svg";
 import {useDebounce} from "use-debounce";
-import {SourcesAPI} from "../api";
-import {useCookies} from "react-cookie";
 import Preloader from "../Preloader/Preloader";
 
 const Sources = () => {
 
-    const {sources, pageSize, count} = useSelector(state => state.sources);
+    const {sources, pageSize, count, isFetching} = useSelector(state => state.sources);
     const dispatch = useDispatch();
     let pageCount = Math.ceil(count / pageSize);
     const [search, setSearch] = useState('');
-    const [isFetching, toggleIsFetching] = useState(false);
     const debouncedSearch = useDebounce(search, 500);
-    const [cookies, setCookies, removeCookies] = useCookies(['token'])
 
     const onSearchChange = (e) => {
-        const {value} = e.target
-        setSearch(value)
+        const {value} = e.target;
+        setSearch(value);
     }
-
 
     const handlePageClick = (e) => {
-        toggleIsFetching(true);
-        const fetchAuthors = async () => {
-            const res = await SourcesAPI.getSourcesSearch(search, e.selected, pageSize);
-            dispatch(setSource(res.data));
-            toggleIsFetching(false);
-        }
-        fetchAuthors();
+        dispatch(fetchSourcesSearch({search, page: e.selected, pageSize}));
     }
 
-
     React.useEffect(() => {
-        if(debouncedSearch[0] !== '') {
-            toggleIsFetching(true);
-            const fetchPublications = async () => {
-                const res = await SourcesAPI.getSourcesSearch(search, 0, pageSize);
-                toggleIsFetching(false);
-                dispatch(setSource(res.data));
-            }
-            fetchPublications();
-        }
-        else {
-            toggleIsFetching(true);
-            const fetchPublications = async () => {
-                const res = await SourcesAPI.getSources(0, pageSize)
-                toggleIsFetching(false);
-                dispatch(setSource(res.data));
-            }
-            fetchPublications();
+        if (debouncedSearch[0] !== '') {
+            dispatch(fetchSourcesSearch({search, page: 0, pageSize}));
+        } else {
+            dispatch(fetchSources({page: 0, pageSize}));
         }
     }, [pageSize, debouncedSearch[0]]);
 

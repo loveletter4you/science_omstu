@@ -1,4 +1,4 @@
-.block{
+.block {
     display: flex;
     flex-direction: column;
     border: 1px solid;
@@ -7,40 +7,43 @@
     font-size: 16px;
     border-radius: 10px;
 }
-.block a{
+
+.block a {
     text-decoration: none;
 }
 
-.block a:hover{
+.block a:hover {
     color: #06c895;
 }
 
-.authors{
+.authors {
     font-size: 16px;
     padding: 10px;
     margin: 15px 0;
-    border: 1px solid ;
+    border: 1px solid;
     border-radius: 10px;
 }
 
-.authors a{
+.authors a {
     text-decoration: none;
 }
-.authors a:hover{
+
+.authors a:hover {
     color: #06c895;
 }
 
-.country .city{
+.country .city {
     display: inline-block;
 }
 
-.keywords{
+.keywords {
     display: inline-block;
 }
 
-.theme{
+.theme {
     color: var(--color-font);
 }
-.theme a{
+
+.theme a {
     color: var(--color-font);
 }

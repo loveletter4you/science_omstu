@@ -3,8 +3,9 @@ import s from "./Bugtracker.module.css"
 
 const Modal = ({active, setActive, children}) => {
     return (
-        <div className={active? s.modal + " " + s.active : s.modal} onClick={() => setActive(false)}>
-            <div className={active? s.modal__content + " " + s.active : s.modal__content} onClick={e => e.stopPropagation()}>
+        <div className={active ? s.modal + " " + s.active : s.modal} onClick={() => setActive(false)}>
+            <div className={active ? s.modal__content + " " + s.active : s.modal__content}
+                 onClick={e => e.stopPropagation()}>
                 {children}
             </div>
         </div>

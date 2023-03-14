@@ -1,11 +1,12 @@
-.block{
+.block {
     border: 1px solid;
     padding: 10px;
     margin: 10px 0;
     font-size: 16px;
     border-radius: 10px;
-   }
-.blockRating{
+}
+
+.blockRating {
     border: 1px solid;
     padding: 10px;
     font-size: 16px;
@@ -13,27 +14,33 @@
     width: 42vw;
     flex-basis: 47.7%;
 }
-.lineBlock{
+
+.lineBlock {
     display: flex;
     gap: 10px;
     justify-content: space-between;
     flex-wrap: wrap;
 }
-.theme{
+
+.theme {
     color: var(--color-font);
 }
-.theme a{
+
+.theme a {
     color: var(--color-font);
 }
+
 @media (max-width: 1201px) {
-    .blockRating{
+    .blockRating {
         width: 100vw;
         flex-basis: 100%;
     }
-    .block{
+
+    .block {
         margin: 5px 0;
     }
-    .lineBlock{
+
+    .lineBlock {
         flex-wrap: wrap;
     }
 }

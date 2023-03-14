@@ -1,11 +1,11 @@
 import {createSlice} from "@reduxjs/toolkit";
 
 const initialState = {
-        id: null,
-        name: null,
-        surname: null,
-        patronymic: null,
-        author_identifiers: [],
+    id: 0,
+    name: null,
+    surname: null,
+    patronymic: null,
+    author_identifiers: [],
 };
 
 const authorSlice = createSlice({

@@ -6,7 +6,8 @@
     color: var(--color-font);
 
 }
-.appWrapperNavbar a{
+
+.appWrapperNavbar a {
     color: var(--color-font);
 }
 
@@ -24,7 +25,7 @@
     text-decoration: none;
 }
 
-.item a.active{
+.item a.active {
     color: #06c895;
 }
 
@@ -39,7 +40,7 @@
     transition: width 0.3s;
 }
 
-.item a:hover:after{
+.item a:hover:after {
     width: 100%;
 }
 
@@ -63,7 +64,7 @@
     display: none;
 }
 
-.image{
+.image {
     width: 20px;
     height: 20px;
     filter: var(--filter);

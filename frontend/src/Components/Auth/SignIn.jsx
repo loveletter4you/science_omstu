@@ -1,7 +1,7 @@
 import React from "react";
 import {useForm} from "react-hook-form";
 import {useDispatch, useSelector} from "react-redux";
-import {setUserData, setIsAuth, setToken, setError} from "../../store/slices/SignInSlice";
+import {setUserData, setIsAuth, setError} from "../../store/slices/SignInSlice";
 import {Navigate} from "react-router-dom";
 import {postSignIn} from "../api";
 import {useCookies} from "react-cookie";
@@ -15,7 +15,6 @@ const SignIn = () => {
     const [cookies, setCookies, removeCookies] = useCookies(['token'])
 
     const onSubmit = (data) => {
-        console.log(data)
         dispatch(setUserData(data));
         const postUser = async () => {
             try {
@@ -25,9 +24,12 @@ const SignIn = () => {
                 if (res.status === 200) {
                     dispatch(setIsAuth(true));
                 }
-                data.checkbox === true?setCookies('token', res.data.access_token, {path: '/', maxAge: 60 * 60 * 24 * 30, secure: true}):
+                data.checkbox === true ? setCookies('token', res.data.access_token, {
+                        path: '/',
+                        maxAge: 60 * 60 * 24 * 30,
+                        secure: true
+                    }) :
                     setCookies('token', res.data.access_token, {path: '/', maxAge: 1800, secure: true})
-
                 console.log(signIn)
             } catch (e) {
                 dispatch(setError(e.response.status));
