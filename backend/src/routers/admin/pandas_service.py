@@ -8,7 +8,7 @@ import datetime
 
 from src.model.model import Identifier, Source, SourceLink, Publication, PublicationLink, \
     AuthorIdentifier, AuthorPublication, Author, AuthorPublicationOrganization, Keyword, \
-    KeywordPublication, SourceRating, Organization
+    KeywordPublication, SourceRating, Organization, Department, Faculty, AuthorDepartment
 from src.model.storage import get_or_create_publication_link_type, get_or_create_source_type, \
     get_or_create_source_link_type, get_or_create_identifier, get_or_create_source_rating_type, \
     get_or_create_organization_omstu, get_source_by_name_or_identifiers, get_or_create_publication_type, \
@@ -167,43 +167,85 @@ async def service_fill_authors(file: UploadFile, db: Session):
         author = db.query(Author).filter(and_(Author.name == row['name'],
                                               Author.surname == row['surname'],
                                               Author.patronymic == row['patronymic'])).first()
-        if not (author is None):
-            continue
-        author = Author(
-            name=row['name'],
-            surname=row['surname'],
-            patronymic=row['patronymic'],
-            confirmed=True
-        )
-        db.add(author)
+        if author is None:
+            author = Author(
+                name=row['name'],
+                surname=row['surname'],
+                patronymic=row['patronymic'],
+                confirmed=True
+            )
+            db.add(author)
+        faculty = db.query(Faculty).filter(Faculty.name == row['faculty']).first()
+        if faculty is None:
+            faculty = Faculty(name=row['faculty'])
+            db.add(faculty)
+            db.commit()
+        department = db.query(Department).filter(and_(Department.name == row['department'],
+                                                      Department.faculty == faculty)).first()
+        if department is None:
+            department = Department(
+                name=row['department'],
+                faculty=faculty
+            )
+            db.add(department)
+            db.commit()
+        author_department = db.query(AuthorDepartment).filter(and_(AuthorDepartment.department == department,
+                                                                   AuthorDepartment.author == author)).first()
+        if author_department is None:
+            author_department = AuthorDepartment(
+                department=department,
+                author=author,
+                position=row['position']
+            )
+            db.add(author_department)
         if str(row['spin']) != "0":
-            author_identifier_spin = AuthorIdentifier(
-                author=author,
-                identifier=identifier_spin,
-                identifier_value=row['spin']
-            )
-            db.add(author_identifier_spin)
+            author_identifier_spin = db.query(AuthorIdentifier)\
+                .filter(and_(AuthorIdentifier.author == author,
+                             AuthorIdentifier.identifier == identifier_spin,
+                             AuthorIdentifier.identifier_value == str(row['spin']))).first()
+            if author_identifier_spin is None:
+                author_identifier_spin = AuthorIdentifier(
+                    author=author,
+                    identifier=identifier_spin,
+                    identifier_value=row['spin']
+                )
+                db.add(author_identifier_spin)
         if str(row['orcid']) != "0":
-            author_identifier_orcid = AuthorIdentifier(
-                author=author,
-                identifier=identifier_orcid,
-                identifier_value=row['orcid']
-            )
-            db.add(author_identifier_orcid)
+            author_identifier_orcid = db.query(AuthorIdentifier) \
+                .filter(and_(AuthorIdentifier.author == author,
+                             AuthorIdentifier.identifier == identifier_orcid,
+                             AuthorIdentifier.identifier_value == str(row['orcid']))).first()
+            if author_identifier_orcid is None:
+                author_identifier_orcid = AuthorIdentifier(
+                    author=author,
+                    identifier=identifier_orcid,
+                    identifier_value=row['orcid']
+                )
+                db.add(author_identifier_orcid)
         if str(row['scopus author id']) != "0":
-            author_identifier_scopus = AuthorIdentifier(
-                author=author,
-                identifier=identifier_scopus,
-                identifier_value=row['scopus author id']
-            )
-            db.add(author_identifier_scopus)
+            author_identifier_scopus = db.query(AuthorIdentifier) \
+                .filter(and_(AuthorIdentifier.author == author,
+                             AuthorIdentifier.identifier == identifier_scopus,
+                             AuthorIdentifier.identifier_value == str(row['scopus author id']))).first()
+            if author_identifier_scopus is None:
+                author_identifier_scopus = AuthorIdentifier(
+                    author=author,
+                    identifier=identifier_scopus,
+                    identifier_value=row['scopus author id']
+                )
+                db.add(author_identifier_scopus)
         if str(row['researcher id']) != "0":
-            author_identifier_researcher = AuthorIdentifier(
-                author=author,
-                identifier=identifier_researcher,
-                identifier_value=row['researcher id']
-            )
-            db.add(author_identifier_researcher)
+            author_identifier_researcher = db.query(AuthorIdentifier) \
+                .filter(and_(AuthorIdentifier.author == author,
+                             AuthorIdentifier.identifier == identifier_researcher,
+                             AuthorIdentifier.identifier_value == str(row['researcher id']))).first()
+            if author_identifier_researcher is None:
+                author_identifier_researcher = AuthorIdentifier(
+                    author=author,
+                    identifier=identifier_researcher,
+                    identifier_value=row['researcher id']
+                )
+                db.add(author_identifier_researcher)
         db.commit()
     return {"message": "OK"}
 
