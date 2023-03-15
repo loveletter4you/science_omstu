@@ -175,29 +175,31 @@ async def service_fill_authors(file: UploadFile, db: Session):
                 confirmed=True
             )
             db.add(author)
-        faculty = db.query(Faculty).filter(Faculty.name == row['faculty']).first()
-        if faculty is None:
-            faculty = Faculty(name=row['faculty'])
-            db.add(faculty)
             db.commit()
-        department = db.query(Department).filter(and_(Department.name == row['department'],
-                                                      Department.faculty == faculty)).first()
-        if department is None:
-            department = Department(
-                name=row['department'],
-                faculty=faculty
-            )
-            db.add(department)
-            db.commit()
-        author_department = db.query(AuthorDepartment).filter(and_(AuthorDepartment.department == department,
-                                                                   AuthorDepartment.author == author)).first()
-        if author_department is None:
-            author_department = AuthorDepartment(
-                department=department,
-                author=author,
-                position=row['position']
-            )
-            db.add(author_department)
+        if row['faculty'] != "":
+            faculty = db.query(Faculty).filter(Faculty.name == row['faculty']).first()
+            if faculty is None:
+                faculty = Faculty(name=row['faculty'])
+                db.add(faculty)
+                db.commit()
+            department = db.query(Department).filter(and_(Department.name == row['department'],
+                                                          Department.faculty == faculty)).first()
+            if department is None:
+                department = Department(
+                    name=row['department'],
+                    faculty=faculty
+                )
+                db.add(department)
+                db.commit()
+            author_department = db.query(AuthorDepartment).filter(and_(AuthorDepartment.department == department,
+                                                                       AuthorDepartment.author == author)).first()
+            if author_department is None:
+                author_department = AuthorDepartment(
+                    department=department,
+                    author=author,
+                    position=row['position']
+                )
+                db.add(author_department)
         if str(row['spin']) != "0":
             author_identifier_spin = db.query(AuthorIdentifier)\
                 .filter(and_(AuthorIdentifier.author == author,
