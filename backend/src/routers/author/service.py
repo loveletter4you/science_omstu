@@ -42,8 +42,8 @@ async def service_get_author(id: int, db: Session):
 
 
 async def service_get_author_publications(id: int, offset: int, limit: int, db: Session):
-    query = db.query(Publication).join(AuthorPublication).filter(AuthorPublication.author_id == id)\
-        .order_by(desc(Publication.publication_date))
+    query = db.query(Publication).join(AuthorPublication).order_by(desc(Publication.publication_date))\
+        .order_by(Publication.title).filter(AuthorPublication.author_id == id)
     publications = query.offset(offset).limit(limit).all()
     scheme_publications = [SchemePublication.from_orm(publication) for publication in publications]
     count = query.count()

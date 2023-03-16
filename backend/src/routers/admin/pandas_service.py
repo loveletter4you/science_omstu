@@ -25,7 +25,6 @@ async def service_fill_scopus(date: datetime.date, file: UploadFile, db: Session
     source_type_conference = get_or_create_source_type("Конференция", db)
     source_link_type_issn = get_or_create_source_link_type("ISSN", db)
     identifier_scopus = get_or_create_identifier("Scopus Author ID", db)
-    scopus_rating_type = get_or_create_source_rating_type("Scopus", db)
     organization_omstu = get_or_create_organization_omstu(db)
 
     for _, row in scopus_df.iterrows():
@@ -39,13 +38,6 @@ async def service_fill_scopus(date: datetime.date, file: UploadFile, db: Session
             else:
                 source.source_type = source_type_journal
             db.add(source)
-            source_rating_scopus = SourceRating(
-                source_rating_type=scopus_rating_type,
-                source=source,
-                rating="Входит",
-                rating_date=date
-            )
-            db.add(source_rating_scopus)
             if row['ISSN'] != "":
                 source_link = SourceLink(
                     source=source,
@@ -66,10 +58,10 @@ async def service_fill_scopus(date: datetime.date, file: UploadFile, db: Session
         publication = db.query(Publication).filter(or_(Publication.title.ilike(row['Title']))).first()
         if publication is not None:
             continue
-        publication = create_publication(publication_type, source, row["Title"], row["abstract"], date, True, db)
+        publication = create_publication(publication_type, source, row["Title"], row["Abstract"], date, True, db)
         create_publication_link(publication, pub_link_type_scopus, row["Link"], db)
         if row['DOI'] != "":
-            create_publication_link(publication, pub_link_type_doi, row["Link"], db)
+            create_publication_link(publication, pub_link_type_doi, row["DOI"], db)
         authors_orgs = row['Authors with affiliations'].split(';')
         authors_scopus = row['Author(s) ID'].split(';')
         for i, author_row in enumerate(authors_orgs):
@@ -284,6 +276,96 @@ async def service_white_list_fill(date: datetime.date, file: UploadFile, db: Ses
                 rating_date=date
             )
             db.add(source_rating_white_list)
+            if len(issns) > 1:
+                source_link_issn = SourceLink(
+                    source=source,
+                    source_link_type=source_link_type_issn,
+                    link=issns[0]
+                )
+                db.add(source_link_issn)
+                source_link_eissn = SourceLink(
+                    source=source,
+                    source_link_type=source_link_type_eissn,
+                    link=issns[1]
+                )
+                db.add(source_link_eissn)
+            else:
+                source_link_issn = SourceLink(
+                    source=source,
+                    source_link_type=source_link_type_issn,
+                    link=issns[0]
+                )
+                db.add(source_link_issn)
+    db.commit()
+    return dict(message="OK")
+
+
+async def service_white_list_jcr_citescore(date: datetime.date, file: UploadFile, db: Session):
+    white_list_df = pd.read_csv(file.file, on_bad_lines='skip')
+    white_list_df = white_list_df.replace(np.nan, "")
+    white_list_rating_type = get_or_create_source_rating_type('«Белый список» РЦНИ', db)
+    jcr_rating_type = get_or_create_source_rating_type('Journal Citation Reports WoS', db)
+    citescore_rating_type = get_or_create_source_rating_type('CiteScore Scopus', db)
+    source_link_type_issn = get_or_create_source_link_type("ISSN", db)
+    source_link_type_eissn = get_or_create_source_link_type("eISSN", db)
+    source_type_journal = get_or_create_source_type("Журнал", db)
+    for _, row in white_list_df.iterrows():
+        issns = row['ISSN'].split('|')
+        source = get_source_by_name_or_identifiers(str(row['Title']), issns, db)
+        if not (source is None):
+            source_rating_white_list = SourceRating(
+                source_rating_type=white_list_rating_type,
+                source=source,
+                rating="Входит",
+                rating_date=date
+            )
+            db.add(source_rating_white_list)
+            if row['Direction'] != "":
+                source_rating_citescore = SourceRating(
+                    source_rating_type=citescore_rating_type,
+                    source=source,
+                    rating=row['Direction'].replace('|', '; '),
+                    rating_date=date
+                )
+                db.add(source_rating_citescore)
+            if row['JCR categories'] != "":
+                source_rating_jcr = SourceRating(
+                    source_rating_type=jcr_rating_type,
+                    source=source,
+                    rating=row['JCR categories'],
+                    rating_date=date
+                )
+                db.add(source_rating_jcr)
+            continue
+        else:
+            source = Source(
+                name=row['Title'],
+                source_type=source_type_journal
+            )
+            db.add(source)
+            source_rating_white_list = SourceRating(
+                source_rating_type=white_list_rating_type,
+                source=source,
+                rating="Входит",
+                rating_date=date
+            )
+            db.add(source_rating_white_list)
+            if row['Direction'] != "":
+                source_rating_citescore = SourceRating(
+                    source_rating_type=citescore_rating_type,
+                    source=source,
+                    rating=row['Direction'].replace('|', '; '),
+                    rating_date=date
+                )
+                db.add(source_rating_citescore)
+            if row['JCR categories'] != "":
+                source_rating_jcr = SourceRating(
+                    source_rating_type=jcr_rating_type,
+                    source=source,
+                    rating=row['JCR categories'],
+                    rating_date=date
+                )
+                db.add(source_rating_jcr)
             if len(issns) > 1:
                 source_link_issn = SourceLink(
                     source=source,
