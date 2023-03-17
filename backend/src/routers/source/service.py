@@ -30,7 +30,8 @@ async def service_get_source(id: int, db: Session):
 
 
 async def service_get_source_publications(id: int, offset: int, limit: int, db: Session):
-    query = db.query(Publication).join(Source).filter(Source.id == id).order_by(desc(Publication.publication_date))
+    query = db.query(Publication).join(Source).order_by(desc(Publication.publication_date))\
+        .order_by(Publication.title).filter(Source.id == id)
     publications = query.offset(offset).limit(limit).all()
     scheme_publications = [SchemePublication.from_orm(publication) for publication in publications]
     count = query.count()

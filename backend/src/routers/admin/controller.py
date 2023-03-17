@@ -4,7 +4,7 @@ from fastapi import HTTPException, status, UploadFile
 from sqlalchemy.orm import Session
 
 from src.routers.admin.pandas_service import service_fill_authors, service_fill_scopus, service_white_list_fill, \
-    service_jcr_list_fill
+    service_jcr_list_fill, service_white_list_jcr_citescore
 from src.routers.admin.service import service_create_admin, service_admin_check, service_get_feedbacks
 from src.schemas.schemas import SchemeUser
 
@@ -55,3 +55,9 @@ async def controller_jcr_list_fill(rating_date: date, file: UploadFile, user: Sc
     return message
 
 
+async def controller_whitelist_jcr_citescore(rating_date: date, file: UploadFile, user: SchemeUser, db: Session):
+    is_admin = await service_admin_check(user.role_id, db)
+    if not is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Доступ запрещен")
+    message = await service_white_list_jcr_citescore(rating_date, file, db)
+    return message
