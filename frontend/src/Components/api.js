@@ -21,31 +21,35 @@ export const postAuthorsData = (data) => {
     })
 }
 export const DataUploadAPI = {
-    postAuthorsData(data) {
+    postAuthorsData(data, token) {
         return instance.post("/api/admin/upload/authors", data, {
             headers: {
-                'Content-Type': 'multipart/form-data'
+                "Content-Type": "multipart/form-data; boundary=----WebKitFormBoundarylMDxS6LSTp97MKcy",
+                authorization: `Bearer ${token}`,
             }
         })
     },
-    postScopusData(data) {
+    postScopusData(data, token) {
         return instance.post("/api/admin/upload/scopus", data, {
             headers: {
-                'Content-Type': 'multipart/form-data'
+                'Content-Type': 'multipart/form-data; boundary = ----WebKitFormBoundaryZFOs57xIdISzeePV',
+                authorization: `Bearer ${token}`
             }
         })
     },
-    postWhiteListData(data) {
+    postWhiteListData(data, token) {
         return instance.post("/api/admin/upload/white_list", data, {
             headers: {
-                'Content-Type': 'multipart/form-data'
+                'Content-Type': 'multipart/form-data',
+                authorization: `Bearer ${token}`
             }
         })
     },
-    postJCRData(data) {
+    postJCRData(data, token) {
         return instance.post("/api/admin/upload/jcr", data, {
             headers: {
-                'Content-Type': 'multipart/form-data'
+                'Content-Type': 'multipart/form-data',
+                authorization: `Bearer ${token}`
             }
         })
     },

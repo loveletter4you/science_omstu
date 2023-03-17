@@ -6,6 +6,7 @@ const initialState = {
     surname: null,
     patronymic: null,
     author_identifiers: [],
+    author_departments: [],
 };
 
 const authorSlice = createSlice({
@@ -13,12 +14,13 @@ const authorSlice = createSlice({
     initialState,
     reducers: {
         setAuthor(state, action) {
-            const {id, name, surname, patronymic, author_identifiers} = action.payload.author;
+            const {id, name, surname, patronymic, author_identifiers, author_departments} = action.payload.author;
             state.id = id;
             state.name = name;
             state.surname = surname;
             state.patronymic = patronymic;
             state.author_identifiers = author_identifiers;
+            state.author_departments = author_departments;
         },
     }
 });

@@ -61,6 +61,11 @@ const Author = () => {
                                 <p className={s.block__text}>{author.surname} {author.name} {author.patronymic}</p>
                                 {author.author_identifiers.map(a => <div key={a.id}>
                                     {a.identifier.name}: {a.identifier_value}
+                                </div>)
+                                }
+                                {author.author_departments.map(a => <div>
+                                    <div>{a.department.name}</div>
+                                    <div>{a.department.faculty.name} ({a.position})</div>
                                 </div>)}
                             </div>
                         </div>

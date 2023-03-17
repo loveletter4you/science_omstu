@@ -6,6 +6,7 @@ import s from "./Feedback.module.css"
 import {useCookies} from "react-cookie";
 import Preloader from "../Preloader/Preloader";
 import {Navigate} from "react-router-dom";
+import Admin from "../Admin/Admin";
 
 const Feedback = () => {
     const signIn = useSelector(state => state.signIn)
@@ -32,6 +33,7 @@ const Feedback = () => {
     }, [pageSize]);
 
     return <div>
+        <Admin/>
         {feedbacks.isFetching === true ? <Preloader/> :
             <div>
                 {signIn.isAuth ? <div>
