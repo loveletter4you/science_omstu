@@ -17,6 +17,7 @@ import Error404 from "./Components/Errors/Erorr404";
 import {setIsAuth} from "./store/slices/SignInSlice";
 import {useDispatch} from "react-redux";
 import {useColorTheme} from "./Components/Theme/Theme";
+import UploadDate from "./Components/UploadDate/UploadDate";
 
 function App(props) {
     const [cookies, setCookies, removeCookies] = useCookies(['token']);
@@ -57,6 +58,8 @@ function App(props) {
                                element={<AuthorsPublications/>}/>
                         <Route exact path='/admin/feedbacks'
                                element={<Feedback/>}/>
+                        <Route exact path = "/admin/upload"
+                               element={<UploadDate/>}/>
                         <Route path='*' element={<Error404/>}/>
 
                     </Routes>
