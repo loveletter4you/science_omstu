@@ -46,6 +46,7 @@ def service_update_from_openalex(db: Session):
             'is_paratext',
             'updated_date',
             'created_date',
+            'abstract_inverted_index',
         ))
         works = []
         while cursor:
@@ -109,7 +110,12 @@ def service_update_from_openalex(db: Session):
             publication_type = get_or_create_publication_type(work["type"].replace('-', ' ').title(), db)
             date_values = [int(i) for i in work['publication_date'].split('-')]
             date = datetime.date(date_values[0], date_values[1], date_values[2])
-            publication = create_publication(publication_type, source, work['title'], None, date, True, db)
+            abstract: str | None
+            if work['abstract_inverted_index']:
+                abstract = inverted_index_to_string(work['abstract_inverted_index'])
+            else:
+                abstract = None
+            publication = create_publication(publication_type, source, work['title'], abstract, date, True, db)
             create_publication_link(publication, pub_link_type_doi, work['doi'].replace('https://doi.org/', ''), db)
             for author in work['authorships']:
                 author_db: Author | None
@@ -193,3 +199,18 @@ def service_update_from_openalex(db: Session):
             db.commit()
     return {"message": "OK"}
 
+
+def inverted_index_to_string(inverted_index):
+    terms = sorted(list(inverted_index.keys()), key=lambda x: inverted_index[x][0])
+    # Create an empty list to store the tokens
+    tokens = {}
+    # Iterate through the sorted terms
+    for term in terms:
+        # Iterate through the list of document positions and add the corresponding token
+        for pos in inverted_index[term]:
+            tokens[pos] = term
+
+    # Join the tokens to form the string
+    string = ' '.join(dict(sorted(tokens.items())).values())
+
+    return string
