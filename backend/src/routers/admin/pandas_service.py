@@ -156,14 +156,14 @@ async def service_fill_authors(file: UploadFile, db: Session):
         identifier_researcher = Identifier(name="ResearcherID")
         db.add(identifier_researcher)
     for _, row in author_df.iterrows():
-        author = db.query(Author).filter(and_(Author.name == row['name'],
-                                              Author.surname == row['surname'],
-                                              Author.patronymic == row['patronymic'])).first()
+        author = db.query(Author).filter(and_(Author.name == row['name'].title(),
+                                              Author.surname == row['surname'].title(),
+                                              Author.patronymic == row['patronymic'].title())).first()
         if author is None:
             author = Author(
-                name=row['name'],
-                surname=row['surname'],
-                patronymic=row['patronymic'],
+                name=row['name'].title(),
+                surname=row['surname'].title(),
+                patronymic=row['patronymic'].title(),
                 confirmed=True
             )
             db.add(author)
@@ -408,8 +408,6 @@ async def service_fill_rsci_journals_rank(date: datetime.date, file: UploadFile,
                 db.add(source_link_issn)
     db.commit()
     return dict(message="OK")
-
-
 
 
 async def service_white_list_jcr_citescore(date: datetime.date, file: UploadFile, db: Session):

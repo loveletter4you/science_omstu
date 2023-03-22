@@ -1,7 +1,7 @@
 import datetime
 
 import requests
-from sqlalchemy import and_, or_
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from src.model.model import Identifier, AuthorIdentifier, PublicationLink, Publication, Source, SourceLink, Author, \
@@ -22,8 +22,8 @@ def service_update_from_openalex(db: Session):
 
     if identifier_orcid is None:
         return None
-    orcids = db.query(AuthorIdentifier).filter(AuthorIdentifier.identifier == identifier_orcid).all()
-
+    orcids = db.query(AuthorIdentifier).join(Author).filter(AuthorIdentifier.identifier == identifier_orcid)\
+        .filter(Author.confirmed).all()
     for orcid in orcids:
         filters = f'author.orcid:https://orcid.org/{orcid.identifier_value}'
         filtered_works_url = f'https://api.openalex.org/works?filter={filters}'
@@ -50,7 +50,7 @@ def service_update_from_openalex(db: Session):
         works = []
         while cursor:
             url = f'{filtered_works_url}&select={select}&cursor={cursor}'
-            page_with_results = requests.get(url).json()
+            page_with_results = requests.get(url, timeout=30).json()
             results = page_with_results['results']
             works.extend(results)
 
@@ -106,7 +106,7 @@ def service_update_from_openalex(db: Session):
                             link=issns[0]
                         )
                         db.add(source_link_issn)
-            publication_type = get_or_create_publication_type(work["type"], db)
+            publication_type = get_or_create_publication_type(work["type"].replace('-', ' ').title(), db)
             date_values = [int(i) for i in work['publication_date'].split('-')]
             date = datetime.date(date_values[0], date_values[1], date_values[2])
             publication = create_publication(publication_type, source, work['title'], None, date, True, db)
@@ -144,15 +144,26 @@ def service_update_from_openalex(db: Session):
                     else:
                         author_db = identifier.author
                 else:
-                    author_db = db.query(Author).filter(and_(Author.name == author_name[0],
+                    if len(author_name) > 1:
+                        author_db = db.query(Author).filter(and_(Author.name == author_name[0],
                                                           Author.surname == author_name[1])).first()
+                    else:
+                        author_db = db.query(Author).filter(and_(Author.name == '-',
+                                                                 Author.surname == author_name[0])).first()
                     if author_db is None:
-                        author_db = Author(
-                            name=author_name[0],
-                            surname=author_name[1],
-                            confirmed=False
-                        )
-                        db.add(author_db)
+                        if len(author_name) > 1:
+                            author_db = Author(
+                                name=author_name[0],
+                                surname=author_name[1],
+                                confirmed=False
+                            )
+                            db.add(author_db)
+                        else:
+                            author_db = Author(
+                                name='-',
+                                surname=author_name[0],
+                                confirmed=False
+                            )
                 author_publication = AuthorPublication(
                     publication=publication,
                     author=author_db
@@ -180,4 +191,5 @@ def service_update_from_openalex(db: Session):
                         db.add(author_publication_organization)
                     db.commit()
             db.commit()
-    return dict(message="OK")
+    return {"message": "OK"}
+
