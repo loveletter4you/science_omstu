@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 
 from src.model.database import get_db
 from src.routers.admin.controller import controller_create_admin, controller_get_feedbacks, controller_fill_authors, \
-    controller_fill_scopus, controller_fill_white_list, controller_jcr_list_fill, controller_whitelist_jcr_citescore
+    controller_fill_scopus, controller_fill_white_list, controller_jcr_list_fill, controller_whitelist_jcr_citescore, \
+    controller_vak_journals_rank, controller_rsci_journals_rank, controller_fill_from_openalex
 from src.routers.user import controller_get_current_user
 from src.schemas.routers import SchemeFeedbacksGetRouter
 from src.schemas.schemas import SchemeUser
@@ -44,6 +45,20 @@ async def jcr_fill(rating_date: date = date.today(), file: UploadFile = File(...
     return message
 
 
+@router.post("/upload/vak_with_rank")
+async def vak_fill(rating_date: date = date.today(), file: UploadFile = File(...),
+                      user: SchemeUser = Depends(controller_get_current_user), db: Session = Depends(get_db)):
+    message = await controller_vak_journals_rank(rating_date, file, user, db)
+    return message
+
+
+@router.post("/upload/rsci_journals_rank")
+async def rsci_fill(rating_date: date = date.today(), file: UploadFile = File(...),
+                      user: SchemeUser = Depends(controller_get_current_user), db: Session = Depends(get_db)):
+    message = await controller_rsci_journals_rank(rating_date, file, user, db)
+    return message
+
+
 @router.post("/upload/scopus")
 async def scopus_fill(rating_date: date = date.today(), file: UploadFile = File(...),
                       user: SchemeUser = Depends(controller_get_current_user), db: Session = Depends(get_db)):
@@ -62,4 +77,10 @@ async def white_list_fill(rating_date: date = date.today(), file: UploadFile = F
 async def jcr_fill(rating_date: date = date.today(), file: UploadFile = File(...),
                       user: SchemeUser = Depends(controller_get_current_user), db: Session = Depends(get_db)):
     message = await controller_jcr_list_fill(rating_date, file, user, db)
+    return message
+
+
+@router.post("/update/openalex")
+async def openalex_update(user: SchemeUser = Depends(controller_get_current_user), db: Session = Depends(get_db)):
+    message = await controller_fill_from_openalex(user, db)
     return message

@@ -85,7 +85,7 @@ def get_or_create_publication_type(name: str, db: Session):
 
 
 def create_publication(publication_type: PublicationType, source: Source,
-                       title: str, abstract: str, publication_date: date,
+                       title: str, abstract: str | None, publication_date: date,
                        accepted: bool, db: Session):
     publication = Publication(
         publication_type=publication_type,

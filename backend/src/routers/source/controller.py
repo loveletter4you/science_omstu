@@ -7,7 +7,7 @@ from src.routers.source.service import service_get_sources, service_get_sources_
 
 async def controller_get_sources(search: str, page: int, limit: int, db: Session):
     offset = page * limit
-    if search is None:
+    if (search is None) or (search == ""):
         sources = await service_get_sources(offset, limit, db)
         return sources
     else:
