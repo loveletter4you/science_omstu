@@ -11,7 +11,7 @@ from src.model.storage import get_or_create_publication_link_type, get_source_by
     create_publication_link, get_or_create_organization_omstu
 
 
-def service_update_from_openalex(db: Session):
+async def service_update_from_openalex(db: Session):
     identifier_orcid = db.query(Identifier).filter(Identifier.name == "ORCID").first()
     pub_link_type_doi = get_or_create_publication_link_type("DOI", db)
     source_link_type_issn = get_or_create_source_link_type("ISSN", db)
