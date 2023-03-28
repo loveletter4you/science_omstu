@@ -1,10 +1,10 @@
 import React from "react";
-import s from "./Bugtracker.module.css"
+import style from "./Bugtracker.module.css"
 
 const Modal = ({active, setActive, children}) => {
     return (
-        <div className={active ? s.modal + " " + s.active : s.modal} onClick={() => setActive(false)}>
-            <div className={active ? s.modal__content + " " + s.active : s.modal__content}
+        <div className={active ? style.modal + " " + style.active : style.modal} onClick={() => setActive(false)}>
+            <div className={active ? style.modal__content + " " + style.active : style.modal__content}
                  onClick={e => e.stopPropagation()}>
                 {children}
             </div>

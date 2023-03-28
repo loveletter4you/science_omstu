@@ -2,7 +2,7 @@ import React, {useEffect} from "react";
 import './App.css';
 import Header from "./Components/Header/Header";
 import Footer from "./Components/Footer/Footer";
-import {Navigate, Route, Routes} from "react-router-dom";
+import {Route, Routes} from "react-router-dom";
 import Authors from "./Components/Authors/Authors";
 import Author from "./Components/Author/Author";
 import Publications from "./Components/Publications/Publications";
@@ -19,9 +19,9 @@ import {useDispatch} from "react-redux";
 import {useColorTheme} from "./Components/Theme/Theme";
 import UploadDate from "./Components/UploadDate/UploadDate";
 
-function App(props) {
-    const [cookies, setCookies, removeCookies] = useCookies(['token']);
-    const [cookiesTheme, setCookiesTheme] = useCookies(['theme']);
+function App() {
+    const [cookies, _setCookies, _removeCookies] = useCookies(['token']);
+    const [cookiesTheme, _setCookiesTheme] = useCookies(['theme']);
     const {colorTheme, toggleColorTheme} = useColorTheme();
 
     const dispatch = useDispatch();

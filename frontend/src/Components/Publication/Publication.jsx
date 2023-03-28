@@ -1,8 +1,8 @@
-import React, {useState} from "react";
+import React from "react";
 import {useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {fetchPublication} from "../../store/slices/PublicationSlice";
-import s from "./Publication.module.css"
+import style from "./Publication.module.css"
 import {NavLink} from "react-router-dom";
 
 import Preloader from "../Preloader/Preloader";
@@ -11,50 +11,54 @@ const Publication = () => {
     const params = useParams();
     const dispatch = useDispatch();
     const publication = useSelector(state => state.publication);
-    const [isFetching, toggleIsFetching] = useState(false);
     const keywords = [];
 
     React.useEffect(() => {
         dispatch(fetchPublication(params.id))
     }, [])
 
-    return (<div className={s.theme}>
+    return (<div className={style.theme}>
             {publication.isFetching === true ? <Preloader/> :
                 <div>
-                    <div className={s.block}>
+                    <div className={style.block}>
                         <div>{publication.publication_type.name}</div>
                         <div><NavLink to={'/source/' + publication.source.id}>{publication.source.name}</NavLink></div>
                     </div>
-                    <div className={s.block}>
+                    <div className={style.block}>
                         <div>{publication.title}</div>
                         <div>{publication.publication_date}</div>
                     </div>
-                    <div className={s.block}>
-                        Авторы: <div>{publication.publication_authors.map(a => <div>
-                        <NavLink
-                            to={'/author/' + a.author.id}>{a.author.surname} {a.author.name} {a.author.patronymic}</NavLink>
-                        {a.author_publication_organizations.map(p => <>
-                            &nbsp;({p.organization.name}{p.organization.country === null ? "" : ", "}
-                            {p.organization.country}{p.organization.city === null ? "" : ", "}{p.organization.city})
-                        </>)}
-                    </div>)}</div>
+                    <div className={style.block}>
+                        Авторы: <div>{publication.publication_authors.map((authorPublication, index) =>
+                        <div key={index}>
+                            <NavLink
+                                to={'/author/' + authorPublication.author.id}>{authorPublication.author.surname}
+                                {authorPublication.author.name} {authorPublication.author.patronymic}</NavLink>
+                            {authorPublication.author_publication_organizations.map((organization, index) =>
+                                <div key = {index} className={style.organization}>
+                                &nbsp;({organization.organization.name}{organization.organization.country === null ?
+                                "" : ", "}
+                                {organization.organization.country}{organization.organization.city === null ?
+                                "" : ", "}{organization.organization.city})
+                            </div>)}
+                        </div>)}</div>
                     </div>
-                    <div className={s.block}>
+                    <div className={style.block}>
                         Аннотация: <div>{publication.abstract}</div>
                     </div>
-                    <div className={s.block}>
+                    <div className={style.block}>
                         Ключевые слова:
-                        {publication.keyword_publications.map(w => {
-                                keywords.push(w.keyword.keyword)
+                        {publication.keyword_publications.map(word => {
+                                keywords.push(word.keyword.keyword)
                             }
                         )}
                         <div>{keywords.join(", ")}</div>
                     </div>
-                    <div className={s.block}>
-                        <div>{publication.publication_links.map(l => <div>
-                            {l.publication_link_type.name}: {l.publication_link_type.name === "DOI" ?
-                            <a href={"https://www.doi.org/" + l.link} target="_blank">{l.link}</a> :
-                            <a href={l.link} target="_blank">{l.link}</a>}
+                    <div className={style.block}>
+                        <div>{publication.publication_links.map((links, index) => <div key = {index}>
+                            {links.publication_link_type.name}: {links.publication_link_type.name === "DOI" ?
+                            <a href={"https://www.doi.org/" + links.link} target="_blank">{links.link}</a> :
+                            <a href={links.link} target="_blank">{links.link}</a>}
                         </div>)
                         }</div>
                     </div>
@@ -62,7 +66,6 @@ const Publication = () => {
             }
         </div>
     )
-
 };
 
 export default Publication;

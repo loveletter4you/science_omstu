@@ -2,20 +2,19 @@ import React, {useState} from "react";
 import {useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {setSource} from "../../store/slices/SourceSlice";
-import s from "./Source.module.css"
+import style from "./Source.module.css"
 import SourcePublications from "../Source/SourcesPublication";
 import {SourceAPI} from "../api";
-import {useCookies} from "react-cookie";
 import Preloader from "../Preloader/Preloader";
+import {setData} from "../../store/slices/PublicationsSlice";
 
 const Source = () => {
 
     const params = useParams();
     const dispatch = useDispatch();
     const source = useSelector(state => state.source)
-    const {publications, pageSize, count} = useSelector(state => state.publications);
+    const {pageSize} = useSelector(state => state.publications);
     const [isFetching, toggleIsFetching] = useState(false);
-    const [cookies, setCookies, removeCookies] = useCookies(['token'])
 
     React.useEffect(() => {
         toggleIsFetching(true);
@@ -31,31 +30,34 @@ const Source = () => {
         toggleIsFetching(true);
         const fetchSource = async () => {
             const res = await SourceAPI.getSourcePageSize(params.id, 0, pageSize);
-            dispatch(setSource(res.data));
+            dispatch(setData(res.data));
             toggleIsFetching(false);
         }
         fetchSource();
     }, [pageSize]);
 
-    return <div className={s.theme}>
+    return <div className={style.theme}>
         {isFetching === true ? <Preloader/> :
             <div>
-                <div className={s.block}>
+                <div className={style.block}>
                     <div>{source.source_type.name}</div>
                     <div>{source.name}</div>
                 </div>
-                <div className={s.block}>
-                    <div>{source.source_links.map(l => <div>
-                        {l.source_link_type.name}{l.link === null ? '' : ':'} {l.link}
+                <div className={style.block}>
+                    <div>{source.source_links.map((links, index) => <div key = {index}>
+                        {links.source_link_type.name}{links.link === null ? '' : ':'} {links.link}
                     </div>)}</div>
                 </div>
                 <div>
 
-                    <div className={s.lineBlock}>{source.source_ratings.map(r => <div className={s.blockRating}>
-                        <div>{r.source_rating_type.name}</div>
-                        <div>{r.rating}</div>
-                        <div>{r.rating_date}</div>
-                    </div>)}</div>
+                    <div className={style.lineBlock}>{source.source_ratings.map((ratings, index) =>
+                            <div key = {index} className={style.blockRating}>
+                        <div>{ratings.source_rating_type.name}</div>
+                        <div>{ratings.rating}</div>
+                        <div>{ratings.rating_date}</div>
+                    </div>
+                    )}
+                    </div>
                 </div>
 
                 <SourcePublications/>

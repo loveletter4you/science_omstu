@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import n from "./Navbar.module.css"
+import style from "./Navbar.module.css"
 import {NavLink} from "react-router-dom";
 import BugTracker from "../Bugtracker/Bugtracker";
 import {useColorTheme} from "../Theme/Theme";
@@ -15,7 +15,7 @@ const Navbar = () => {
     const toggle = () => {
         setActive(!Active);
     }
-    const [cookiesTheme, setCookiesTheme] = useCookies(['theme']);
+    const [cookiesTheme, _] = useCookies(['theme']);
     const {colorTheme, toggleColorTheme} = useColorTheme();
 
     useEffect(() => {
@@ -38,39 +38,38 @@ const Navbar = () => {
 
 
     return (
-        <div className={n.appWrapperNavbar}>
-
-            <div className={n.burger} onClick={toggle}>
+        <div className={style.appWrapperNavbar}>
+            <div className={style.burger} onClick={toggle}>
                 <span></span>
             </div>
-            <div className={Active ? n.back : null}>
-                <div className={Active ? n.menu + " " + n.active : n.menu}>
-                    <div className={n.item} onClick={toggle}>
+            <div className={Active ? style.back : null}>
+                <div className={Active ? style.menu + " " + style.active : style.menu}>
+                    <div className={style.item} onClick={toggle}>
                         <NavLink to="/publication"
-                                 className={navData => navData.isActive ? n.active : null}>Публикации</NavLink>
+                                 className={navData => navData.isActive ? style.active : null}>Публикации</NavLink>
                     </div>
-                    <div className={n.item} onClick={toggle}>
+                    <div className={style.item} onClick={toggle}>
                         <NavLink to="/author"
-                                 className={navData => navData.isActive ? n.active : null}>Персоналии</NavLink>
+                                 className={navData => navData.isActive ? style.active : null}>Персоналии</NavLink>
                     </div>
-                    <div className={n.item} onClick={toggle}>
+                    <div className={style.item} onClick={toggle}>
                         <NavLink to="/source"
-                                 className={navData => navData.isActive ? n.active : null}>Источники</NavLink>
+                                 className={navData => navData.isActive ? style.active : null}>Источники</NavLink>
                     </div>
-                    {signIn.isAuth ? <div className={n.item} onClick={toggle}>
+                    {signIn.isAuth ? <div className={style.item} onClick={toggle}>
                         <NavLink to="/admin/feedbacks">Администратор</NavLink>
                     </div> : null}
-                    <div className={n.item}>
+                    <div className={style.item}>
                         <BugTracker/>
                     </div>
-                    <div className={n.item} onClick={onChangeTheme}>
-                        <img src={theme} className={n.image}/>
+                    <div className={style.item} onClick={onChangeTheme}>
+                        <img src={theme} className={style.image}/>
                     </div>
                     <div>
                         {signIn.isAuth ?
                             <div onClick={toggle}><SignOut/></div> :
                             <NavLink to="/login">
-                                <button className={n.btn} onClick={toggle}>Войти</button>
+                                <button className={style.btn} onClick={toggle}>Войти</button>
                             </NavLink>
                         }
                     </div>

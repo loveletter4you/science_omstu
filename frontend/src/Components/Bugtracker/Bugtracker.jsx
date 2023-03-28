@@ -1,6 +1,6 @@
 import React, {useState, useRef} from "react";
 import bugtracker from "./../../assets/img/bagtracker.png"
-import s from "./Bugtracker.module.css"
+import style from "./Bugtracker.module.css"
 import Modal from "./BugtrackerWindow";
 import ReCAPTCHA from "react-google-recaptcha";
 import axios from "axios";
@@ -30,27 +30,27 @@ const BugTracker = () => {
     }
 
     return (<div>
-            <img src={bugtracker} className={s.image} onClick={() => setModal(true)}/>
+            <img src={bugtracker} className={style.image} onClick={() => setModal(true)}/>
             {isModal ? <Modal visible={true} active={isModal} setActive={setModal}>
-                <form onSubmit={handleSubmit} className={s.form}>
-                    <div className={s.title}>Форма обратной связи</div>
-                    <div className={s.line}>
+                <form onSubmit={handleSubmit} className={style.form}>
+                    <div className={style.title}>Форма обратной связи</div>
+                    <div className={style.line}>
                         <div>
                             <div>Имя</div>
-                            <input type="text" name="name" className={s.input}/>
+                            <input type="text" name="name" className={style.input}/>
                         </div>
                         <div>
                             <div>Почта</div>
-                            <input type="email" name="mail" className={s.input}/>
+                            <input type="email" name="mail" className={style.input}/>
                         </div>
                     </div>
                     <div>Сообщение</div>
-                    <textarea className={s.input} id="message" name="message"/>
+                    <textarea className={style.input} id="message" name="message"/>
                     <ReCAPTCHA
                         sitekey={process.env.REACT_APP_SITE_KEY}
                         ref={captchaRef}
                     />
-                    <div><input className={s.input} type="submit" value="Отправить"/></div>
+                    <div><input className={style.input} type="submit" value="Отправить"/></div>
                 </form>
             </Modal> : null}
         </div>

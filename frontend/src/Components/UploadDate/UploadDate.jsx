@@ -25,7 +25,6 @@ const UploadDate = () => {
             console.log(data.authorsUpload[0])
             try {
                 const res = await DataUploadAPI.postAuthorsData(formData, cookies.token);
-                console.log(res)
             } catch (e) {
                 console.log(e)
             }
@@ -34,10 +33,10 @@ const UploadDate = () => {
     }
     const onSubmitWhiteList = (data) => {
         let formData = new FormData();
-        formData.append("file", data.authorsUpload[1])
+        formData.append("file", data.authorsUpload[1], data.authorsUpload[1].filename)
         const UploadAuthors = async () => {
             try {
-                const res = await DataUploadAPI.postWhiteListData(data.WhiteListUpload[0], cookies.token);
+                const res = await DataUploadAPI.postWhiteListData(formData, cookies.token);
 
             } catch (e) {
 
@@ -48,10 +47,10 @@ const UploadDate = () => {
 
     const onSubmitScopus = (data) => {
         let formData = new FormData();
-        formData.append("file", data.authorsUpload[2], "authors.csv")
+        formData.append("file", data.authorsUpload[2], data.authorsUpload[2].filename)
         const UploadAuthors = async () => {
             try {
-                const res = await DataUploadAPI.postScopusData(data.ScopusUpload[0], cookies.token);
+                const res = await DataUploadAPI.postScopusData(formData, cookies.token);
 
             } catch (e) {
 
@@ -61,10 +60,10 @@ const UploadDate = () => {
     }
     const onSubmitJCR = (data) => {
         let formData = new FormData();
-        formData.append("file", data.authorsUpload[3], "authors.csv")
+        formData.append("file", data.authorsUpload[3], data.authorsUpload[3].filename)
         const UploadAuthors = async () => {
             try {
-                const res = await DataUploadAPI.postJCRData(data.JCRUpload[0], cookies.token);
+                const res = await DataUploadAPI.postJCRData(formData, cookies.token);
 
             } catch (e) {
 
