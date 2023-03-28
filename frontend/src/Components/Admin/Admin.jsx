@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {NavLink} from "react-router-dom";
-import s from "./Admin.module.css";
+import style from "./Admin.module.css";
 
 const Admin = () => {
     const [Active, setActive] = useState(false);
@@ -9,16 +9,16 @@ const Admin = () => {
     }
 
     return (
-        <div className={s.AdminWrapper}>
-            <div className={s.burger} onClick={toggle}>
+        <div className={style.AdminWrapper}>
+            <div className={style.burger} onClick={toggle}>
                 <span></span>
             </div>
-            <div className={Active ? s.menu + " " + s.active : s.menu}>
-                <div className={s.menuItems}>
-                    <div className={s.item} onClick={toggle}>
+            <div className={Active ? style.menu + " " + style.active : style.menu}>
+                <div className={style.menuItems}>
+                    <div className={style.item} onClick={toggle}>
                         <NavLink to="/admin/feedbacks">Сообщения пользователей</NavLink>
                     </div>
-                    <div className={s.item} onClick={toggle}>
+                    <div className={style.item} onClick={toggle}>
                         <NavLink to="/admin/upload">Загрузка данных</NavLink>
                     </div>
                 </div>
@@ -26,6 +26,5 @@ const Admin = () => {
             </div>
         </div>
     )
-
 }
 export default Admin;

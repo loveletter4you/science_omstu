@@ -1,5 +1,5 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
-import {AuthorAPI, PublicationAPI} from "../../Components/api";
+import {PublicationAPI} from "../../Components/api";
 
 export const fetchPublication = createAsyncThunk(
     "publication/fetchPublication", async (id, {rejectWithValue}) => {
@@ -61,8 +61,5 @@ const publicationSlice = createSlice({
     },
 
 });
-
-
-export const {setPublication} = publicationSlice.actions;
 
 export default publicationSlice.reducer;

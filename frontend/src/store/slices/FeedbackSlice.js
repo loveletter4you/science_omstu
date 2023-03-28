@@ -1,6 +1,5 @@
 import {createSlice, createAsyncThunk} from "@reduxjs/toolkit";
-import {FeedbackAPI, SourcesAPI} from "../../Components/api";
-import {fetchSources, fetchSourcesSearch} from "./SourcesSlice";
+import {FeedbackAPI} from "../../Components/api";
 
 export const fetchFeedback = createAsyncThunk(
     "feedbacks/fetchSources", async ({page, pageSize, token}, {rejectWithValue}) => {

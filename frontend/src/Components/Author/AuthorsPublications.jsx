@@ -3,7 +3,7 @@ import {NavLink} from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import {setData} from "../../store/slices/PublicationsSlice";
 import {useDispatch, useSelector} from "react-redux";
-import s from "../Publications/Publications.module.css";
+import style from "../Publications/Publications.module.css";
 import {AuthorAPI} from "../api";
 import Preloader from "../Preloader/Preloader";
 
@@ -46,23 +46,29 @@ const AuthorsPublications = () => {
 
     return <div>
         {isFetching === true ? <Preloader/> :
-            <div className={s.theme}>
-                <div className={s.block}>
-                    {publications === undefined ? 'Подождите пожалуйста' : publications.map(p => <div key={p.id}>
-                        <div key={p.id} className={s.blocks}>
-                            <div>{p.publication_type.name}</div>
-                            <div><NavLink to={'/source/' + p.source.id}>{p.source.name}</NavLink></div>
-                            <NavLink to={"/publication/" + p.id}>
-                                <div>{p.title}</div>
+            <div>
+                <div className={style.block}>
+                    {publications.map((authorsPublication, index) => <div key={index}>
+                        <div className={style.blocks}>
+                            <div>{authorsPublication.publication_type.name}</div>
+                            <div><NavLink
+                                to={'/source/' + authorsPublication.source.id}>
+                                {authorsPublication.source.name}</NavLink>
+                            </div>
+                            <NavLink to={"/publication/" + authorsPublication.id}>
+                                <div>{authorsPublication.title}</div>
                             </NavLink>
-                            <div className={s.authors}>
-                                <div className={s.author}>{p.publication_authors.map(a =>
-                                    <NavLink to={"/author/" + a.author.id}>
-                                        {a.author.surname} {a.author.name}
+                            <div className={style.authors}>
+                                <div className={style.author}>
+                                    {authorsPublication.publication_authors.map((authors,index) =>
+                                    <NavLink key={index} to={"/author/" + authors.author.id}>
+                                        {authors.author.surname} {authors.author.name}
                                     </NavLink>
                                 )}</div>
                             </div>
-                            <div>{p.publication_date === null || p.publication_date === undefined ? '' : p.publication_date.slice(0, 4)}</div>
+                            <div>{authorsPublication.publication_date === null ||
+                            authorsPublication.publication_date === undefined ? '' :
+                                authorsPublication.publication_date.slice(0, 4)}</div>
                         </div>
                     </div>)}
                 </div>

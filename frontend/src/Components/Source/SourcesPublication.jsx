@@ -1,14 +1,11 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import {NavLink} from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import {setData} from "../../store/slices/PublicationsSlice";
-import axios from "axios";
 import {useDispatch, useSelector} from "react-redux";
-import s from "../Publications/Publications.module.css";
-import preloader from "../../assets/img/preloader.svg";
-import c from "./Source.module.css"
+import stylePublication from "../Publications/Publications.module.css";
+import style from "./Source.module.css"
 import {SourceAPI} from "../api";
-import {useCookies} from "react-cookie";
 import Preloader from "../Preloader/Preloader";
 
 
@@ -18,48 +15,59 @@ const SourcePublications = () => {
     const {publications, pageSize, count} = useSelector(state => state.publications);
     let pageCount = Math.ceil(count / pageSize);
     const [isFetching, toggleIsFetching] = useState(false);
-    const [cookies, setCookies, removeCookies] = useCookies(['token'])
 
 
     const handlePageClick = (e) => {
         toggleIsFetching(true);
-        const fetchPublications = async () => {
-            const res = await SourceAPI.getSourcePageSize(source.id, e.selected, pageSize);
-            dispatch(setData(res.data));
-            toggleIsFetching(false);
+        try {
+            const fetchPublications = async () => {
+                const res = await SourceAPI.getSourcePageSize(source.id, e.selected, pageSize);
+                dispatch(setData(res.data));
+                toggleIsFetching(false);
+            }
+            fetchPublications();
+        } catch (e){
+            console.log(e)
         }
-        fetchPublications();
     }
 
-    React.useEffect(() => {
+    useEffect(() => {
         toggleIsFetching(true);
-        const fetchPublications = async () => {
-            const res = await SourceAPI.getSourcePageSize(source.id, 0, pageSize);
-            dispatch(setData(res.data));
-            toggleIsFetching(false);
+        try {
+            const fetchPublications = async () => {
+                const res = await SourceAPI.getSourcePageSize(source.id, 0, pageSize);
+                dispatch(setData(res.data));
+                toggleIsFetching(false);
+            }
+            fetchPublications();
+        } catch (e) {
+            console.log(e)
         }
-        fetchPublications();
+
     }, [source.id]);
 
-    return (<div className={c.theme}>
+    return (<div className={style.theme}>
             {isFetching === true ? <Preloader/> :
                 <div>
-                    <div className={s.block}>
-                        {publications === undefined ? 'Подождите пожалуйста' : publications.map(p => <div>
-                            <div key={p.id} className={s.blocks}>
-                                <div>{p.publication_type.name}</div>
-                                <div>{p.source.name}</div>
-                                <NavLink to={"/publication/" + p.id}>
-                                    <div>{p.title}</div>
+                    <div className={stylePublication.block}>
+                        {publications.map((publication, index) => <div key={index}>
+                            <div className={stylePublication.blocks}>
+                                <div>{publication.publication_type.name}</div>
+                                <div>{publication.source.name}</div>
+                                <NavLink to={"/publication/" + publication.id}>
+                                    <div>{publication.title}</div>
                                 </NavLink>
-                                <div className={s.authors}>
-                                    <div className={s.author}>{p.publication_authors.map(a =>
-                                        <NavLink to={"/author/" + a.author.id}>
-                                            {a.author.surname} {a.author.name}
+                                <div className={stylePublication.authors}>
+                                    <div
+                                        className={stylePublication.author}>{publication.publication_authors.map((authors, index) =>
+                                        <NavLink key={index} to={"/author/" + authors.author.id}>
+                                            {authors.author.surname} {authors.author.name}
                                         </NavLink>
                                     )}</div>
                                 </div>
-                                <div>{p.publication_date === null || p.publication_date === undefined ? '' : p.publication_date.slice(0, 4)}</div>
+                                <div>{publication.publication_date === null ||
+                                publication.publication_date === undefined ? '' :
+                                    publication.publication_date.slice(0, 4)}</div>
                             </div>
                         </div>)}
                     </div>

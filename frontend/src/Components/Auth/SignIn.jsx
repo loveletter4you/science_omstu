@@ -5,7 +5,7 @@ import {setUserData, setIsAuth, setError} from "../../store/slices/SignInSlice";
 import {Navigate} from "react-router-dom";
 import {postSignIn} from "../api";
 import {useCookies} from "react-cookie";
-import s from "./SignIn.module.css"
+import style from "./SignIn.module.css"
 
 const SignIn = () => {
 
@@ -30,7 +30,6 @@ const SignIn = () => {
                         secure: true
                     }) :
                     setCookies('token', res.data.access_token, {path: '/', maxAge: 1800, secure: true})
-                console.log(signIn)
             } catch (e) {
                 dispatch(setError(e.response.status));
             }
@@ -43,18 +42,19 @@ const SignIn = () => {
             {signIn.isAuth ? <Navigate to={"/publication"}/> :
                 <div>
                     {signIn.error === 404 ? <div>Аккаунт не найден!</div> : null}
-                    <form onSubmit={handleSubmit(onSubmit)} className={s.form}>
-                        <div className={s.block}>
-                            <input className={s.input} {...register("username", {required: true})}
+                    <form onSubmit={handleSubmit(onSubmit)} className={style.form}>
+                        <div className={style.block}>
+                            <input className={style.input} {...register("username", {required: true})}
                                    aria-invalid={errors.username ? "true" : "false"}/>
                             {errors.username?.type === 'required' && <p role="alert">Login is required</p>}
-                            <input className={s.input} type={"password"} {...register("password", {required: true})}
+                            <input className={style.input} type={"password"} {...register("password", {required: true})}
                                    aria-invalid={errors.password ? "true" : "false"}/>
                             {errors.password?.type === 'required' && <p role="alert">Password is required</p>}
                             <div>
-                                <input className={s.input} type={"checkbox"} {...register("checkbox")}/> Запомнить меня
+                                <input className={style.input} type={"checkbox"}
+                                       {...register("checkbox")}/> Запомнить меня
                             </div>
-                            <input className={s.input} type="submit"/>
+                            <input className={style.input} type="submit"/>
                         </div>
                     </form>
                 </div>

@@ -1,9 +1,9 @@
 import React, {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import c from "../Search/Search.module.css";
+import styleSearch from "../Search/Search.module.css";
 import ReactPaginate from "react-paginate";
 import {fetchSources, fetchSourcesSearch} from "../../store/slices/SourcesSlice";
-import s from "./Sources.module.css"
+import style from "./Sources.module.css"
 import {setSize} from "../../store/slices/SourcesSlice";
 import {NavLink} from "react-router-dom";
 import {useDebounce} from "use-debounce";
@@ -35,9 +35,9 @@ const Sources = () => {
     }, [pageSize, debouncedSearch[0]]);
 
 
-    return <div className={s.container}>
-        <input className={c.search} placeholder='Поиск' type="text" value={search} onChange={onSearchChange}/>
-        <div className={s.size}>
+    return <div className={style.container}>
+        <input className={styleSearch.search} placeholder='Поиск' type="text" value={search} onChange={onSearchChange}/>
+        <div className={style.size}>
             Отображать по:
             <ul>
                 <li onClick={() => {
@@ -55,9 +55,9 @@ const Sources = () => {
             </ul>
         </div>
         {isFetching === true ? <Preloader/> :
-            <div className={s.block}>
-                {sources.map(source => <div>
-                    <div className={s.source}>
+            <div className={style.block}>
+                {sources.map((source, index) => <div key = {index}>
+                    <div className={style.source}>
                         <div>{source.source_type.name}</div>
                         <div><NavLink to={'/source/' + source.id}
                         >{source.name}</NavLink></div>

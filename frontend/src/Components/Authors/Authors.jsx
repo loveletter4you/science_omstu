@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {NavLink} from "react-router-dom";
-import s from "./Authors.module.css";
-import c from './../Search/Search.module.css';
+import style from "./Authors.module.css";
+import styleSearch from './../Search/Search.module.css';
 import ReactPaginate from "react-paginate";
 import Paginator from '../Paginator/Paginator.css';
 import {useDispatch, useSelector} from "react-redux";
@@ -11,7 +11,7 @@ import Preloader from "../Preloader/Preloader";
 
 const Authors = () => {
 
-    const {authors, currentPage, pageSize, count} = useSelector(state => state.authors);
+    const {authors, pageSize, count} = useSelector(state => state.authors);
     const dispatch = useDispatch();
     let pageCount = Math.ceil(count / pageSize);
     const [search, setSearch] = useState('');
@@ -42,14 +42,14 @@ const Authors = () => {
         }
     }, [pageSize, debouncedSearch[0]]);
 
-    return (<div color={s.theme}>
-            <div className={s.block}>
-                <input className={c.search} placeholder='Поиск' type="text" value={search} onChange={onSearchChange}/>
+    return (<div color={style.theme}>
+            <div className={style.block}>
+                <input className={styleSearch.search} placeholder='Поиск' type="text" value={search} onChange={onSearchChange}/>
             </div>
             {authors.isFetching === true ? <Preloader/> :
                 <div>
-                    <div className={s.block}>
-                        <div className={s.size}>
+                    <div className={style.block}>
+                        <div className={style.size}>
                             Отображать по:
                             <ul>
                                 <li onClick={() => {
@@ -66,13 +66,14 @@ const Authors = () => {
                                 </li>
                             </ul>
                         </div>
-                        <div className={s.block__item}>
-                            <ul className={s.item}>
-                                {authors.map(a => <>
-                                        <li key={a.id} className={s.list__item}>
-                                            <NavLink to={'/author/' + a.id}> {a.surname} {a.name} {a.patronymic}</NavLink>
+                        <div className={style.block__item}>
+                            <ul className={style.item}>
+                                {authors.map((author, index) =>
+                                        <li key={index} className={style.list__item}>
+                                            <NavLink to={'/author/' + author.id}> {author.surname} {author.name}
+                                                {author.patronymic}</NavLink>
                                         </li>
-                                    </>
+
                                 )}
                             </ul>
 
@@ -89,7 +90,6 @@ const Authors = () => {
                 pageCount={pageCount}
                 previousLabel="<-"
                 renderOnZeroPageCount={null}
-
                 pageClassName="page-item"
                 pageLinkClassName="page-link"
                 previousClassName="page-item"

@@ -1,6 +1,6 @@
 import React from "react";
 import {useDispatch} from "react-redux";
-import n from "../Navbar/Navbar.module.css";
+import style from "../Navbar/Navbar.module.css";
 import {setIsAuth} from "../../store/slices/SignInSlice";
 import {useCookies} from 'react-cookie';
 
@@ -14,7 +14,7 @@ const SignOut = () => {
 
     }
     return (<div>
-            <button className={n.btn} onClick={logout}>Выйти</button>
+            <button className={style.btn} onClick={logout}>Выйти</button>
         </div>
     );
 }
