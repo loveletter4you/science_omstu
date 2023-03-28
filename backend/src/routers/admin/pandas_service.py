@@ -156,14 +156,14 @@ async def service_fill_authors(file: UploadFile, db: Session):
         identifier_researcher = Identifier(name="ResearcherID")
         db.add(identifier_researcher)
     for _, row in author_df.iterrows():
-        author = db.query(Author).filter(and_(Author.name == row['name'],
-                                              Author.surname == row['surname'],
-                                              Author.patronymic == row['patronymic'])).first()
+        author = db.query(Author).filter(and_(Author.name == row['name'].title(),
+                                              Author.surname == row['surname'].title(),
+                                              Author.patronymic == row['patronymic'].title())).first()
         if author is None:
             author = Author(
-                name=row['name'],
-                surname=row['surname'],
-                patronymic=row['patronymic'],
+                name=row['name'].title(),
+                surname=row['surname'].title(),
+                patronymic=row['patronymic'].title(),
                 confirmed=True
             )
             db.add(author)
@@ -263,7 +263,7 @@ async def service_white_list_fill(date: datetime.date, file: UploadFile, db: Ses
             )
             db.add(source_rating_white_list)
             continue
-        if source is None:
+        else:
             source = Source(
                 name=row['Title'],
                 source_type=source_type_journal
@@ -294,6 +294,116 @@ async def service_white_list_fill(date: datetime.date, file: UploadFile, db: Ses
                     source=source,
                     source_link_type=source_link_type_issn,
                     link=issns[0]
+                )
+                db.add(source_link_issn)
+    db.commit()
+    return dict(message="OK")
+
+
+async def service_fill_vak_journals_rank(date: datetime.date, file: UploadFile, db: Session):
+    vak_df = pd.read_excel(file.file, 'rank')
+    vak_df = vak_df.replace(np.nan, "")
+    vak_rating_type = get_or_create_source_rating_type('ВАК', db)
+    source_link_type_issn = get_or_create_source_link_type("ISSN", db)
+    source_link_type_eissn = get_or_create_source_link_type("eISSN", db)
+    source_type_journal = get_or_create_source_type("Журнал", db)
+    for _, row in vak_df.iterrows():
+        issns = row['issn'].split(',')
+        source = get_source_by_name_or_identifiers(str(row['title']), issns, db)
+        if not (source is None):
+            source_rating_white_list = SourceRating(
+                source_rating_type=vak_rating_type,
+                source=source,
+                rating=row['Q'],
+                rating_date=date
+            )
+            db.add(source_rating_white_list)
+            continue
+        else:
+            source = Source(
+                name=row['title'],
+                source_type=source_type_journal
+            )
+            db.add(source)
+            source_rating_white_list = SourceRating(
+                source_rating_type=vak_rating_type,
+                source=source,
+                rating=row['Q'],
+                rating_date=date
+            )
+            db.add(source_rating_white_list)
+            if len(issns) > 1:
+                source_link_issn = SourceLink(
+                    source=source,
+                    source_link_type=source_link_type_issn,
+                    link=issns[0]
+                )
+                db.add(source_link_issn)
+                source_link_eissn = SourceLink(
+                    source=source,
+                    source_link_type=source_link_type_eissn,
+                    link=issns[1]
+                )
+                db.add(source_link_eissn)
+            else:
+                source_link_issn = SourceLink(
+                    source=source,
+                    source_link_type=source_link_type_issn,
+                    link=issns[0]
+                )
+                db.add(source_link_issn)
+    db.commit()
+    return dict(message='OK')
+
+
+async def service_fill_rsci_journals_rank(date: datetime.date, file: UploadFile, db: Session):
+    rsci_df = pd.read_csv(file.file, on_bad_lines='skip')
+    rsci_df = rsci_df.replace(np.nan, "")
+    rsci_rating_type = get_or_create_source_rating_type('RSCI', db)
+    source_link_type_issn = get_or_create_source_link_type("ISSN", db)
+    source_link_type_eissn = get_or_create_source_link_type("eISSN", db)
+    source_type_journal = get_or_create_source_type("Журнал", db)
+    for _, row in rsci_df.iterrows():
+        issns = []
+        if row['issn1'] != 'NA':
+            issns.append(row['issn1'])
+        if row['issn2'] != 'NA':
+            issns.append(row['issn2'])
+        source = get_source_by_name_or_identifiers(str(row['title']), issns, db)
+        if not (source is None):
+            source_rating_white_list = SourceRating(
+                source_rating_type=rsci_rating_type,
+                source=source,
+                rating=f'OECD: {row["oecd"]}; Квартиль: {row["q"]}',
+                rating_date=date
+            )
+            db.add(source_rating_white_list)
+            continue
+        else:
+            source = Source(
+                name=row['title'],
+                source_type=source_type_journal
+            )
+            db.add(source)
+            source_rating_white_list = SourceRating(
+                source_rating_type=rsci_rating_type,
+                source=source,
+                rating=f'OECD: {row["oecd"]}; Квартиль: {row["q"]}',
+                rating_date=date
+            )
+            db.add(source_rating_white_list)
+            if row['issn1'] != 'NA':
+                source_link_issn = SourceLink(
+                    source=source,
+                    source_link_type=source_link_type_issn,
+                    link=row['issn1']
+                )
+                db.add(source_link_issn)
+            if row['issn2'] != 'NA':
+                source_link_issn = SourceLink(
+                    source=source,
+                    source_link_type=source_link_type_eissn,
+                    link=row['issn2']
                 )
                 db.add(source_link_issn)
     db.commit()

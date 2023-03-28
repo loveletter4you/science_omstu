@@ -1,7 +1,7 @@
-from sqlalchemy import func, desc
+from sqlalchemy import func, desc, or_
 from sqlalchemy.orm import Session
 
-from src.model.model import Source, Publication
+from src.model.model import Source, Publication, SourceLink
 from src.schemas.schemas import SchemeSourceWithType, SchemeSourceWithRating, SchemePublication
 
 
@@ -14,7 +14,10 @@ async def service_get_sources(offset: int, limit: int, db: Session):
 
 
 async def service_get_sources_search(search: str, offset: int, limit: int, db: Session):
-    query = db.query(Source).filter(func.lower(Source.name).contains(search.lower()))
+    query = db.query(Source).join(SourceLink)\
+        .filter(or_(func.replace(SourceLink.link, '-', '').contains(search.replace('-', '')),
+                                                         func.lower(Source.name).contains(search.lower())))\
+        .group_by(Source.id)
     sources = query.offset(offset).limit(limit).all()
     count = query.count()
     scheme_sources = [SchemeSourceWithType.from_orm(source) for source in sources]

@@ -3,8 +3,10 @@ from datetime import date
 from fastapi import HTTPException, status, UploadFile
 from sqlalchemy.orm import Session
 
+from src.routers.admin.openalex_service import service_update_from_openalex
 from src.routers.admin.pandas_service import service_fill_authors, service_fill_scopus, service_white_list_fill, \
-    service_jcr_list_fill, service_white_list_jcr_citescore
+    service_jcr_list_fill, service_white_list_jcr_citescore, service_fill_vak_journals_rank, \
+    service_fill_rsci_journals_rank
 from src.routers.admin.service import service_create_admin, service_admin_check, service_get_feedbacks
 from src.schemas.schemas import SchemeUser
 
@@ -60,4 +62,28 @@ async def controller_whitelist_jcr_citescore(rating_date: date, file: UploadFile
     if not is_admin:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Доступ запрещен")
     message = await service_white_list_jcr_citescore(rating_date, file, db)
+    return message
+
+
+async def controller_vak_journals_rank(rating_date: date, file: UploadFile, user: SchemeUser, db: Session):
+    is_admin = await service_admin_check(user.role_id, db)
+    if not is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Доступ запрещен")
+    message = await service_fill_vak_journals_rank(rating_date, file, db)
+    return message
+
+
+async def controller_rsci_journals_rank(rating_date: date, file: UploadFile, user: SchemeUser, db: Session):
+    is_admin = await service_admin_check(user.role_id, db)
+    if not is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Доступ запрещен")
+    message = await service_fill_rsci_journals_rank(rating_date, file, db)
+    return message
+
+
+async def controller_fill_from_openalex(user: SchemeUser, db: Session):
+    is_admin = await service_admin_check(user.role_id, db)
+    if not is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Доступ запрещен")
+    message = await service_update_from_openalex(db)
     return message
