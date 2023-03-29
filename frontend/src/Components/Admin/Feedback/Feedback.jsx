@@ -1,12 +1,14 @@
 import React from "react";
-import {fetchFeedback} from "../../store/slices/FeedbackSlice";
+import {fetchFeedback} from "../../../store/slices/FeedbackSlice";
 import {useDispatch, useSelector} from "react-redux";
 import ReactPaginate from "react-paginate";
 import style from "./Feedback.module.css"
 import {useCookies} from "react-cookie";
-import Preloader from "../Preloader/Preloader";
+import Preloader from "../../Preloader/Preloader";
 import {Navigate} from "react-router-dom";
-import Admin from "../Admin/Admin";
+import Admin from "../Admin";
+import {setIsAuth} from "../../../store/slices/SignInSlice";
+import Erorr404 from "../../Errors/Erorr404";
 
 const Feedback = () => {
     const signIn = useSelector(state => state.signIn)
@@ -32,11 +34,12 @@ const Feedback = () => {
 
     }, [pageSize]);
 
+
     return <div>
-        <Admin/>
         {feedbacks.isFetching === true ? <Preloader/> :
             <div>
                 {signIn.isAuth ? <div>
+                    <Admin/>
                     {feedbacks.map((feedback, index) => <div key = {index} className={style.block}>
                         <div>Имя: {feedback.name}</div>
                         <div>Почта: {feedback.mail}</div>
@@ -64,7 +67,7 @@ const Feedback = () => {
                         breakLinkClassName="page-link"
                         containerClassName="pagination"
                         activeClassName="active"
-                    /></div> : <Navigate to={"/publication"}/>}
+                    /></div> : <Erorr404/>}
             </div>
         }
     </div>

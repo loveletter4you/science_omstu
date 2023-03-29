@@ -7,6 +7,7 @@ import SourceSlice from "./slices/SourceSlice";
 import SourcesSlice from "./slices/SourcesSlice";
 import signInSlice from "./slices/SignInSlice";
 import feedbackSlice from "./slices/FeedbackSlice";
+import authorsConfirmedFalseSlice from "./slices/AuthorsConfirmedFalseSlice";
 
 const store = configureStore({
     reducer: {
@@ -17,7 +18,8 @@ const store = configureStore({
         source: SourceSlice,
         sources: SourcesSlice,
         signIn: signInSlice,
-        feedbacks: feedbackSlice
+        feedbacks: feedbackSlice,
+        authorsConfirmedFalse: authorsConfirmedFalseSlice
     }
 })
 export default store;

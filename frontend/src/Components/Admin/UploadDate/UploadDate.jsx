@@ -1,13 +1,15 @@
 import React from "react";
 import {useForm} from "react-hook-form";
-import {DataUploadAPI} from "../api";
-import {useDispatch} from "react-redux";
-import Admin from "../Admin/Admin";
+import {DataUploadAPI} from "../../api";
+import {useDispatch, useSelector} from "react-redux";
+import Admin from "../Admin";
 import s from "./Upload.module.css"
 import {useCookies} from "react-cookie";
+import Error404 from "../../Errors/Erorr404";
 
 const UploadDate = () => {
-    const { register, handleSubmit, formState:{errors} } = useForm({
+    const signIn = useSelector(state => state.signIn)
+    const {register, handleSubmit, formState: {errors}} = useForm({
         defaultValues: {
             authorsUpload: FileList,
             WhiteListUpload: FileList,
@@ -73,45 +75,47 @@ const UploadDate = () => {
     }
 
     return <div>
-        <Admin/>
-        <div className={s.container}>
-            <form onSubmit={handleSubmit(onSubmitAuthors)}>
-                Авторы:
-                <div>
-                    <input  {...register("authorsUpload")} className={s.submit} accept="text/csv" type="file" />
-                </div>
-                <div>
-                    <input className={s.submit} type="submit"/>
-                </div>
-            </form>
-            <form onSubmit={handleSubmit(onSubmitWhiteList)}>
-                Публикации (Белый лист):
-                <div>
-                    <input className={s.submit}  {...register("WhiteListUpload")}  accept="text/csv" type="file"/>
-                </div>
-                <div>
-                    <input className={s.submit} type="submit"/>
-                </div>
-            </form>
-            <form onSubmit={handleSubmit(onSubmitScopus)}>
-                Публикации (Scopus):
-                <div>
-                    <input className={s.submit} {...register("ScopusUpload")} accept="text/csv" type="file"/>
-                </div>
-                <div>
-                    <input className={s.submit} type="submit"/>
-                </div>
-            </form>
-            <form onSubmit={handleSubmit(onSubmitJCR)}>
-                Источники:
-                <div>
-                    <input className={s.submit} {...register("JCRUpload")} accept="text/csv" type="file"/>
-                </div>
-                <div>
-                    <input className={s.submit} type="submit"/>
-                </div>
-            </form>
-        </div>
+        {signIn.isAuth ? <div>
+            <Admin/>
+            <div className={s.container}>
+                <form onSubmit={handleSubmit(onSubmitAuthors)}>
+                    Авторы:
+                    <div>
+                        <input  {...register("authorsUpload")} className={s.submit} accept="text/csv" type="file"/>
+                    </div>
+                    <div>
+                        <input className={s.submit} type="submit"/>
+                    </div>
+                </form>
+                <form onSubmit={handleSubmit(onSubmitWhiteList)}>
+                    Публикации (Белый лист):
+                    <div>
+                        <input className={s.submit}  {...register("WhiteListUpload")} accept="text/csv" type="file"/>
+                    </div>
+                    <div>
+                        <input className={s.submit} type="submit"/>
+                    </div>
+                </form>
+                <form onSubmit={handleSubmit(onSubmitScopus)}>
+                    Публикации (Scopus):
+                    <div>
+                        <input className={s.submit} {...register("ScopusUpload")} accept="text/csv" type="file"/>
+                    </div>
+                    <div>
+                        <input className={s.submit} type="submit"/>
+                    </div>
+                </form>
+                <form onSubmit={handleSubmit(onSubmitJCR)}>
+                    Источники:
+                    <div>
+                        <input className={s.submit} {...register("JCRUpload")} accept="text/csv" type="file"/>
+                    </div>
+                    <div>
+                        <input className={s.submit} type="submit"/>
+                    </div>
+                </form>
+            </div>
+        </div> : <Error404/>}
     </div>
 }
 

@@ -1,9 +1,9 @@
 import React from "react";
 import {useForm} from "react-hook-form";
 import {useDispatch, useSelector} from "react-redux";
-import {setUserData, setIsAuth, setError} from "../../store/slices/SignInSlice";
-import {Navigate} from "react-router-dom";
+import {setIsAuth, setError} from "../../store/slices/SignInSlice";
 import {postSignIn} from "../api";
+import {Navigate} from "react-router-dom";
 import {useCookies} from "react-cookie";
 import style from "./SignIn.module.css"
 
@@ -12,14 +12,17 @@ const SignIn = () => {
     const signIn = useSelector(state => state.signIn)
     const {register, formState: {errors}, handleSubmit} = useForm();
     const dispatch = useDispatch();
-    const [cookies, setCookies, removeCookies] = useCookies(['token'])
-
+    const [cookies, setCookies, _removeCookies] = useCookies(['token'])
+    React.useEffect(() => {
+        if(cookies.token){
+            dispatch(setIsAuth(true));
+        }
+    }, [])
     const onSubmit = (data) => {
-        dispatch(setUserData(data));
+
         const postUser = async () => {
             try {
                 const res = await postSignIn(data);
-                dispatch(setUserData(data));
                 dispatch(setError(res.status));
                 if (res.status === 200) {
                     dispatch(setIsAuth(true));
@@ -39,7 +42,7 @@ const SignIn = () => {
     };
 
     return (<div>
-            {signIn.isAuth ? <Navigate to={"/publication"}/> :
+            {signIn.isAuth ? <Navigate to = "/publication"/> :
                 <div>
                     {signIn.error === 404 ? <div>Аккаунт не найден!</div> : null}
                     <form onSubmit={handleSubmit(onSubmit)} className={style.form}>

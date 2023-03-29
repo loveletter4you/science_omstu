@@ -21,6 +21,9 @@ const Admin = () => {
                     <div className={style.item} onClick={toggle}>
                         <NavLink to="/admin/upload">Загрузка данных</NavLink>
                     </div>
+                    <div className={style.item} onClick={toggle}>
+                        <NavLink to = "/admin/merge">Слияние пользователей</NavLink>
+                    </div>
                 </div>
 
             </div>
