@@ -20,11 +20,13 @@ export const fetchAuthorSearch = createAsyncThunk(
     });
 
 
+
 const initialState = {
     authors: [],
     pageSize: 30,
     count: 1,
     currentPage: 1,
+    confirmed: true,
     isFetching: false,
 };
 

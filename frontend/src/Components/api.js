@@ -13,6 +13,14 @@ export const postSignIn = (data) => {
     })
 }
 
+export const postMergeAuthors = (merge_id,data, token) =>{
+    return instance.post(`/api/author/${merge_id}/merge`, data, {
+        headers:{
+            authorization: `Bearer ${token}`
+        }
+    })
+}
+
 export const postAuthorsData = (data) => {
     return instance.post("/api/admin/upload/authors", data, {
         headers: {
@@ -69,6 +77,9 @@ export const AuthorsAPI = {
     },
     getAuthors(page, pageSize) {
         return instance.get(`/api/author?page=${page}&limit=${pageSize}`)
+    },
+    getAuthorConfirmed(page, pageSize, confirmed){
+        return instance.get(`/api/author?page=${page}&limit=${pageSize}&confirmed=${confirmed}`)
     }
 }
 

@@ -11,13 +11,14 @@ import Publication from "./Components/Publication/Publication";
 import Sources from "./Components/Sources/Sources";
 import Source from "./Components/Source/Source";
 import AuthorsPublications from "./Components/Author/AuthorsPublications";
-import Feedback from "./Components/Feedback/Feedback";
+import Feedback from "./Components/Admin/Feedback/Feedback";
 import {useCookies, withCookies} from 'react-cookie';
 import Error404 from "./Components/Errors/Erorr404";
 import {setIsAuth} from "./store/slices/SignInSlice";
 import {useDispatch} from "react-redux";
 import {useColorTheme} from "./Components/Theme/Theme";
-import UploadDate from "./Components/UploadDate/UploadDate";
+import UploadDate from "./Components/Admin/UploadDate/UploadDate";
+import Merge from "./Components/Admin/Merge/Merge";
 
 function App() {
     const [cookies, _setCookies, _removeCookies] = useCookies(['token']);
@@ -60,8 +61,9 @@ function App() {
                                element={<Feedback/>}/>
                         <Route exact path = "/admin/upload"
                                element={<UploadDate/>}/>
+                        <Route exact path = "/admin/merge"
+                               element={<Merge/>}/>
                         <Route path='*' element={<Error404/>}/>
-
                     </Routes>
                 </div>
                 <Footer/>
