@@ -44,7 +44,8 @@ const Authors = () => {
 
     return (<div color={style.theme}>
             <div className={style.block}>
-                <input className={styleSearch.search} placeholder='Поиск' type="text" value={search} onChange={onSearchChange}/>
+                <input className={styleSearch.search} placeholder='Поиск' type="text" value={search}
+                       onChange={onSearchChange}/>
             </div>
             {authors.isFetching === true ? <Preloader/> :
                 <div>
@@ -69,11 +70,10 @@ const Authors = () => {
                         <div className={style.block__item}>
                             <ul className={style.item}>
                                 {authors.map((author, index) =>
-                                        <li key={index} className={style.list__item}>
-                                            <NavLink to={'/author/' + author.id}> {author.surname} {author.name}
-                                                {author.patronymic}</NavLink>
-                                        </li>
-
+                                    <li key={index} className={style.list__item}>
+                                        <NavLink to={'/author/' + author.id}> {author.surname} {author.name}
+                                            {author.patronymic}</NavLink>
+                                    </li>
                                 )}
                             </ul>
 

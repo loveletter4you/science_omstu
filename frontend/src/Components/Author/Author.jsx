@@ -8,6 +8,7 @@ import AuthorsPublications from "./AuthorsPublications";
 import {setData} from "../../store/slices/PublicationsSlice";
 import {AuthorAPI} from "../api";
 import Preloader from "../Preloader/Preloader";
+import MergeButton from "../Admin/Merge/MergeButton";
 
 const Author = () => {
 
@@ -16,6 +17,7 @@ const Author = () => {
     const author = useSelector(state => state.author);
     const {pageSize} = useSelector(state => state.publications);
     const [isFetching, toggleIsFetching] = useState(false);
+    const signIn = useSelector(state => state.signIn)
 
     React.useEffect(() => {
         toggleIsFetching(true);
@@ -65,6 +67,10 @@ const Author = () => {
                                     <div>{authors.department.faculty.name} ({authors.position})</div>
                                 </div>)}
                             </div>
+                        </div>
+                        <div>
+                            {signIn.isAuth? <MergeButton authorId = {author.id}/>
+                            :null}
                         </div>
                         <div className={style.title}>
                         </div>

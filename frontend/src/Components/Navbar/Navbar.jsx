@@ -57,7 +57,7 @@ const Navbar = () => {
                                  className={navData => navData.isActive ? style.active : null}>Источники</NavLink>
                     </div>
                     {signIn.isAuth ? <div className={style.item} onClick={toggle}>
-                        <NavLink to="/admin/feedbacks">Администратор</NavLink>
+                        <NavLink to="/admin">Администратор</NavLink>
                     </div> : null}
                     <div className={style.item}>
                         <BugTracker/>

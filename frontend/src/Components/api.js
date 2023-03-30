@@ -80,6 +80,9 @@ export const AuthorsAPI = {
     },
     getAuthorConfirmed(page, pageSize, confirmed){
         return instance.get(`/api/author?page=${page}&limit=${pageSize}&confirmed=${confirmed}`)
+    },
+    getUnconfirmedOmSTU(page, pageSize){
+        return instance.get(`/api/author/unconfirmed_omstu?page=${page}&limit=${pageSize}`)
     }
 }
 

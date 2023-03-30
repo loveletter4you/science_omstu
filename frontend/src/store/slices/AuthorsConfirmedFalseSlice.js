@@ -1,10 +1,10 @@
 import {AuthorsAPI} from "../../Components/api";
 import {createSlice, createAsyncThunk} from "@reduxjs/toolkit";
 
-export const fetchAuthorConfirmed = createAsyncThunk(
+export const fetchAuthorUnconfirmed = createAsyncThunk(
     "authorsConfirmedFalse/fetchAuthorsConfirmed", async({page, pageSize, confirmed}, {rejectWithValue}) => {
         try{
-            const res = await AuthorsAPI.getAuthorConfirmed(page,pageSize,confirmed)
+            const res = await AuthorsAPI.getUnconfirmedOmSTU(page,pageSize)
             return res.data;
         } catch (err){
             return rejectWithValue([], err)
@@ -17,7 +17,6 @@ const initialState = {
     pageSize: 30,
     count: 1,
     currentPage: 1,
-    confirmed: true,
     isFetching: false,
 };
 
@@ -27,10 +26,10 @@ const authorsConfirmedFalseSlice = createSlice({
     initialState,
     extraReducers: (builder) => {
         builder
-            .addCase(fetchAuthorConfirmed.pending, (state) =>{
+            .addCase(fetchAuthorUnconfirmed.pending, (state) =>{
                 state.isFetching = true;
             })
-            .addCase(fetchAuthorConfirmed.fulfilled, (state, action) =>{
+            .addCase(fetchAuthorUnconfirmed.fulfilled, (state, action) =>{
                 state.isFetching = false;
                 const {authors, count} = action.payload;
                 state.authors = authors;

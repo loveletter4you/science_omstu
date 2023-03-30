@@ -1,6 +1,10 @@
 import React, {useState} from "react";
 import {NavLink} from "react-router-dom";
 import style from "./Admin.module.css";
+import {Route, Routes} from "react-router-dom";
+import Feedback from "./Feedback/Feedback";
+import UploadDate from "./UploadDate/UploadDate";
+import Merge from "./Merge/Merge";
 
 const Admin = () => {
     const [Active, setActive] = useState(false);
@@ -25,7 +29,6 @@ const Admin = () => {
                         <NavLink to = "/admin/merge">Слияние пользователей</NavLink>
                     </div>
                 </div>
-
             </div>
         </div>
     )
