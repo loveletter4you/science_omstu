@@ -59,8 +59,7 @@ const Publications = () => {
                                     {publications.publication_authors.map((authors, index) =>
                                     <NavLink key = {index}
                                         to={'/author/' + authors.author.id}>
-                                        {authors.author.surname}
-                                        {authors.author.name}
+                                        {authors.author.surname} {authors.author.name}
                                     </NavLink>
                                 )}</div>
                             </div>

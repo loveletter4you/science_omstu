@@ -19,6 +19,7 @@ import {useDispatch} from "react-redux";
 import {useColorTheme} from "./Components/Theme/Theme";
 import UploadDate from "./Components/Admin/UploadDate/UploadDate";
 import Merge from "./Components/Admin/Merge/Merge";
+import Admin from "./Components/Admin/Admin";
 
 function App() {
     const [cookies, _setCookies, _removeCookies] = useCookies(['token']);
@@ -57,12 +58,15 @@ function App() {
                                element={<Source/>}/>
                         <Route exact path='/author/:id/publications'
                                element={<AuthorsPublications/>}/>
+                        {cookies.token?<>
+                        <Route exact path = "/admin"
+                               element={<Admin/>}/>
                         <Route exact path='/admin/feedbacks'
                                element={<Feedback/>}/>
                         <Route exact path = "/admin/upload"
                                element={<UploadDate/>}/>
                         <Route exact path = "/admin/merge"
-                               element={<Merge/>}/>
+                               element={<Merge/>}/></>:null}
                         <Route path='*' element={<Error404/>}/>
                     </Routes>
                 </div>
