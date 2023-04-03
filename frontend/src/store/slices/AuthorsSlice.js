@@ -1,5 +1,5 @@
 import {createSlice, createAsyncThunk} from "@reduxjs/toolkit";
-import {AuthorsAPI} from "../../Components/api";
+import {AuthorsAPI} from "../api";
 export const fetchAuthor = createAsyncThunk(
     "authors/fetchAuthor", async ({page, pageSize}, {rejectWithValue}) => {
         try {

@@ -1,5 +1,5 @@
 import {createSlice, createAsyncThunk} from "@reduxjs/toolkit";
-import {PublicationsAPI} from "../../Components/api";
+import {PublicationsAPI} from "../api";
 
 export const fetchPublications = createAsyncThunk(
     "publications/fetchPublications", async ({page, pageSize}, {rejectWithValue}) => {

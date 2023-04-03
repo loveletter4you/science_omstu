@@ -1,25 +1,26 @@
 import React, {useEffect} from "react";
 import './App.css';
-import Header from "./Components/Header/Header";
-import Footer from "./Components/Footer/Footer";
+import Header from "./components/Header/Header";
+import Footer from "./components/Footer/Footer";
 import {Route, Routes} from "react-router-dom";
-import Authors from "./Components/Authors/Authors";
-import Author from "./Components/Author/Author";
-import Publications from "./Components/Publications/Publications";
-import SignIn from "./Components/Auth/SignIn";
-import Publication from "./Components/Publication/Publication";
-import Sources from "./Components/Sources/Sources";
-import Source from "./Components/Source/Source";
-import AuthorsPublications from "./Components/Author/AuthorsPublications";
-import Feedback from "./Components/Admin/Feedback/Feedback";
+import Authors from "./components/Authors/Authors";
+import Author from "./components/Authors/Author/Author";
+import Publications from "./components/Publications/Publications";
+import SignIn from "./components/Auth/SignIn";
+import Publication from "./components/Publications/Publication/Publication";
+import Sources from "./components/Sources/Sources";
+import Source from "./components/Sources/Source/Source";
+import AuthorsPublications from "./components/Authors/Author/AuthorsPublications";
+import Feedback from "./components/Admin/Feedback/Feedback";
 import {useCookies, withCookies} from 'react-cookie';
-import Error404 from "./Components/Errors/Erorr404";
+import Error404 from "./components/Helpers/Errors/Erorr404";
 import {setIsAuth} from "./store/slices/SignInSlice";
 import {useDispatch} from "react-redux";
-import {useColorTheme} from "./Components/Theme/Theme";
-import UploadDate from "./Components/Admin/UploadDate/UploadDate";
-import Merge from "./Components/Admin/Merge/Merge";
-import Admin from "./Components/Admin/Admin";
+import {useColorTheme} from "./components/Helpers/Theme/Theme";
+import UploadDate from "./components/Admin/UploadDate/UploadDate";
+import Merge from "./components/Admin/Merge/Merge";
+import Admin from "./components/Admin/Admin";
+import UnconfirmedAuthors from "./components/Admin/UnconfirmedAuthors/UnconfirmedAuthors";
 
 function App() {
     const [cookies, _setCookies, _removeCookies] = useCookies(['token']);
@@ -28,15 +29,15 @@ function App() {
 
     const dispatch = useDispatch();
     useEffect(() => {
-        if(cookies.token){
+        if (cookies.token) {
             dispatch(setIsAuth(true));
         }
-        if(cookiesTheme.theme !== colorTheme){
+        if (cookiesTheme.theme !== colorTheme) {
             toggleColorTheme();
         }
     }, [])
 
-    return <div className='app-wrapper' id = 'app-wrapper'>
+    return <div className='app-wrapper' id='app-wrapper'>
         <main className="main">
             <div className="app-wrapper__container">
                 <Header/>
@@ -58,15 +59,15 @@ function App() {
                                element={<Source/>}/>
                         <Route exact path='/author/:id/publications'
                                element={<AuthorsPublications/>}/>
-                        {cookies.token?<>
-                        <Route exact path = "/admin"
-                               element={<Admin/>}/>
-                        <Route exact path='/admin/feedbacks'
-                               element={<Feedback/>}/>
-                        <Route exact path = "/admin/upload"
-                               element={<UploadDate/>}/>
-                        <Route exact path = "/admin/merge"
-                               element={<Merge/>}/></>:null}
+                        {cookies.token ? <>
+                            <Route exact path='/admin/feedbacks'
+                                   element={<Feedback/>}/>
+                            <Route exact path="/admin/upload"
+                                   element={<UploadDate/>}/>
+                            <Route exact path={"/admin/unconfirmed"}
+                                   element={<UnconfirmedAuthors/>}/>
+                            <Route exact path="/admin/merge"
+                                   element={<Merge/>}/></> : null}
                         <Route path='*' element={<Error404/>}/>
                     </Routes>
                 </div>
