@@ -12,7 +12,7 @@ import Preloader from "../Helpers/Preloader/Preloader";
 const Publications = () => {
 
 
-    const {publications, pageSize, count} = useSelector(state => state.publications);
+    const {publications, pageSize, count, isFetching} = useSelector(state => state.publications);
     const dispatch = useDispatch();
     let pageCount = Math.ceil(count / pageSize);
     const [search, setSearch] = useState('');
@@ -40,22 +40,22 @@ const Publications = () => {
             <input className={styleSearch.search} placeholder='Поиск' type="text" value={search}
                    onChange={onSearchChange}/>
             <PublicationFilter min={20} mid={40} max={80}/>
-            {publications.isFetching === true ? <Preloader/> :
+            {isFetching === true ? <Preloader/> :
                 <div className={style.block}>
                     {publications.map((publications, index) => <div key={index}>
                         <div className={style.blocks}>
-                            <div>
+                            <div title="Тип публикации">
                                 {publications.publication_type.name}</div>
-                            <div>
+                            <div title="Источник">
                                 <NavLink to={'/source/' + publications.source.id}>
                                     {publications.source.name}
                                 </NavLink>
                             </div>
                             <NavLink to={"/publication/" + publications.id}>
-                                <div>{publications.title}</div>
+                                <div title="Публикация">{publications.title}</div>
                             </NavLink>
                             <div className={style.authors}>
-                                <div className={style.author}>
+                                <div className={style.author} title="Авторы">
                                     {publications.publication_authors.map((authors, index) =>
                                     <NavLink key = {index}
                                         to={'/author/' + authors.author.id}>

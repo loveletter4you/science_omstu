@@ -73,6 +73,10 @@
 
 @media (max-width: 991px) {
 
+    .item a:hover:after {
+        width: 110px;
+    }
+
     .burger {
         display: block;
         position: relative;
