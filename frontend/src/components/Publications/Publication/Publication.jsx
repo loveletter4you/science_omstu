@@ -32,8 +32,7 @@ const Publication = () => {
                         Авторы: <div>{publication.publication_authors.map((authorPublication, index) =>
                         <div key={index}>
                             <NavLink
-                                to={'/author/' + authorPublication.author.id}>{authorPublication.author.surname}
-                                {authorPublication.author.name} {authorPublication.author.patronymic}</NavLink>
+                                to={'/author/' + authorPublication.author.id}>{authorPublication.author.surname} {authorPublication.author.name} {authorPublication.author.patronymic}</NavLink>
                             {authorPublication.author_publication_organizations.map((organization, index) =>
                                 <div key = {index} className={style.organization}>
                                 &nbsp;({organization.organization.name}{organization.organization.country === null ?
