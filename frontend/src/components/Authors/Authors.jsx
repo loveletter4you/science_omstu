@@ -11,7 +11,7 @@ import Preloader from "../Helpers/Preloader/Preloader";
 
 const Authors = () => {
 
-    const {authors, pageSize, count} = useSelector(state => state.authors);
+    const {authors, pageSize, count, isFetching} = useSelector(state => state.authors);
     const dispatch = useDispatch();
     let pageCount = Math.ceil(count / pageSize);
     const [search, setSearch] = useState('');
@@ -47,7 +47,7 @@ const Authors = () => {
                 <input className={styleSearch.search} placeholder='Поиск' type="text" value={search}
                        onChange={onSearchChange}/>
             </div>
-            {authors.isFetching === true ? <Preloader/> :
+            {isFetching === true ? <Preloader/> :
                 <div>
                     <div className={style.block}>
                         <div className={style.size}>

@@ -7,7 +7,7 @@ const COLOR_THEME = {
 };
 
 export const useColorTheme = () => {
-    const [colorTheme, setColorTheme] = useState(COLOR_THEME.light);
+    const [colorTheme, setColorTheme] = useState(COLOR_THEME.dark);
     const [cookiesTheme, setCookiesTheme] = useCookies(['theme'])
 
     const changeColorTheme = useCallback((theme = "") => {
