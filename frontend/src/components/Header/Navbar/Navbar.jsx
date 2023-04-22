@@ -22,7 +22,7 @@ const Navbar = () => {
         if (cookiesTheme.theme !== colorTheme) {
             toggleColorTheme();
         }
-    }, [])
+    },[colorTheme])
     const onChangeTheme = () => {
         document.getElementById("app-wrapper").style.transition = '.5s ease-in-out';
         toggleColorTheme();
