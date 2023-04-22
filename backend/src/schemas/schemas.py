@@ -17,6 +17,7 @@ class SchemeAuthor(BaseModel):
     name: str
     surname: str
     patronymic: str | None
+    confirmed: bool
 
     class Config:
         orm_mode = True

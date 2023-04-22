@@ -5,6 +5,7 @@ from sqlalchemy import and_, or_
 from sqlalchemy.orm import Session
 
 import datetime
+import re
 
 from src.model.model import Identifier, Source, SourceLink, Publication, PublicationLink, \
     AuthorIdentifier, AuthorPublication, Author, AuthorPublicationOrganization, Keyword, \
@@ -68,9 +69,9 @@ async def service_fill_scopus(date: datetime.date, file: UploadFile, db: Session
             if i >= len(authors_scopus):
                 continue
             author_data = author_row.split(', ')
-            identifier = db.query(AuthorIdentifier).\
+            identifier = db.query(AuthorIdentifier). \
                 filter(and_(AuthorIdentifier.identifier_id == identifier_scopus.id,
-                       AuthorIdentifier.identifier_value == authors_scopus[i])).first()
+                            AuthorIdentifier.identifier_value == authors_scopus[i])).first()
             author: Author
             if identifier is None:
                 author: Author
@@ -136,6 +137,151 @@ async def service_fill_scopus(date: datetime.date, file: UploadFile, db: Session
     return {'Message': 'OK'}
 
 
+async def service_fill_elibrary(file: UploadFile, db: Session):
+    elibrary_df = pd.read_csv(file.file, on_bad_lines='skip')
+    elibrary_df = elibrary_df.replace(np.nan, "")
+
+    pub_link_type_doi = get_or_create_publication_link_type("DOI", db)
+    pub_link_type_elibrary = get_or_create_publication_link_type("Elibrary", db)
+    source_type_journal = get_or_create_source_type("Журнал", db)
+    source_link_type_issn = get_or_create_source_link_type("ISSN", db)
+    source_link_type_eissn = get_or_create_source_link_type("eISSN", db)
+    identifier_elibrary = get_or_create_identifier("Elibrary ID", db)
+    publication_type = get_or_create_publication_type('Article', db)
+    organization_omstu = get_or_create_organization_omstu(db)
+
+    for _, row in elibrary_df.iterrows():
+        issns = []
+        if row['ISSN'] != '-':
+            issns.append(row['ISSN'])
+        if row['eISSN'] != '-':
+            issns.append(row['ISSN'])
+        source = get_source_by_name_or_identifiers(str(row['Журнал']), issns, db)
+        if source is None:
+            source = Source(name=row['Журнал'])
+            source.source_type = source_type_journal
+            db.add(source)
+            if row['ISSN'] != "-":
+                source_link = SourceLink(
+                    source=source,
+                    source_link_type=source_link_type_issn,
+                    link=row['ISSN']
+                )
+                db.add(source_link)
+            if row['eISSN'] != "-":
+                source_link = SourceLink(
+                    source=source,
+                    source_link_type=source_link_type_eissn,
+                    link=row['eISSN']
+                )
+                db.add(source_link)
+            db.commit()
+        date = datetime.date(int(row['Год']), 1, 1)
+        if row['DOI'] != "-":
+            link_doi = db.query(PublicationLink).filter(PublicationLink.link == row['DOI']).first()
+            if link_doi is not None:
+                continue
+        publication = db.query(Publication).filter(or_(Publication.title.ilike(row['Название']))).first()
+        if publication is not None:
+            continue
+        publication = create_publication(publication_type, source, row["Название"], row["Аннотация"], date, True, db)
+        create_publication_link(publication, pub_link_type_elibrary, f'https://www.elibrary.ru{row["Ссылка"]}', db)
+        if row['DOI'] != "":
+            create_publication_link(publication, pub_link_type_doi, row["DOI"], db)
+        authors = row['Авторы'].split('|')
+        authors_id = row['ID авторов'].split('|')
+        authors_org = row['Аффилиации в публикации'].split('|')
+        orgs = row['Организации'].split('|')
+        orgs_id = row['ID организаций'].split('|')
+        for i, author_row in enumerate(authors):
+            author_data = re.subn(r'\([^()]*\)', '', author_row)[0]
+            author_data = author_data.replace('  ', ' ').split()
+            if len(author_data) <= 1:
+                continue
+            author: Author | None
+            if authors_id[i] != '-':
+                identifier = db.query(AuthorIdentifier). \
+                    filter(and_(AuthorIdentifier.identifier_id == identifier_elibrary.id,
+                                AuthorIdentifier.identifier_value == authors_id[i])).first()
+                if identifier is None:
+                    if len(author_data) > 2:
+                        author = Author(
+                            name=author_data[1],
+                            surname=author_data[0],
+                            patronymic=author_data[2],
+                            confirmed=False
+                        )
+                    else:
+                        author = Author(
+                            name=author_data[1],
+                            surname=author_data[0],
+                            confirmed=False
+                        )
+                    db.add(author)
+                    author_identifier = AuthorIdentifier(
+                        author=author,
+                        identifier=identifier_elibrary,
+                        identifier_value=authors_id[i]
+                    )
+                    db.add(author_identifier)
+                else:
+                    author = identifier.author
+            else:
+                if len(author_data) > 2:
+                    author = db.query(Author).filter(and_(Author.name == author_data[1],
+                                                          Author.surname == author_data[0],
+                                                          Author.patronymic == author_data[2])).first()
+                else:
+                    author = db.query(Author).filter(and_(Author.name == author_data[1],
+                                                          Author.surname == author_data[0])).first()
+                if author is None:
+                    if len(author_data) > 2:
+                        author = Author(
+                            name=author_data[1],
+                            surname=author_data[0],
+                            patronymic=author_data[2],
+                            confirmed=False
+                        )
+                        db.add(author)
+                    else:
+                        author = Author(
+                            name=author_data[1],
+                            surname=author_data[0],
+                            confirmed=False
+                        )
+                        db.add(author)
+            author_publication = AuthorPublication(
+                publication=publication,
+                author=author
+            )
+            db.add(author_publication)
+            if authors_org[i] != '-':
+                author_orgs = authors_org[i].split(',')
+                for org in author_orgs:
+                    author_org = orgs[int(org) - 1]
+                    org_id = orgs_id[int(org) - 1]
+                    if org_id == '401':
+                        author_publication_organization = AuthorPublicationOrganization(
+                            author_publication=author_publication,
+                            organization=organization_omstu
+                        )
+                        db.add(author_publication_organization)
+                    else:
+                        organization = db.query(Organization).filter(Organization.name == author_org).first()
+                        if organization is None:
+                            organization = Organization(name=author_org)
+                            db.add(organization)
+                        author_publication_organization = AuthorPublicationOrganization(
+                            author_publication=author_publication,
+                            organization=organization
+                        )
+                        db.add(author_publication_organization)
+                    db.commit()
+            db.commit()
+        db.commit()
+    return {'Message': 'OK'}
+
+
 async def service_fill_authors(file: UploadFile, db: Session):
     author_df = pd.read_csv(file.file)
     author_df = author_df.replace(np.nan, "")
@@ -155,6 +301,11 @@ async def service_fill_authors(file: UploadFile, db: Session):
     if identifier_researcher is None:
         identifier_researcher = Identifier(name="ResearcherID")
         db.add(identifier_researcher)
+    identifier_elibrary_id = db.query(Identifier).filter(Identifier.name == "Elibrary ID").first()
+    if identifier_elibrary_id is None:
+        identifier_elibrary_id = Identifier(name="Elibrary ID")
+        db.add(identifier_elibrary_id)
+
     for _, row in author_df.iterrows():
         author = db.query(Author).filter(and_(Author.name == row['name'].title(),
                                               Author.surname == row['surname'].title(),
@@ -193,7 +344,7 @@ async def service_fill_authors(file: UploadFile, db: Session):
                 )
                 db.add(author_department)
         if str(row['spin']) != "0":
-            author_identifier_spin = db.query(AuthorIdentifier)\
+            author_identifier_spin = db.query(AuthorIdentifier) \
                 .filter(and_(AuthorIdentifier.author == author,
                              AuthorIdentifier.identifier == identifier_spin,
                              AuthorIdentifier.identifier_value == str(row['spin']))).first()
@@ -240,6 +391,18 @@ async def service_fill_authors(file: UploadFile, db: Session):
                     identifier_value=row['researcher id']
                 )
                 db.add(author_identifier_researcher)
+        if str(row['elibrary id']) != "0":
+            author_identifier_elibrary = db.query(AuthorIdentifier) \
+                .filter(and_(AuthorIdentifier.author == author,
+                             AuthorIdentifier.identifier == identifier_researcher,
+                             AuthorIdentifier.identifier_value == str(row['elibrary id']))).first()
+            if author_identifier_elibrary is None:
+                author_identifier_elibrary = AuthorIdentifier(
+                    author=author,
+                    identifier=identifier_elibrary_id,
+                    identifier_value=row['elibrary id']
+                )
+                db.add(author_identifier_elibrary)
         db.commit()
     return {"message": "OK"}
 

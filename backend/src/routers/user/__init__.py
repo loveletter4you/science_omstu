@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, security
 from sqlalchemy.orm import Session
+from starlette.responses import JSONResponse
 
 from src.model.database import get_db
 from src.routers.user.controller import controller_generate_token, controller_get_current_user
@@ -21,5 +22,13 @@ async def login(form_data: security.OAuth2PasswordRequestForm = Depends(), db: S
     :return: JWT-token
     """
     token = await controller_generate_token(form_data, db)
-    return token
+    response = JSONResponse(dict(message='OK'))
+    response.set_cookie("Authorization",
+                        value=f"Bearer {token['access_token']}",
+                        httponly=True,
+                        #domain='science.omgtu.ru',
+                        secure=True,
+                        max_age=1800,
+                        expires=1800,)
+    return response
 
