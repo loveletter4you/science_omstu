@@ -7,7 +7,7 @@ const COLOR_THEME = {
 };
 
 export const useColorTheme = () => {
-    const [colorTheme, setColorTheme] = useState(COLOR_THEME.dark);
+    const [colorTheme, setColorTheme] = useState(COLOR_THEME.light);
     const [cookiesTheme, setCookiesTheme] = useCookies(['theme'])
 
     const changeColorTheme = useCallback((theme = "") => {
@@ -18,13 +18,17 @@ export const useColorTheme = () => {
 
 
     const toggleColorTheme = useCallback(() => {
-        if (colorTheme === COLOR_THEME.light) {
+        if(cookiesTheme.theme === undefined){
+            changeColorTheme(COLOR_THEME.light);
+            setCookiesTheme('theme', COLOR_THEME.light, {path: '/', maxAge: 60 * 60 * 24 * 30, secure: true});
+        }else if (colorTheme === COLOR_THEME.light) {
             changeColorTheme(COLOR_THEME.dark)
             setCookiesTheme('theme', COLOR_THEME.dark, {path: '/', maxAge: 60 * 60 * 24 * 30, secure: true});
         } else {
             changeColorTheme(COLOR_THEME.light);
             setCookiesTheme('theme', COLOR_THEME.light, {path: '/', maxAge: 60 * 60 * 24 * 30, secure: true});
         }
+
     }, [colorTheme, changeColorTheme]);
 
     return {colorTheme, changeColorTheme, toggleColorTheme};

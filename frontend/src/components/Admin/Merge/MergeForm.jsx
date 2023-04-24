@@ -14,7 +14,7 @@ const MergeForm = (props) => {
     const dispatch = useDispatch();
     const [search, setSearch] = useState('');
     const debouncedSearch = useDebounce(search, 500);
-    const [cookies, _] = useCookies(['token'])
+    const [cookies, ] = useCookies(['isAuth'])
     const onSearchChange = (e) => {
         const {value} = e.target
         setSearch(value)
@@ -31,7 +31,7 @@ const MergeForm = (props) => {
         const postMerge = async () => {
             console.log(data.authorName)
             try {
-                const res = await postMergeAuthors(props.authorId, data.authorName, cookies.token)
+                const res = await postMergeAuthors(props.authorId, data.authorName)
                 console.log(res)
             } catch (e) {
                 console.log(e)

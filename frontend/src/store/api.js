@@ -14,11 +14,7 @@ export const postSignIn = (data) => {
 }
 
 export const postMergeAuthors = (merge_id, base_id, token) =>{
-    return instance.post(`/api/author/${merge_id}/merge?base_id=${base_id}`, {merge_id: merge_id, base_id: base_id}, {
-        headers:{
-            authorization: `Bearer ${token}`
-        }
-    })
+    return instance.post(`/api/author/${merge_id}/merge?base_id=${base_id}`, {merge_id: merge_id, base_id: base_id})
 }
 
 export const postAuthorsData = (data) => {
@@ -29,37 +25,21 @@ export const postAuthorsData = (data) => {
     })
 }
 export const DataUploadAPI = {
-    postAuthorsData(data, token) {
+    postAuthorsData(data) {
         return instance.post("/api/admin/upload/authors", data, {
             headers: {
                 "Content-Type": "multipart/form-data; boundary=----WebKitFormBoundarylMDxS6LSTp97MKcy",
-                authorization: `Bearer ${token}`,
             }
         })
     },
-    postScopusData(data, token) {
-        return instance.post("/api/admin/upload/scopus", data, {
-            headers: {
-                'Content-Type': 'multipart/form-data; boundary = ----WebKitFormBoundaryZFOs57xIdISzeePV',
-                authorization: `Bearer ${token}`
-            }
-        })
+    postScopusData(data) {
+        return instance.post("/api/admin/upload/scopus", data)
     },
-    postWhiteListData(data, token) {
-        return instance.post("/api/admin/upload/white_list", data, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                authorization: `Bearer ${token}`
-            }
-        })
+    postWhiteListData(data) {
+        return instance.post("/api/admin/upload/white_list", data)
     },
-    postJCRData(data, token) {
-        return instance.post("/api/admin/upload/jcr", data, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                authorization: `Bearer ${token}`
-            }
-        })
+    postJCRData(data) {
+        return instance.post("/api/admin/upload/jcr", data)
     },
 }
 
@@ -88,12 +68,8 @@ export const AuthorsAPI = {
 
 export const FeedbackAPI = {
 
-    getFeedback(page, pageSize, token) {
-        return instance.get(`/api/admin/feedbacks?page=${page}&limit=${pageSize}`, {
-            headers: {
-                authorization: `Bearer ${token}`
-            }
-        })
+    getFeedback(page, pageSize) {
+        return instance.get(`/api/admin/feedbacks?page=${page}&limit=${pageSize}`)
     }
 }
 

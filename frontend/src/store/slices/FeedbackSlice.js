@@ -2,9 +2,9 @@ import {createSlice, createAsyncThunk} from "@reduxjs/toolkit";
 import {FeedbackAPI} from "../api";
 
 export const fetchFeedback = createAsyncThunk(
-    "feedbacks/fetchSources", async ({page, pageSize, token}, {rejectWithValue}) => {
+    "feedbacks/fetchSources", async ({page, pageSize}, {rejectWithValue}) => {
         try {
-            const res = await FeedbackAPI.getFeedback(page, pageSize, token)
+            const res = await FeedbackAPI.getFeedback(page, pageSize)
             return res.data;
         } catch (err) {
             return rejectWithValue([], err);

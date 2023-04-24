@@ -10,7 +10,7 @@ import {useCookies} from "react-cookie";
 
 const Navbar = () => {
 
-    const signIn = useSelector(state => state.signIn)
+    const [cookies, , ] = useCookies(['isAuth']);
     const [Active, setActive] = useState(false);
     const toggle = () => {
         setActive(!Active);
@@ -22,7 +22,7 @@ const Navbar = () => {
         if (cookiesTheme.theme !== colorTheme) {
             toggleColorTheme();
         }
-    }, [])
+    },[colorTheme])
     const onChangeTheme = () => {
         document.getElementById("app-wrapper").style.transition = '.5s ease-in-out';
         toggleColorTheme();
@@ -56,7 +56,7 @@ const Navbar = () => {
                         <NavLink to="/source"
                                  className={navData => navData.isActive ? style.active : null}>Источники</NavLink>
                     </div>
-                    {signIn.isAuth ? <div className={style.item} onClick={toggle}>
+                    {cookies.isAuth? <div className={style.item} onClick={toggle}>
                         <NavLink to="/admin/unconfirmed">Администратор</NavLink>
                     </div> : null}
                     <div className={style.item}>
@@ -66,9 +66,7 @@ const Navbar = () => {
                         <img src={theme} className={style.image}/>
                     </div>
                     <div>
-                        {signIn.isAuth ?
-                            <div onClick={toggle}><SignOut/></div> :
-                            <NavLink to="/login">
+                        {cookies.isAuth? <div onClick={toggle}><SignOut/></div> : <NavLink to="/login">
                                 <button className={style.btn} onClick={toggle}>Войти</button>
                             </NavLink>
                         }

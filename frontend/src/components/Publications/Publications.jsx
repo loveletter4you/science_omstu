@@ -44,18 +44,18 @@ const Publications = () => {
                 <div className={style.block}>
                     {publications.map((publications, index) => <div key={index}>
                         <div className={style.blocks}>
-                            <div title="Тип публикации">
+                            <div>
                                 {publications.publication_type.name}</div>
-                            <div title="Источник">
+                            <div>
                                 <NavLink to={'/source/' + publications.source.id}>
                                     {publications.source.name}
                                 </NavLink>
                             </div>
                             <NavLink to={"/publication/" + publications.id}>
-                                <div title="Публикация">{publications.title}</div>
+                                <div>{publications.title}</div>
                             </NavLink>
                             <div className={style.authors}>
-                                <div className={style.author} title="Авторы">
+                                <div className={style.author}>
                                     {publications.publication_authors.map((authors, index) =>
                                     <NavLink key = {index}
                                         to={'/author/' + authors.author.id}>
