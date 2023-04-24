@@ -21,7 +21,7 @@ export const signInSlice = createSlice({
     }
 })
 
-export const {setUserData, setIsAuth, setError} = signInSlice.actions;
+export const {setIsAuth, setError} = signInSlice.actions;
 
 export default signInSlice.reducer;
 

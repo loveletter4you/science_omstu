@@ -11,15 +11,14 @@ import {setIsAuth} from "../../../store/slices/SignInSlice";
 import Erorr404 from "../../Helpers/Errors/Erorr404";
 
 const Feedback = () => {
-    const signIn = useSelector(state => state.signIn)
-    const [cookies, _] = useCookies(['token'])
+    const [cookies, ] = useCookies(['isAuth'])
     const {feedbacks, pageSize, count} = useSelector(state => state.feedbacks);
     const dispatch = useDispatch();
     let pageCount = Math.ceil(count / pageSize);
 
     const handlePageClick = (e) => {
         try {
-            dispatch(fetchFeedback({page: e.selected, pageSize, token: cookies.token}))
+            dispatch(fetchFeedback({page: e.selected, pageSize}))
         } catch (e) {
             console.log(e);
         }
@@ -27,7 +26,7 @@ const Feedback = () => {
 
     React.useEffect(() => {
         try {
-            dispatch(fetchFeedback({page: 0, pageSize, token: cookies.token}))
+            dispatch(fetchFeedback({page: 0, pageSize}))
         } catch (e) {
             console.log(e);
         }
@@ -38,7 +37,7 @@ const Feedback = () => {
     return <div>
         {feedbacks.isFetching === true ? <Preloader/> :
             <div>
-                {signIn.isAuth ? <div>
+                {cookies.isAuth ? <div>
                     <Admin/>
                     {feedbacks.map((feedback, index) => <div key = {index} className={style.block}>
                         <div>Имя: {feedback.name}</div>

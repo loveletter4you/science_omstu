@@ -8,18 +8,18 @@ import style from "./Merge.module.css"
 import Preloader from "../../Helpers/Preloader/Preloader";
 import Error404 from "../../Helpers/Errors/Erorr404";
 import MergeForm from "./MergeForm";
+import {useCookies} from "react-cookie";
 
 const Merge = () => {
     const {register, formState: {errors}, handleSubmit} = useForm();
     const {authors, count} = useSelector(state => state.authors);
     const authorConfirmed = useSelector(state => state.authorsConfirmedFalse);
-    const dispatch = useDispatch();
-    const signIn = useSelector(state => state.signIn)
+    const [cookies, ] = useCookies(['isAuth'])
 
 
     return (
         <div>
-            {signIn.isAuth ?
+            {cookies.isAuth ?
             <div>
                 {authorConfirmed.isFetching === true && authors.isFetching === true ? <Preloader/> :
                     <div>

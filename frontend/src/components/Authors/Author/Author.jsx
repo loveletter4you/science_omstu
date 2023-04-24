@@ -9,6 +9,7 @@ import {setData} from "../../../store/slices/PublicationsSlice";
 import {AuthorAPI} from "../../../store/api";
 import Preloader from "../../Helpers/Preloader/Preloader";
 import MergeButton from "../../Admin/Merge/MergeButton";
+import {useCookies} from "react-cookie";
 
 const Author = () => {
 
@@ -17,7 +18,7 @@ const Author = () => {
     const author = useSelector(state => state.author);
     const {pageSize} = useSelector(state => state.publications);
     const [isFetching, toggleIsFetching] = useState(false);
-    const signIn = useSelector(state => state.signIn)
+    const [cookies, ] = useCookies(['isAuth'])
 
     React.useEffect(() => {
         toggleIsFetching(true);
@@ -69,7 +70,7 @@ const Author = () => {
                             </div>
                         </div>
                         <div>
-                            {signIn.isAuth? <MergeButton authorId = {author.id}/>
+                            {cookies.isAuth? <MergeButton authorId = {author.id}/>
                             :null}
                         </div>
                         <div className={style.title}>

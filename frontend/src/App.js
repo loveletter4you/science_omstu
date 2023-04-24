@@ -15,35 +15,34 @@ import Feedback from "./components/Admin/Feedback/Feedback";
 import {useCookies, withCookies} from 'react-cookie';
 import Error404 from "./components/Helpers/Errors/Erorr404";
 import {setIsAuth} from "./store/slices/SignInSlice";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {useColorTheme} from "./components/Helpers/Theme/Theme";
 import UploadDate from "./components/Admin/UploadDate/UploadDate";
 import Merge from "./components/Admin/Merge/Merge";
 import Admin from "./components/Admin/Admin";
 import UnconfirmedAuthors from "./components/Admin/UnconfirmedAuthors/UnconfirmedAuthors";
+import Main from "./components/Main/Main";
 
 function App() {
-    const [cookies, _setCookies, _removeCookies] = useCookies(['token']);
-    const [cookiesTheme, _setCookiesTheme] = useCookies(['theme']);
+    const [cookies, , ] = useCookies(['isAuth']);
+    const [cookiesTheme, ] = useCookies(['theme']);
     const {colorTheme, toggleColorTheme} = useColorTheme();
-
     const dispatch = useDispatch();
+
     useEffect(() => {
-        if (cookies.token) {
-            dispatch(setIsAuth(true));
-        }
         if (cookiesTheme.theme !== colorTheme) {
             toggleColorTheme();
         }
     })
-    console.log(colorTheme)
-    console.log(cookiesTheme.theme)
+
     return <div className='app-wrapper' id='app-wrapper'>
         <main className="main">
             <div className="app-wrapper__container">
                 <Header/>
                 <div className='app-wrapper-content'>
                     <Routes>
+                        <Route exact path = '/'
+                               element = {<Main/>}/>
                         <Route exact path='/author/:id'
                                element={<Author/>}/>
                         <Route exact path='/author'
@@ -60,7 +59,7 @@ function App() {
                                element={<Source/>}/>
                         <Route exact path='/author/:id/publications'
                                element={<AuthorsPublications/>}/>
-                        {cookies.token ? <>
+                        {cookies.isAuth? <>
                             <Route exact path='/admin/feedbacks'
                                    element={<Feedback/>}/>
                             <Route exact path="/admin/upload"

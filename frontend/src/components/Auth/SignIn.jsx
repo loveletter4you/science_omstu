@@ -9,15 +9,11 @@ import style from "./SignIn.module.css"
 
 const SignIn = () => {
 
-    const signIn = useSelector(state => state.signIn)
+    const {error} = useSelector(state => state.signIn)
     const {register, formState: {errors}, handleSubmit} = useForm();
     const dispatch = useDispatch();
-    const [cookies, setCookies, _removeCookies] = useCookies(['token'])
-    React.useEffect(() => {
-        if(cookies.token){
-            dispatch(setIsAuth(true));
-        }
-    }, [])
+    const [cookies, setCookies] = useCookies(['isAuth'])
+
     const onSubmit = (data) => {
 
         const postUser = async () => {
@@ -26,13 +22,16 @@ const SignIn = () => {
                 dispatch(setError(res.status));
                 if (res.status === 200) {
                     dispatch(setIsAuth(true));
-                }
-                data.checkbox === true ? setCookies('token', res.data.access_token, {
+                data.checkbox === true ? setCookies('isAuth', true, {
                         path: '/',
                         maxAge: 60 * 60 * 24 * 30,
                         secure: true
                     }) :
-                    setCookies('token', res.data.access_token, {path: '/', maxAge: 1800, secure: true})
+                    setCookies('isAuth', true, {path: '/', maxAge: 60*60*24, secure: true})
+                }
+                if(res.status === 403){
+                    dispatch(setError(403))
+                }
             } catch (e) {
                 dispatch(setError(e.response.status));
             }
@@ -42,9 +41,8 @@ const SignIn = () => {
     };
 
     return (<div>
-            {signIn.isAuth ? <Navigate to = "/publication"/> :
+            {cookies.isAuth? <Navigate to = "/publication"/> :
                 <div>
-                    {signIn.error === 404 ? <div>Аккаунт не найден!</div> : null}
                     <form onSubmit={handleSubmit(onSubmit)} className={style.form}>
                         <div className={style.block}>
                             <input className={style.input} {...register("username", {required: true})}

@@ -1,14 +1,12 @@
 import React from "react";
 import {useForm} from "react-hook-form";
 import {DataUploadAPI} from "../../../store/api";
-import {useSelector} from "react-redux";
 import Admin from "../Admin";
 import s from "./Upload.module.css"
 import {useCookies} from "react-cookie";
 import Error404 from "../../Helpers/Errors/Erorr404";
 
 const UploadDate = () => {
-    const signIn = useSelector(state => state.signIn)
     const {register, handleSubmit, formState: {errors}} = useForm({
         defaultValues: {
             authorsUpload: FileList,
@@ -17,7 +15,7 @@ const UploadDate = () => {
             JCRUpload: FileList
         }
     });
-    const [cookies, _] = useCookies(['token'])
+    const [cookies, ] = useCookies(['isAuth'])
     const onSubmitAuthors = (data) => {
 
         let formData = new FormData();
@@ -25,7 +23,7 @@ const UploadDate = () => {
         const UploadAuthors = async () => {
             console.log(data.authorsUpload[0])
             try {
-                const res = await DataUploadAPI.postAuthorsData(formData, cookies.token);
+                const res = await DataUploadAPI.postAuthorsData(formData);
             } catch (e) {
                 console.log(e)
             }
@@ -37,7 +35,7 @@ const UploadDate = () => {
         formData.append("file", data.authorsUpload[1], data.authorsUpload[1].filename)
         const UploadAuthors = async () => {
             try {
-                const res = await DataUploadAPI.postWhiteListData(formData, cookies.token);
+                const res = await DataUploadAPI.postWhiteListData(formData);
 
             } catch (e) {
 
@@ -51,7 +49,7 @@ const UploadDate = () => {
         formData.append("file", data.authorsUpload[2], data.authorsUpload[2].filename)
         const UploadAuthors = async () => {
             try {
-                const res = await DataUploadAPI.postScopusData(formData, cookies.token);
+                const res = await DataUploadAPI.postScopusData(formData);
 
             } catch (e) {
 
@@ -64,7 +62,7 @@ const UploadDate = () => {
         formData.append("file", data.authorsUpload[3], data.authorsUpload[3].filename)
         const UploadAuthors = async () => {
             try {
-                const res = await DataUploadAPI.postJCRData(formData, cookies.token);
+                const res = await DataUploadAPI.postJCRData(formData);
 
             } catch (e) {
 
@@ -74,7 +72,7 @@ const UploadDate = () => {
     }
 
     return <div>
-        {signIn.isAuth ? <div>
+        {cookies.isAuth ? <div>
             <Admin/>
             <div className={s.container}>
                 <form onSubmit={handleSubmit(onSubmitAuthors)}>
