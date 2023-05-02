@@ -33,7 +33,7 @@ function App() {
         if (cookiesTheme.theme !== colorTheme) {
             toggleColorTheme();
         }
-    })
+    }, [])
 
     return <div className='app-wrapper' id='app-wrapper'>
         <main className="main">

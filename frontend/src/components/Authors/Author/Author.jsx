@@ -69,10 +69,11 @@ const Author = () => {
                                 </div>)}
                             </div>
                         </div>
+                        {cookies.isAuth?
                         <div>
-                            {cookies.isAuth? <MergeButton authorId = {author.id}/>
+                            {author.confirmed === false? <MergeButton authorId = {author.id}/>
                             :null}
-                        </div>
+                        </div>:null}
                         <div className={style.title}>
                         </div>
                         <AuthorsPublications/>
