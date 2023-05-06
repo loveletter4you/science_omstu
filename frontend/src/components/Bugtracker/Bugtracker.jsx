@@ -4,6 +4,7 @@ import style from "./Bugtracker.module.css"
 import Modal from "./BugtrackerWindow";
 import ReCAPTCHA from "react-google-recaptcha";
 import axios from "axios";
+import {REACT_APP_SITE_KEY} from "../../settings"
 
 const BugTracker = () => {
 
@@ -30,7 +31,7 @@ const BugTracker = () => {
     }
 
     return (<div>
-            <img src={bugtracker} className={style.image} onClick={() => setModal(true)}/>
+            <img src={bugtracker} className={style.image} onClick={() => setModal(true)} alt=''/>
             {isModal ? <Modal visible={true} active={isModal} setActive={setModal}>
                 <form onSubmit={handleSubmit} className={style.form}>
                     <div className={style.title}>Форма обратной связи</div>
@@ -47,7 +48,7 @@ const BugTracker = () => {
                     <div>Сообщение</div>
                     <textarea className={style.input} id="message" name="message"/>
                     <ReCAPTCHA
-                        sitekey={process.env.REACT_APP_SITE_KEY}
+                        sitekey={REACT_APP_SITE_KEY}
                         ref={captchaRef}
                     />
                     <div><input className={style.input} type="submit" value="Отправить"/></div>

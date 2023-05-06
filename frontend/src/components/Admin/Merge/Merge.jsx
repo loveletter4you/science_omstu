@@ -2,9 +2,6 @@ import React from "react";
 import Admin from "../Admin";
 import {useForm} from "react-hook-form";
 import {useDispatch, useSelector} from "react-redux";
-import {fetchAuthor} from "../../../store/slices/AuthorsSlice";
-import {fetchAuthorConfirmed} from "../../../store/slices/AuthorsConfirmedFalseSlice";
-import style from "./Merge.module.css"
 import Preloader from "../../Helpers/Preloader/Preloader";
 import Error404 from "../../Helpers/Errors/Erorr404";
 import MergeForm from "./MergeForm";

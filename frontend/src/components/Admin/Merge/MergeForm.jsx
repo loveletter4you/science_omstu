@@ -6,7 +6,8 @@ import style from "./Merge.module.css"
 import {useDebounce} from "use-debounce";
 import {postMergeAuthors} from "../../../store/api";
 import {useCookies} from "react-cookie";
-
+import { useNavigate } from "react-router-dom";
+import author from "../../Authors/Author/Author";
 
 const MergeForm = (props) => {
     const {register, formState: {errors}, handleSubmit} = useForm();
@@ -15,6 +16,8 @@ const MergeForm = (props) => {
     const [search, setSearch] = useState('');
     const debouncedSearch = useDebounce(search, 500);
     const [cookies, ] = useCookies(['isAuth'])
+    const navigate = useNavigate();
+
     const onSearchChange = (e) => {
         const {value} = e.target
         setSearch(value)
@@ -26,13 +29,18 @@ const MergeForm = (props) => {
         } catch (e) {
             console.log(e);
         }
-    }, [debouncedSearch[0]])
+    }, [debouncedSearch[0]] )
+
+
+
     const onSubmit = (data) => {
         const postMerge = async () => {
             console.log(data.authorName)
             try {
                 const res = await postMergeAuthors(props.authorId, data.authorName)
-                console.log(res)
+                if(res.status === 200){
+                    navigate(`/author/${data.authorName}`)
+                }
             } catch (e) {
                 console.log(e)
             }
