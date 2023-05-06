@@ -25,22 +25,43 @@ export const postAuthorsData = (data) => {
     })
 }
 export const DataUploadAPI = {
-    postAuthorsData(data) {
+    postAuthors(data) {
         return instance.post("/api/admin/upload/authors", data, {
             headers: {
                 "Content-Type": "multipart/form-data; boundary=----WebKitFormBoundarylMDxS6LSTp97MKcy",
             }
         })
     },
-    postScopusData(data) {
-        return instance.post("/api/admin/upload/scopus", data)
+    postWhiteListUpgraded(data, rating_date){
+        return instance.post(`/api/admin/upload/white_list_upgraded?rating_date=${rating_date}`, data)
     },
-    postWhiteListData(data) {
-        return instance.post("/api/admin/upload/white_list", data)
+    postVakWithRank(data, rating_date){
+        return instance.post(`/api/admin/upload/vak_with_rank?rating_date=${rating_date}`, data)
     },
-    postJCRData(data) {
-        return instance.post("/api/admin/upload/jcr", data)
+    postRSCIJournalsRank(data, rating_date){
+        return instance.post(`/api/admin/upload/rsci_journals_rank?rating_date=${rating_date}`, data,{
+            headers:{
+                "content-Type": "multipart/form-data; boundary=----WebKitFormBoundaryeAGvovuKxSANvAaj",
+            }
+        })
     },
+    postScopus(data) {
+        return instance.post("/api/admin/upload/scopus", data,{
+            headers:{
+                "content-Type": "multipart/form-data; boundary=----WebKitFormBoundaryeAGvovuKxSANvAaj",
+            }
+        })
+    },
+    postElibrary(data){
+        return instance.post("/api/admin/upload/elibrary", data)
+    },
+    postWhiteList(data, rating_date) {
+        return instance.post(`/api/admin/upload/white_list?rating_date=${rating_date}`, data)
+    },
+    postJCR(data, rating_date) {
+        return instance.post(`/api/admin/upload/jcr?rating_date=${rating_date}`, data)
+    },
+
 }
 
 export const AuthorAPI = {

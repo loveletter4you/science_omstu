@@ -43,6 +43,7 @@ const SignIn = () => {
     return (<div>
             {cookies.isAuth? <Navigate to = "/publication"/> :
                 <div>
+                    {error === 403? <p className={style.error}>Неверный логин или пароль!</p>:null}
                     <form onSubmit={handleSubmit(onSubmit)} className={style.form}>
                         <div className={style.block}>
                             <input className={style.input} {...register("username", {required: true})}

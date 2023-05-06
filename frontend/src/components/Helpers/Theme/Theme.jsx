@@ -16,20 +16,21 @@ export const useColorTheme = () => {
         document.documentElement.setAttribute("data-theme", currentTheme);
     }, []);
 
-
     const toggleColorTheme = useCallback(() => {
-        if(cookiesTheme.theme === undefined){
-            changeColorTheme(COLOR_THEME.light);
-            setCookiesTheme('theme', COLOR_THEME.light, {path: '/', maxAge: 60 * 60 * 24 * 30, secure: true});
-        }else if (colorTheme === COLOR_THEME.light) {
-            changeColorTheme(COLOR_THEME.dark)
-            setCookiesTheme('theme', COLOR_THEME.dark, {path: '/', maxAge: 60 * 60 * 24 * 30, secure: true});
-        } else {
-            changeColorTheme(COLOR_THEME.light);
+        if(cookiesTheme.theme !== undefined){
+            if (colorTheme === COLOR_THEME.light) {
+                changeColorTheme(COLOR_THEME.dark)
+                setCookiesTheme('theme', COLOR_THEME.dark, {path: '/', maxAge: 60 * 60 * 24 * 30, secure: true});
+            } else if (colorTheme === COLOR_THEME.dark) {
+                changeColorTheme(COLOR_THEME.light);
+                setCookiesTheme('theme', COLOR_THEME.light, {path: '/', maxAge: 60 * 60 * 24 * 30, secure: true});
+            }
+        }else {
+            changeColorTheme("");
             setCookiesTheme('theme', COLOR_THEME.light, {path: '/', maxAge: 60 * 60 * 24 * 30, secure: true});
         }
 
-    }, [colorTheme, changeColorTheme]);
+    }, [colorTheme, changeColorTheme, cookiesTheme]);
 
     return {colorTheme, changeColorTheme, toggleColorTheme};
 };
