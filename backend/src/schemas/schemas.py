@@ -231,3 +231,25 @@ class SchemeUser(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class SchemeAnalysis(BaseModel):
+    year: int
+    count: int
+
+
+class SchemeAnalysisSourceRating(BaseModel):
+    id: int
+    name: str
+
+
+class SchemeAnalysisRating(BaseModel):
+    source_rating: SchemeAnalysisSourceRating
+    counts: List[SchemeAnalysis]
+    total: int
+
+
+class SchemeAnalysisOrganization(BaseModel):
+    organization: SchemeOrganization
+    counts: List[SchemeAnalysis]
+    total: int

@@ -8,7 +8,7 @@ from settings_env import DB_NAME, DB_HOST, DB_ROOT, DB_PASSWORD
 DATABASE_URL: str = f"postgresql+psycopg2://{DB_ROOT}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
 Base = declarative_base()
 
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URL, client_encoding='utf8')
 
 session_local = orm.sessionmaker(
         autocommit=False,

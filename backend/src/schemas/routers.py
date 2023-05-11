@@ -3,7 +3,8 @@ from typing import List
 from pydantic import BaseModel
 
 from src.schemas.schemas import SchemePublication, SchemePublicationPage, SchemeAuthor, \
-    SchemeAuthorProfile, SchemeSourceWithType, SchemeSourceWithRating, SchemeFeedback, SchemeFeedbackOutput
+    SchemeAuthorProfile, SchemeSourceWithType, SchemeSourceWithRating, SchemeFeedback, SchemeFeedbackOutput, \
+    SchemeAnalysis, SchemeAnalysisRating, SchemeAnalysisOrganization
 
 
 class SchemePublicationsRouter(BaseModel):
@@ -41,3 +42,16 @@ class SchemeFeedbackPostRouter(BaseModel):
 class SchemeFeedbacksGetRouter(BaseModel):
     feedbacks: List[SchemeFeedbackOutput]
     count: int
+
+
+class SchemeAnalysisRouter(BaseModel):
+    result: List[SchemeAnalysis]
+    total: int
+
+
+class SchemeAnalysisRatingRouter(BaseModel):
+    result: List[SchemeAnalysisRating]
+
+
+class SchemeAnalysisOrganizationRouter(BaseModel):
+    result: List[SchemeAnalysisOrganization]
