@@ -22,6 +22,7 @@ import Merge from "./components/Admin/Merge/Merge";
 import Admin from "./components/Admin/Admin";
 import UnconfirmedAuthors from "./components/Admin/UnconfirmedAuthors/UnconfirmedAuthors";
 import Main from "./components/Main/Main";
+import AnalysisDate from "./components/Analysis/AnalysisDate";
 
 function App() {
     const [cookies, , ] = useCookies(['isAuth']);
@@ -47,6 +48,8 @@ function App() {
                                element={<Author/>}/>
                         <Route exact path='/author'
                                element={<Authors/>}/>
+                        <Route exact path='/analysis'
+                               element={<AnalysisDate/>}/>
                         <Route exact path='/publication'
                                element={<Publications/>}/>
                         <Route exact path='/publication/:id'
