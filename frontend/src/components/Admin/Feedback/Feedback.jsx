@@ -5,9 +5,7 @@ import ReactPaginate from "react-paginate";
 import style from "./Feedback.module.css"
 import {useCookies} from "react-cookie";
 import Preloader from "../../Helpers/Preloader/Preloader";
-import {Navigate} from "react-router-dom";
 import Admin from "../Admin";
-import {setIsAuth} from "../../../store/slices/SignInSlice";
 import Erorr404 from "../../Helpers/Errors/Erorr404";
 
 const Feedback = () => {

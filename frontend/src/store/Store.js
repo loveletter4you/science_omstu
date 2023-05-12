@@ -8,6 +8,10 @@ import SourcesSlice from "./slices/SourcesSlice";
 import signInSlice from "./slices/SignInSlice";
 import feedbackSlice from "./slices/FeedbackSlice";
 import authorsConfirmedFalseSlice from "./slices/AuthorsConfirmedFalseSlice";
+import analysisSlice from "./slices/AnalysisSlice";
+import analysisSourceRatingSlice from "./slices/AnalysisSourceRatingSlice";
+import analysisOrganizationSlice from "./slices/AnalysisOrganizationSlice";
+
 
 const store = configureStore({
     reducer: {
@@ -19,7 +23,10 @@ const store = configureStore({
         sources: SourcesSlice,
         signIn: signInSlice,
         feedbacks: feedbackSlice,
-        authorsConfirmedFalse: authorsConfirmedFalseSlice
+        authorsConfirmedFalse: authorsConfirmedFalseSlice,
+        analysis: analysisSlice,
+        analysisSourceRating: analysisSourceRatingSlice,
+        analysisOrganization: analysisOrganizationSlice
     }
 })
 export default store;

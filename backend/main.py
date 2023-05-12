@@ -1,9 +1,20 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from src.model.database import create_db
 from src.routers import author, publication, source, feedback, user, admin, analysis
 
 create_db()
 app = FastAPI()
+
+app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
 
 app.include_router(feedback.router)
 app.include_router(author.router)

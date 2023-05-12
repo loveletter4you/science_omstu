@@ -5,6 +5,8 @@ const instance = axios.create({
 });
 
 
+
+
 export const postSignIn = (data) => {
     return instance.post("/api/user/token", data, {
         headers: {
@@ -13,17 +15,11 @@ export const postSignIn = (data) => {
     })
 }
 
-export const postMergeAuthors = (merge_id, base_id, token) =>{
+export const postMergeAuthors = (merge_id, base_id, token) => {
     return instance.post(`/api/author/${merge_id}/merge?base_id=${base_id}`, {merge_id: merge_id, base_id: base_id})
 }
 
-export const postAuthorsData = (data) => {
-    return instance.post("/api/admin/upload/authors", data, {
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        }
-    })
-}
+
 export const DataUploadAPI = {
     postAuthors(data) {
         return instance.post("/api/admin/upload/authors", data, {
@@ -32,27 +28,27 @@ export const DataUploadAPI = {
             }
         })
     },
-    postWhiteListUpgraded(data, rating_date){
+    postWhiteListUpgraded(data, rating_date) {
         return instance.post(`/api/admin/upload/white_list_upgraded?rating_date=${rating_date}`, data)
     },
-    postVakWithRank(data, rating_date){
+    postVakWithRank(data, rating_date) {
         return instance.post(`/api/admin/upload/vak_with_rank?rating_date=${rating_date}`, data)
     },
-    postRSCIJournalsRank(data, rating_date){
-        return instance.post(`/api/admin/upload/rsci_journals_rank?rating_date=${rating_date}`, data,{
-            headers:{
+    postRSCIJournalsRank(data, rating_date) {
+        return instance.post(`/api/admin/upload/rsci_journals_rank?rating_date=${rating_date}`, data, {
+            headers: {
                 "content-Type": "multipart/form-data; boundary=----WebKitFormBoundaryeAGvovuKxSANvAaj",
             }
         })
     },
     postScopus(data) {
-        return instance.post("/api/admin/upload/scopus", data,{
-            headers:{
+        return instance.post("/api/admin/upload/scopus", data, {
+            headers: {
                 "content-Type": "multipart/form-data; boundary=----WebKitFormBoundaryeAGvovuKxSANvAaj",
             }
         })
     },
-    postElibrary(data){
+    postElibrary(data) {
         return instance.post("/api/admin/upload/elibrary", data)
     },
     postWhiteList(data, rating_date) {
@@ -60,6 +56,19 @@ export const DataUploadAPI = {
     },
     postJCR(data, rating_date) {
         return instance.post(`/api/admin/upload/jcr?rating_date=${rating_date}`, data)
+    },
+
+}
+
+export const AnalysisAPI= {
+    getAnalysisDate(){
+        return instance.get('/api/analysis/')
+    },
+    getAnalysisSourceRating(){
+        return instance.get('/api/analysis/source_rating')
+    },
+    getAnalysisOrganization(){
+        return instance.get('/api/analysis/organization')
     },
 
 }
@@ -79,10 +88,10 @@ export const AuthorsAPI = {
     getAuthors(page, pageSize) {
         return instance.get(`/api/author?page=${page}&limit=${pageSize}`)
     },
-    getUnconfirmedOmSTU(page, pageSize){
+    getUnconfirmedOmSTU(page, pageSize) {
         return instance.get(`/api/author/unconfirmed_omstu?page=${page}&limit=${pageSize}`)
     },
-    getUnconfirmedOmSTUSearch(search, page, pageSize){
+    getUnconfirmedOmSTUSearch(search, page, pageSize) {
         return instance.get(`/api/author/unconfirmed_omstu?search=${search}&page=${page}&limit=${pageSize}`)
     }
 }
