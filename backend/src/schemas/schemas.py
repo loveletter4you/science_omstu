@@ -33,6 +33,7 @@ class SchemeAuthorIdentifier(BaseModel):
 
 
 class SchemeFaculty(BaseModel):
+    id: int
     name: str
 
     class Config:
@@ -40,6 +41,7 @@ class SchemeFaculty(BaseModel):
 
 
 class SchemeDepartment(BaseModel):
+    id: int
     name: str
     faculty: SchemeFaculty
 
@@ -253,3 +255,17 @@ class SchemeAnalysisOrganization(BaseModel):
     organization: SchemeOrganization
     counts: List[SchemeAnalysis]
     total: int
+
+
+class SchemeSourceAnalysis(SchemeSource):
+    source_ratings: List[SchemeSourceRating]
+
+
+class SchemePublicationAnalysis(BaseModel):
+    id: int
+    source: SchemeSourceAnalysis
+    title: str
+    publication_date: date
+
+    class Config:
+        orm_mode = True

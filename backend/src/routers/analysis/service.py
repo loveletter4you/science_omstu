@@ -3,10 +3,10 @@ from sqlalchemy.orm import Session
 from sqlalchemy.testing import in_
 
 from src.model.model import Publication, PublicationType, SourceRatingType, SourceRating, Source, Organization, \
-    AuthorPublication, AuthorPublicationOrganization
+    AuthorPublication, AuthorPublicationOrganization, Author, AuthorIdentifier
 from datetime import date
 
-from src.schemas.schemas import SchemeOrganization
+from src.schemas.schemas import SchemeOrganization, SchemeAuthorIdentifier, SchemePublicationAnalysis
 
 
 async def get_service_analysis(from_date: date, to_date: date, db: Session):
@@ -111,3 +111,28 @@ async def get_organization_collaborations(id: int, search: str, max_count: int, 
         result.append(dict(organization=scheme_organization, counts=counts, total=total))
 
     return dict(result=result)
+
+
+async def service_author_analysis(id: int, db: Session):
+    author = db.query(Author).filter(Author.id == id).first()
+    author_identifiers = db.query(AuthorIdentifier).filter(AuthorIdentifier.author_id == id).all()
+    author_identifiers_schemas = [SchemeAuthorIdentifier.from_orm(author_identifier) for author_identifier in author_identifiers]
+    query = db.query(Publication).join(AuthorPublication).order_by(desc(Publication.publication_date)) \
+        .order_by(Publication.title).filter(AuthorPublication.author_id == id)
+    publications = query.all()
+    publications_schemas = [SchemePublicationAnalysis.from_orm(publication) for publication in publications]
+    source_rating_types = db.query(SourceRatingType).all()
+    result = []
+    for rating_type in source_rating_types:
+            rating_query = query.join(Source).join(SourceRating).join(SourceRatingType).filter(SourceRatingType.id == rating_type.id).group_by(Publication.id).distinct()
+            pubs_id = [x.id for x in rating_query]
+            id = rating_type.id
+            name = rating_type.name
+            counts = []
+            for year in range(2018, 2022 + 1):
+                count = db.query(Publication).filter(and_(func.extract('year', Publication.publication_date) == year,
+                                                          Publication.id.in_(pubs_id))).count()
+                if count != 0:
+                    counts.append(dict(year=year, count=count))
+            result.append(dict(source_rating=dict(id=id, name=name), counts=counts))
+    return dict(author=author, author_identifier=author_identifiers_schemas, publications=publications_schemas, result=result)

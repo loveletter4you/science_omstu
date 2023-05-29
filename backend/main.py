@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.model.database import create_db
-from src.routers import author, publication, source, feedback, user, admin, analysis
+from src.routers import author, publication, source, feedback, user, admin, analysis, department
 
 create_db()
 app = FastAPI()
@@ -23,3 +23,4 @@ app.include_router(source.router)
 app.include_router(user.router)
 app.include_router(admin.router)
 app.include_router(analysis.router)
+app.include_router(department.router)
