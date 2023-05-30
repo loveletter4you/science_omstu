@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from src.model.database import get_db
 from src.routers.analysis.service import get_service_analysis, get_source_rating, get_organization, \
-    get_organization_collaborations, service_author_analysis
+    get_organization_collaborations, service_author_analysis, service_docent_analysis
 
 from datetime import date
 
@@ -44,9 +44,9 @@ async def get_source_publications(id: int, search: str = None, max_count: int = 
     return publications
 
 
-@router.get('/author/{id}')
-async def get_author_analysis(id: int, db: Session = Depends(get_db)):
-    author = await service_author_analysis(id, db)
+@router.get('/author/docent')
+async def get_author_analysis(from_date: date, to_date: date, db: Session = Depends(get_db)):
+    author = await service_docent_analysis(from_date, to_date, db)
     return author
 
 

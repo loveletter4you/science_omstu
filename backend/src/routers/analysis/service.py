@@ -1,9 +1,10 @@
+import pandas as pd
 from sqlalchemy import func, desc, and_
 from sqlalchemy.orm import Session
 from sqlalchemy.testing import in_
 
 from src.model.model import Publication, PublicationType, SourceRatingType, SourceRating, Source, Organization, \
-    AuthorPublication, AuthorPublicationOrganization, Author, AuthorIdentifier
+    AuthorPublication, AuthorPublicationOrganization, Author, AuthorIdentifier, AuthorDepartment, Identifier
 from datetime import date
 
 from src.schemas.schemas import SchemeOrganization, SchemeAuthorIdentifier, SchemePublicationAnalysis
@@ -136,3 +137,44 @@ async def service_author_analysis(id: int, db: Session):
                     counts.append(dict(year=year, count=count))
             result.append(dict(source_rating=dict(id=id, name=name), counts=counts))
     return dict(author=author, author_identifier=author_identifiers_schemas, publications=publications_schemas, result=result)
+
+
+async def service_docent_analysis(from_date: date, to_date: date, db: Session):
+    authors = db.query(Author).join(AuthorDepartment).filter(AuthorDepartment.position == 'доцент').all()
+    orcid = db.query(Identifier).filter(Identifier.name == 'ORCID').first()
+    elibrary_id = db.query(Identifier).filter(Identifier.name == 'Elibrary ID').first()
+    vak_type = db.query(SourceRatingType).filter(SourceRatingType.name == 'ВАК').first()
+    white_list = db.query(SourceRatingType).filter(SourceRatingType.name == '«Белый список» РЦНИ').first()
+    author_surname, author_name, author_patronymic, author_elibrary_list, author_orcid_list, all_count, vak_count, \
+        white_list_coint = [], [], [], [], [], [], [], []
+    df = pd.DataFrame()
+    for author in authors:
+        author_elibrary = db.query(AuthorIdentifier).filter(and_(AuthorIdentifier.author_id == author.id, AuthorIdentifier.identifier_id == elibrary_id.id)).first()
+        author_orcid = db.query(AuthorIdentifier).filter(and_(AuthorIdentifier.author_id == author.id, AuthorIdentifier.identifier_id == orcid.id)).first()
+        if not author_elibrary or not author_orcid:
+            continue
+        query = db.query(Publication).join(AuthorPublication).order_by(desc(Publication.publication_date)) \
+            .order_by(Publication.title).filter(AuthorPublication.author_id == author.id)\
+            .filter(Publication.publication_date >= from_date) \
+            .filter(Publication.publication_date <= to_date)
+        vak_query = query.join(Source).join(SourceRating).join(SourceRatingType).filter(
+            SourceRatingType.id == vak_type.id).group_by(Publication.id).distinct()
+        white_list_query = query.join(Source).join(SourceRating).join(SourceRatingType).filter(
+            SourceRatingType.id == white_list.id).group_by(Publication.id).distinct()
+        author_surname.append(author.surname)
+        author_name.append(author.name)
+        author_patronymic.append(author.patronymic)
+        author_elibrary_list.append(author_elibrary.identifier_value)
+        author_orcid_list.append(author_orcid.identifier_value)
+        all_count.append(query.count())
+        vak_count.append(vak_query.count())
+        white_list_coint.append(white_list_query.count())
+    df['Фамилия'] = author_surname
+    df['Имя'] = author_name
+    df['Отчество'] = author_patronymic
+    df['Elibrary ID'] = author_elibrary_list
+    df['ORCID'] = author_orcid_list
+    df['Количество публикаций'] = all_count
+    df['Количество публикаций в ВАК'] = vak_count
+    df['Количество публикаций в белом списке'] = white_list_coint
+    df.to_csv('Доценты 18-22.csv')
