@@ -1,7 +1,8 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
-from src.routers.department.service import service_get_departments, service_get_faculties, service_get_faculty
+from src.routers.department.service import service_get_departments, service_get_faculties, service_get_faculty, \
+    service_get_department_publications, service_get_department_authors
 
 
 async def controller_get_departments(page: int, limit: int, db: Session):
@@ -21,3 +22,18 @@ async def controller_get_faculty(id: int, db: Session):
     if not faculty:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return faculty
+
+
+async def controller_department_publication(id: int, page: int, limit: int, db: Session):
+    offset = page * limit
+    publications = await service_get_department_publications(id, offset, limit, db)
+    if not publications:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    return publications
+
+
+async def controller_department_authors(id: int, db: Session):
+    authors = await service_get_department_authors(id, db)
+    if not authors:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    return authors

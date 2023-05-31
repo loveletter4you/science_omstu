@@ -45,8 +45,8 @@ async def get_source_publications(id: int, search: str = None, max_count: int = 
 
 
 @router.get('/author/docent')
-async def get_author_analysis(from_date: date, to_date: date, db: Session = Depends(get_db)):
-    author = await service_docent_analysis(from_date, to_date, db)
+async def get_author_analysis(position: str, from_date: date, to_date: date, db: Session = Depends(get_db)):
+    author = await service_docent_analysis(position, from_date, to_date, db)
     return author
 
 

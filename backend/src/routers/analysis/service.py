@@ -1,7 +1,7 @@
 import pandas as pd
 from sqlalchemy import func, desc, and_
 from sqlalchemy.orm import Session
-from sqlalchemy.testing import in_
+from fastapi.responses import StreamingResponse
 
 from src.model.model import Publication, PublicationType, SourceRatingType, SourceRating, Source, Organization, \
     AuthorPublication, AuthorPublicationOrganization, Author, AuthorIdentifier, AuthorDepartment, Identifier
@@ -139,8 +139,8 @@ async def service_author_analysis(id: int, db: Session):
     return dict(author=author, author_identifier=author_identifiers_schemas, publications=publications_schemas, result=result)
 
 
-async def service_docent_analysis(from_date: date, to_date: date, db: Session):
-    authors = db.query(Author).join(AuthorDepartment).filter(AuthorDepartment.position == 'доцент').all()
+async def service_docent_analysis(postion: str, from_date: date, to_date: date, db: Session):
+    authors = db.query(Author).join(AuthorDepartment).filter(AuthorDepartment.position == position).all()
     orcid = db.query(Identifier).filter(Identifier.name == 'ORCID').first()
     elibrary_id = db.query(Identifier).filter(Identifier.name == 'Elibrary ID').first()
     vak_type = db.query(SourceRatingType).filter(SourceRatingType.name == 'ВАК').first()
@@ -177,4 +177,8 @@ async def service_docent_analysis(from_date: date, to_date: date, db: Session):
     df['Количество публикаций'] = all_count
     df['Количество публикаций в ВАК'] = vak_count
     df['Количество публикаций в белом списке'] = white_list_coint
-    df.to_csv('Доценты 18-22.csv')
+    return StreamingResponse(
+        iter([df.to_csv(index=False)]),
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=data.csv"}
+    )

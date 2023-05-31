@@ -1,7 +1,8 @@
+from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
-from src.model.model import Department, Faculty
-from src.schemas.schemas import SchemeDepartment, SchemeFaculty
+from src.model.model import Department, Faculty, Publication, Author, AuthorPublication, AuthorDepartment
+from src.schemas.schemas import SchemeDepartment, SchemeFaculty, SchemePublication, SchemeAuthor
 
 
 async def service_get_faculties(offset: int, limit: int, db: Session):
@@ -32,4 +33,21 @@ async def service_get_department_publications(id: int, offset: int, limit: int, 
     department = db.query(Department).filter(Department.id == id).first()
     if department is None:
         return None
-    
+    query = db.query(Publication).join(AuthorPublication).join(Author).join(AuthorDepartment)\
+        .filter(AuthorDepartment.department_id == department.id).order_by(desc(Publication.publication_date))\
+        .distinct()
+    publications = query.offset(offset).limit(limit).all()
+    scheme_publications = [SchemePublication.from_orm(publication) for publication in publications]
+    count = query.count()
+    return dict(publications=scheme_publications, count=count)
+
+
+async def service_get_department_authors(id: int, db: Session):
+    department = db.query(Department).filter(Department.id == id).first()
+    if department is None:
+        return None
+    query = db.query(Author).join(AuthorDepartment).filter(AuthorDepartment.department_id == department.id).distinct()
+    authors_count = query.count()
+    authors = query.all()
+    scheme_authors = [SchemeAuthor.from_orm(author) for author in authors]
+    return dict(authors=scheme_authors, count=authors_count)
