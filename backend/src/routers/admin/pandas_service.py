@@ -407,6 +407,72 @@ async def service_fill_authors(file: UploadFile, db: Session):
     return {"message": "OK"}
 
 
+async def service_fill_author_department(file: UploadFile, db: Session):
+    authors_df = pd.read_excel(file.file)
+    db.query(AuthorDepartment).delete()
+    db.query(Department).delete()
+    db.query(Faculty).delete()
+    db.query(Author).update({Author.confirmed: False}, synchronize_session=False)
+    db.commit()
+    for _, row in authors_df.iterrows():
+        name = row['Сотрудник'].split(' ')
+        if len(name) < 3:
+            name.append("")
+        author = db.query(Author).filter(and_(Author.name == name[1].title(),
+                                              Author.surname == name[0].title(),
+                                              Author.patronymic == name[2].title())).first()
+        if author is None:
+            author = Author(
+                name=name[1].title(),
+                surname=name[0].title(),
+                patronymic=name[2].title(),
+            )
+            db.add(author)
+        author.confirmed = True
+        birthday = row['Дата рождения'].split('.')
+        author.birthday = datetime.date(year=int(birthday[2]), month=int(birthday[1]), day=int(birthday[0]))
+        db.commit()
+        if row['Подразделение.Группа подразделений (Подразделения)'] == "ПО":
+            workplace = row['Полное наименование подразделения'].split('/')
+            if len(workplace) == 1:
+                workplace.append('')
+            if len(workplace) > 2:
+                workplace = [workplace[0], '/'.join(workplace[1:])]
+            faculty = db.query(Faculty).filter(Faculty.name == workplace[0]).first()
+            if faculty is None:
+                faculty = Faculty(name=workplace[0])
+                db.add(faculty)
+                db.commit()
+            department = db.query(Department).filter(and_(Department.name == workplace[1],
+                                                          Department.faculty == faculty)).first()
+            if department is None:
+                department = Department(
+                    name=workplace[1],
+                    faculty=faculty
+                )
+                db.add(department)
+                db.commit()
+            author_department = db.query(AuthorDepartment)\
+                .filter(and_(AuthorDepartment.author_id == author.id,
+                             AuthorDepartment.department_id == department.id,
+                             AuthorDepartment.position == row['Должность, Код по ОКЗ, Категории ВПО-1 (Должности)'].split(',')[0])).first()
+            if author_department is None:
+                author_department = AuthorDepartment(
+                    department=department,
+                    author=author,
+                    position=row['Должность, Код по ОКЗ, Категории ВПО-1 (Должности)'].split(',')[0],
+                    rate=float(row['Количество ставок'])
+                )
+                db.add(author_department)
+            else:
+                author_department.rate += float(row['Количество ставок'])
+            db.commit()
+    return dict(message="OK")
+
+
+
+
+
 async def service_white_list_fill(date: datetime.date, file: UploadFile, db: Session):
     white_list_df = pd.read_csv(file.file, on_bad_lines='skip', sep='\t')
     white_list_df = white_list_df.replace(np.nan, "")

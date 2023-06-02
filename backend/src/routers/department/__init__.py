@@ -24,7 +24,7 @@ async def get_faculty(id: int, db: Session = Depends(get_db)):
     return faculty
 
 
-@router.get("/departments")
+@router.get("/departments/all")
 async def get_departments(page: int = 0, limit: int = 20,
                       db: Session = Depends(get_db)):
     departments = await controller_get_departments(page, limit, db)

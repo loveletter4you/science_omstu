@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean, Integer, Date, ForeignKey
+from sqlalchemy import Column, String, Boolean, Integer, Date, ForeignKey, Float
 from sqlalchemy.orm import relationship
 from passlib.hash import bcrypt
 
@@ -31,6 +31,7 @@ class Author(Base):
     name = Column(String, nullable=False)
     surname = Column(String, nullable=False)
     patronymic = Column(String)
+    birthday = Column(Date)
     confirmed = Column(Boolean, nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'))
     author_identifiers = relationship("AuthorIdentifier", backref='author')
@@ -57,9 +58,9 @@ class AuthorDepartment(Base):
     __tablename__ = "author_department"
     id = Column(Integer, primary_key=True)
     position = Column(String)
+    rate = Column(Float, default='1', nullable=False)
     author_id = Column(Integer, ForeignKey('author.id'), nullable=False)
     department_id = Column(Integer, ForeignKey('department.id'), nullable=False)
-
 
 
 class Identifier(Base):
