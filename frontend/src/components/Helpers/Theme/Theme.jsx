@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useState} from "react";
 import {useCookies} from "react-cookie";
-import {DOMAIN, SECURE} from "../../settings.js"
+import {DOMAIN, SECURE} from "../../../settings.js"
 
 const COLOR_THEME = {
     light: "light",

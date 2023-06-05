@@ -27,11 +27,11 @@ app.include_router(analysis.router)
 app.include_router(department.router)
 
 
-@app.get("/docs", include_in_schema=False)
-async def get_docs(request: Request):
-    return get_swagger_ui_html(openapi_url=request.scope.get('root_path') + "/openapi.json", title="Swagger")
-
-
 @app.get("/openapi.json", include_in_schema=False)
 async def openapi():
     return get_openapi(title=app.title, version=app.version, routes=app.routes)
+
+
+@app.get("/docs", include_in_schema=False)
+async def get_docs(request: Request):
+    return get_swagger_ui_html(openapi_url=request.scope.get('root_path') + "/openapi.json", title="Swagger")
