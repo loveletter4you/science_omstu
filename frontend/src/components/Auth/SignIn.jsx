@@ -6,6 +6,7 @@ import {postSignIn} from "../../store/api";
 import {Navigate} from "react-router-dom";
 import {useCookies} from "react-cookie";
 import style from "./SignIn.module.css"
+import {DOMAIN, SECURE} from "../../settings.js"
 
 const SignIn = () => {
 
@@ -25,9 +26,10 @@ const SignIn = () => {
                 data.checkbox === true ? setCookies('isAuth', true, {
                         path: '/',
                         maxAge: 60 * 60 * 24 * 30,
-                        secure: true
+                        domain: DOMAIN,
+                        secure: SECURE
                     }) :
-                    setCookies('isAuth', true, {path: '/', maxAge: 60*60*24, secure: true})
+                    setCookies('isAuth', true, {path: '/', maxAge: 60*60*24, domain: DOMAIN, secure: SECURE})
                 }
                 if(res.status === 403){
                     dispatch(setError(403))

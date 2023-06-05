@@ -139,7 +139,7 @@ async def service_author_analysis(id: int, db: Session):
     return dict(author=author, author_identifier=author_identifiers_schemas, publications=publications_schemas, result=result)
 
 
-async def service_docent_analysis(postion: str, from_date: date, to_date: date, db: Session):
+async def service_docent_analysis(position: str, from_date: date, to_date: date, db: Session):
     authors = db.query(Author).join(AuthorDepartment).filter(AuthorDepartment.position == position).all()
     orcid = db.query(Identifier).filter(Identifier.name == 'ORCID').first()
     elibrary_id = db.query(Identifier).filter(Identifier.name == 'Elibrary ID').first()

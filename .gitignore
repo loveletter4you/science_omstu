@@ -38,4 +38,5 @@ data
 .idea/libraries
 
 *.iml
+.env
 

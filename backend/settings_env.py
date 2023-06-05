@@ -15,3 +15,6 @@ ADMIN_LOGIN: str = os.environ.get("ADMIN_LOGIN")
 ADMIN_PASSWORD: str = os.environ.get("ADMIN_PASSWORD")
 
 SECRET_KEY: str = os.environ.get("SECRET_KEY")
+
+DOMAIN: str = os.environ.get("DOMAIN")
+SECURE_COOKIE: bool = bool(os.environ.get("SECURE_COOKIE"))

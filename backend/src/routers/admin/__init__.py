@@ -19,10 +19,10 @@ router = APIRouter(
 )
 
 
-@router.get("/create_admin")
-async def create_admin(db: Session = Depends(get_db)):
-    message = await controller_create_admin(db)
-    return message
+# @router.get("/create_admin")
+# async def create_admin(db: Session = Depends(get_db)):
+#     message = await controller_create_admin(db)
+#     return message
 
 
 @router.get("/feedbacks", response_model=SchemeFeedbacksGetRouter)

@@ -1,5 +1,6 @@
 import {useCallback, useEffect, useState} from "react";
 import {useCookies} from "react-cookie";
+import {DOMAIN, SECURE} from "../../settings.js"
 
 const COLOR_THEME = {
     light: "light",
@@ -20,14 +21,14 @@ export const useColorTheme = () => {
         if(cookiesTheme.theme !== undefined){
             if (colorTheme === COLOR_THEME.light) {
                 changeColorTheme(COLOR_THEME.dark)
-                setCookiesTheme('theme', COLOR_THEME.dark, {path: '/', maxAge: 60 * 60 * 24 * 30, secure: true});
+                setCookiesTheme('theme', COLOR_THEME.dark, {path: '/', maxAge: 60 * 60 * 24 * 30, domain: DOMAIN, secure: SECURE});
             } else if (colorTheme === COLOR_THEME.dark) {
                 changeColorTheme(COLOR_THEME.light);
-                setCookiesTheme('theme', COLOR_THEME.light, {path: '/', maxAge: 60 * 60 * 24 * 30, secure: true});
+                setCookiesTheme('theme', COLOR_THEME.light, {path: '/', maxAge: 60 * 60 * 24 * 30, domain: DOMAIN, secure: SECURE});
             }
         }else {
             changeColorTheme("");
-            setCookiesTheme('theme', COLOR_THEME.light, {path: '/', maxAge: 60 * 60 * 24 * 30, secure: true});
+            setCookiesTheme('theme', COLOR_THEME.light, {path: '/', maxAge: 60 * 60 * 24 * 30, domain: DOMAIN, secure: SECURE});
         }
 
     }, [colorTheme, changeColorTheme, cookiesTheme]);
