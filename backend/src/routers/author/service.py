@@ -7,7 +7,7 @@ from src.schemas.schemas import SchemePublication, SchemeAuthor, SchemeAuthorPro
 
 
 async def service_get_authors(offset: int, limit: int, confirmed: bool, db: Session):
-    query = db.query(Author).filter(Author.confirmed == confirmed)
+    query = db.query(Author).filter(Author.confirmed == confirmed).order_by(Author.surname)
     authors_count = query.count()
     authors = query.offset(offset).limit(limit).all()
     scheme_authors = [SchemeAuthor.from_orm(author) for author in authors]
@@ -19,7 +19,7 @@ async def service_get_authors_search(search: str, offset: int, limit: int, confi
     if len(name) == 1:
         authors_query = db.query(Author).filter(Author.confirmed == confirmed). \
             filter(or_(func.lower(Author.name).contains(name[0]),
-                       func.lower(Author.surname).contains(name[0])))
+                       func.lower(Author.surname).contains(name[0]))).order_by(Author.surname)
         authors_count = authors_query.count()
         authors = authors_query.offset(offset).limit(limit).all()
         scheme_authors = [SchemeAuthor.from_orm(author) for author in authors]
