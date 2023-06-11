@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from src.model.database import get_db
-from src.routers.publication.controller import controller_get_publications, controller_get_publication_by_id
+from src.routers.publication.controller import controller_get_publications, controller_get_publication_by_id, \
+    controller_get_publication_types
 from src.routers.publication.schema import Publication_params
 from src.schemas.routers import SchemePublicationsRouter, SchemePublicationRouter
 
@@ -12,6 +13,12 @@ router = APIRouter(
     tags=["publication"],
     responses={404: {"description": "Not found"}}
 )
+
+
+@router.get("/publication_types", response_model=SchemePublicationRouter)
+async def get_publication_types(id: int, db: Session = Depends(get_db)):
+    publication_types = await controller_get_publication_types(db)
+    return publication_types
 
 
 @router.get("", response_model=SchemePublicationsRouter)

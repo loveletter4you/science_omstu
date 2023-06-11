@@ -1,7 +1,7 @@
 from sqlalchemy import func, desc, and_
 from sqlalchemy.orm import Session
 
-from src.model.model import Publication, AuthorPublication, Source, SourceRating, SourceRatingType
+from src.model.model import Publication, AuthorPublication, Source, SourceRating, SourceRatingType, PublicationType
 from src.routers.publication.schema import Publication_params
 from src.schemas.schemas import SchemePublication, SchemePublicationPage
 
@@ -35,3 +35,8 @@ async def service_get_publication(id: int, db: Session):
         return False
     scheme_publication = SchemePublicationPage.from_orm(publication)
     return dict(publication=scheme_publication)
+
+
+async def service_get_publication_publication_types(db: Session):
+    publcation_types = db.query(PublicationType).all()
+    return dict(publication_types=publcation_types)

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from src.model.database import get_db
 from src.routers.source.controller import controller_get_sources, controller_get_source, \
-    controller_get_source_publications
+    controller_get_source_publications, controller_source_rating_types
 from src.schemas.routers import SchemeSourcesRouter, SchemeSourceRouter, SchemePublicationsRouter
 
 router = APIRouter(
@@ -20,6 +20,12 @@ async def get_sources(search: str = None,
     return sources
 
 
+@router.get("/source_rating_types", response_model=SchemePublicationRouter)
+async def get_source_rating_types(id: int, db: Session = Depends(get_db)):
+    source_rating_types = await controller_source_rating_types(db)
+    return source_rating_types
+
+
 @router.get("/{id}", response_model=SchemeSourceRouter)
 async def get_source(id: int, db: Session = Depends(get_db)):
     source = await controller_get_source(id, db)
@@ -30,3 +36,4 @@ async def get_source(id: int, db: Session = Depends(get_db)):
 async def get_source_publications(id: int, page: int = 0, limit: int = 20, db: Session = Depends(get_db)):
     publications = await controller_get_source_publications(id, page, limit, db)
     return publications
+

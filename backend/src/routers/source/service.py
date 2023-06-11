@@ -1,7 +1,7 @@
 from sqlalchemy import func, desc, or_
 from sqlalchemy.orm import Session
 
-from src.model.model import Source, Publication, SourceLink
+from src.model.model import Source, Publication, SourceLink, SourceRatingType
 from src.schemas.schemas import SchemeSourceWithType, SchemeSourceWithRating, SchemePublication
 
 
@@ -40,3 +40,9 @@ async def service_get_source_publications(id: int, offset: int, limit: int, db: 
     scheme_publications = [SchemePublication.from_orm(publication) for publication in publications]
     count = query.count()
     return dict(publications=scheme_publications, count=count)
+
+
+async def service_source_rating_types(db: Session):
+    source_rating_types = db.query(SourceRatingType).all()
+    return dict(source_rating_types=source_rating_types)
+

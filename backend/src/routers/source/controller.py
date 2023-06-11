@@ -26,3 +26,9 @@ async def controller_get_source_publications(id: int, page: int, limit: int, db:
     offset = page * limit
     publications = await service_get_source_publications(id, offset, limit, db)
     return publications
+
+
+async def controller_source_rating_types(db: Session):
+    source_rating_types = await service_source_rating_types(db)
+    return source_rating_types
+
