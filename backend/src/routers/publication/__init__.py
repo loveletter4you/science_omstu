@@ -15,8 +15,8 @@ router = APIRouter(
 )
 
 
-@router.get("/publication_types", response_model=SchemePublicationRouter)
-async def get_publication_types(id: int, db: Session = Depends(get_db)):
+@router.get("/publication_types")
+async def get_publication_types(db: Session = Depends(get_db)):
     publication_types = await controller_get_publication_types(db)
     return publication_types
 

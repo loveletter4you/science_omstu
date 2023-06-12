@@ -11,9 +11,13 @@ export const fetchPublications = createAsyncThunk(
         }
     });
 export const fetchPublicationsSearch = createAsyncThunk(
-    "publications/fetchPublicationsSearch", async ({search, page, pageSize}, {rejectWithValue}) => {
+    "publications/fetchPublicationsSearch", async ({search,publication_type_id,author_id,
+                                                       source_rating_type_id, from_date, to_date,
+                                                       page, pageSize}, {rejectWithValue}) => {
         try {
-            const res = await PublicationsAPI.getPublicationsSearch(search, page, pageSize)
+            const res = await PublicationsAPI.getPublicationsSearch(search,publication_type_id,author_id,
+                source_rating_type_id, from_date, to_date,
+                page, pageSize)
             return res.data;
         } catch (err) {
             return rejectWithValue([], err);
@@ -39,6 +43,7 @@ const initialState = {
     count: 1,
     currentPage: 1,
     isFetching: false,
+    data:[]
 };
 
 const publicationsSlice = createSlice({
@@ -52,6 +57,9 @@ const publicationsSlice = createSlice({
             const {publications, count} = action.payload;
             state.publications = publications;
             state.count = count;
+        },
+        setFilter(state, action){
+            state.data = action.payload;
         }
     },
     extraReducers: (builder) => {
@@ -82,7 +90,7 @@ const publicationsSlice = createSlice({
 });
 
 
-export const {setData, setSize} = publicationsSlice.actions;
+export const {setData, setSize, setFilter} = publicationsSlice.actions;
 
 export default publicationsSlice.reducer;
 

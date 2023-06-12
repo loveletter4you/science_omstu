@@ -73,6 +73,15 @@ export const AnalysisAPI= {
 
 }
 
+export const FilterAPI = {
+    getPublicationType(){
+        return instance.get('/api/publication/publication_types')
+    },
+    getSourceRatingTypes(){
+        return instance.get('/api/source/source_rating_types')
+    }
+}
+
 export const AuthorAPI = {
     getAuthor(id) {
         return instance.get(`/api/author/${id}`)
@@ -110,8 +119,19 @@ export const PublicationAPI = {
 }
 
 export const PublicationsAPI = {
-    getPublicationsSearch(search, page, pageSize) {
-        return instance.get(`/api/publication?search=${search}&page=${page}&limit=${pageSize}`)
+    getPublicationsSearch(search,publication_type_id,author_id,
+                          source_rating_type_id, from_date, to_date,
+                          page, pageSize=20) {
+        let url = '/api/publication?';
+        if (search !== null)
+            url += `search=${search}&`
+        if (publication_type_id !== null)
+            url += `publication_type_id=${publication_type_id}&`
+        if (author_id !== null)
+            url += `author_id=${author_id}&`
+        if (source_rating_type_id !== null)
+            url += `source_rating_type_id=${source_rating_type_id}&`
+        return instance.get(`${url}from_date=${from_date}&to_date=${to_date}&page=${page}&limit=${pageSize}`)
     },
     getPublications(page, pageSize) {
         return instance.get(`/api/publication?page=${page}&limit=${pageSize}`)

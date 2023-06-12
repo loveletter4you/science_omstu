@@ -12,6 +12,22 @@
     flex-direction: column;
 }
 
+.filter {
+    width: 200px;
+    padding-bottom: 10px;
+}
+
+.date {
+    border-radius: 10px;
+    padding: 5px;
+    margin-top: 5px;
+}
+.dataName{
+    border-radius: 10px;
+    padding: 5px;
+    margin-top: 5px;
+    width: 200px;
+}
 
 .sort b {
     font-weight: normal;

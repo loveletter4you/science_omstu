@@ -11,6 +11,7 @@ import authorsConfirmedFalseSlice from "./slices/AuthorsConfirmedFalseSlice";
 import analysisSlice from "./slices/AnalysisSlice";
 import analysisSourceRatingSlice from "./slices/AnalysisSourceRatingSlice";
 import analysisOrganizationSlice from "./slices/AnalysisOrganizationSlice";
+import filterSlices from "./slices/FilterSlices";
 
 
 const store = configureStore({
@@ -26,7 +27,8 @@ const store = configureStore({
         authorsConfirmedFalse: authorsConfirmedFalseSlice,
         analysis: analysisSlice,
         analysisSourceRating: analysisSourceRatingSlice,
-        analysisOrganization: analysisOrganizationSlice
+        analysisOrganization: analysisOrganizationSlice,
+        filter: filterSlices
     }
 })
 export default store;

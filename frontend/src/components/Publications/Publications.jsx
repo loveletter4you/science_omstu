@@ -5,19 +5,18 @@ import {useDispatch, useSelector} from "react-redux";
 import {fetchPublications, fetchPublicationsSearch} from "../../store/slices/PublicationsSlice";
 import ReactPaginate from "react-paginate";
 import {NavLink} from "react-router-dom";
-import PublicationFilter from "../Helpers/Filters/PublicationFilter";
+import PublicationFilterSize from "../Helpers/Filters/PublicationFilterSize";
 import {useDebounce} from "use-debounce";
 import Preloader from "../Helpers/Preloader/Preloader";
 
 const Publications = () => {
 
 
-    const {publications, pageSize, count, isFetching} = useSelector(state => state.publications);
+    const {publications, pageSize, count, isFetching, data} = useSelector(state => state.publications);
     const dispatch = useDispatch();
     let pageCount = Math.ceil(count / pageSize);
     const [search, setSearch] = useState('');
     const debouncedSearch = useDebounce(search, 500);
-
 
     const onSearchChange = (e) => {
         const {value} = e.target
@@ -25,12 +24,14 @@ const Publications = () => {
     }
 
     const handlePageClick = (e) => {
-        dispatch(fetchPublicationsSearch({search, page: e.selected, pageSize}));
+        dispatch(fetchPublicationsSearch({search,publication_type_id: data.publicationType,author_id: data.authorName,
+            source_rating_type_id: data.SourceRating, from_date: data.beforeTime, to_date: data.afterTime, page: e.selected, pageSize}));
     }
 
     React.useEffect(() => {
         if (debouncedSearch[0] !== '') {
-            dispatch(fetchPublicationsSearch({search, page: 0, pageSize}))
+            dispatch(fetchPublicationsSearch({search,publication_type_id: data.publicationType,author_id: data.authorName,
+                source_rating_type_id: data.SourceRating, from_date: data.beforeTime, to_date: data.afterTime, page: 0, pageSize}))
         } else {
             dispatch(fetchPublications({page: 0, pageSize}))
         }
@@ -39,7 +40,7 @@ const Publications = () => {
     return (<div className={style.container}>
             <input className={styleSearch.search} placeholder='Поиск' type="text" value={search}
                    onChange={onSearchChange}/>
-            <PublicationFilter min={20} mid={40} max={80}/>
+            <PublicationFilterSize min={20} mid={40} max={80}/>
             {isFetching === true ? <Preloader/> :
                 <div className={style.block}>
                     {publications.map((publications, index) => <div key={index}>
@@ -57,11 +58,11 @@ const Publications = () => {
                             <div className={style.authors}>
                                 <div className={style.author}>
                                     {publications.publication_authors.map((authors, index) =>
-                                    <NavLink key = {index}
-                                        to={'/author/' + authors.author.id}>
-                                        {authors.author.surname} {authors.author.name}
-                                    </NavLink>
-                                )}</div>
+                                        <NavLink key={index}
+                                                 to={'/author/' + authors.author.id}>
+                                            {authors.author.surname} {authors.author.name}
+                                        </NavLink>
+                                    )}</div>
                             </div>
                             <div>
                                 {publications.publication_date === null ||

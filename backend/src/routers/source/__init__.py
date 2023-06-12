@@ -20,8 +20,8 @@ async def get_sources(search: str = None,
     return sources
 
 
-@router.get("/source_rating_types", response_model=SchemePublicationRouter)
-async def get_source_rating_types(id: int, db: Session = Depends(get_db)):
+@router.get("/source_rating_types")
+async def get_source_rating_types(db: Session = Depends(get_db)):
     source_rating_types = await controller_source_rating_types(db)
     return source_rating_types
 

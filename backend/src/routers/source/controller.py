@@ -2,7 +2,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from src.routers.source.service import service_get_sources, service_get_sources_search, service_get_source, \
-    service_get_source_publications
+    service_get_source_publications, service_source_rating_types
 
 
 async def controller_get_sources(search: str, page: int, limit: int, db: Session):

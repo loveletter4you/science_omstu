@@ -35,7 +35,6 @@ const MergeForm = (props) => {
 
     const onSubmit = (data) => {
         const postMerge = async () => {
-            console.log(data.authorName)
             try {
                 const res = await postMergeAuthors(props.authorId, data.authorName)
                 if(res.status === 200){
