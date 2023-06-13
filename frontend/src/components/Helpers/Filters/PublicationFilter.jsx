@@ -1,3 +1,4 @@
+
 import React, {useState} from "react";
 import {FilterAPI} from "../../../store/api";
 import {useDispatch, useSelector} from "react-redux";
@@ -125,7 +126,7 @@ const PublicationFilter = () => {
                     </select>
                 </div>
                 <div>
-                    <input className={style.dataName} type={"submit"}/>
+                    <input className={style.dataName} type={"submit"} value={"Применить"}/>
                 </div>
             </form>
         </div>
