@@ -37,7 +37,6 @@ async def service_update_from_openalex(db: Session):
             'publication_year',
             'publication_date',
             'primary_location',
-            'host_venue',
             'type',
             'open_access',
             'authorships',
@@ -67,13 +66,15 @@ async def service_update_from_openalex(db: Session):
                 continue
             if not work['title']:
                 continue
+            if not work['primary_location']['source']:
+                continue
             publication = db.query(Publication).filter(Publication.title.ilike(work['title'])).first()
             if publication is not None:
                 continue
-            issns = work['host_venue']['issn']
+            issns = work['primary_location']['source']['issn']
             source_title = ''
-            if work['host_venue']['display_name']:
-                source_title = work['host_venue']['display_name']
+            if work['primary_location']['source']['display_name']:
+                source_title = work['primary_location']['source']['display_name']
             source = None
             if not (issns is None):
                 source = get_source_by_name_or_identifiers(source_title, issns, db)
@@ -81,7 +82,7 @@ async def service_update_from_openalex(db: Session):
                 if source_title == '':
                     continue
                 source = Source(name=source_title)
-                if work['host_venue']['type'] == 'journal':
+                if work['primary_location']['source']['type'] == 'journal':
                     source.source_type = source_type_journal
                 else:
                     source.source_type = source_type_conference
