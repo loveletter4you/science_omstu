@@ -9,6 +9,7 @@ class Publication_params(BaseModel):
     publication_type_id: int | None = None
     author_id: int | None = None
     source_rating_type_id: int | None = None
+    department_id: int | None = None
     from_date: date = date.today() - relativedelta(years=10)
     to_date: date = date.today()
     page: int = 0

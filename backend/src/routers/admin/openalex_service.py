@@ -1,6 +1,5 @@
 import datetime
 
-import requests
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
@@ -9,6 +8,7 @@ from src.model.model import Identifier, AuthorIdentifier, PublicationLink, Publi
 from src.model.storage import get_or_create_publication_link_type, get_source_by_name_or_identifiers, \
     get_or_create_source_link_type, get_or_create_source_type, get_or_create_publication_type, create_publication, \
     create_publication_link, get_or_create_organization_omstu
+from src.utils.aiohttp import SingletonAiohttp
 
 
 async def service_update_from_openalex(db: Session):
@@ -50,8 +50,9 @@ async def service_update_from_openalex(db: Session):
         works = []
         while cursor:
             url = f'{filtered_works_url}&select={select}&cursor={cursor}'
-            page_with_results = requests.get(url, timeout=30).json()
+            page_with_results = await SingletonAiohttp.query_url(url)
             results = page_with_results['results']
+            print(results)
             works.extend(results)
 
             cursor = page_with_results['meta']['next_cursor']
