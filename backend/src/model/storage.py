@@ -1,11 +1,18 @@
 from datetime import date
 
-from sqlalchemy import func
+from sqlalchemy import Select, select
+from sqlalchemy.sql import func
 from sqlalchemy.ext.asyncio import AsyncSession as Session
 
 
 from src.model.model import PublicationLinkType, SourceType, SourceLinkType, Identifier, SourceRatingType, Organization, \
     Source, SourceLink, PublicationType, Publication, PublicationLink
+
+
+async def get_count(q: Select, db: Session):
+    count_q = select(func.count()).select_from(q.subquery())
+    count = await db.execute(count_q)
+    return count.scalar()
 
 
 async def get_or_create_publication_link_type(name: str, db: Session):

@@ -14,8 +14,7 @@ engine = create_async_engine(DATABASE_URL, echo=True)
 session_local = sessionmaker(
         engine,
         class_=AsyncSession,
-        autocommit=False,
-        autoflush=False,
+        expire_on_commit=False,
     )
 
 

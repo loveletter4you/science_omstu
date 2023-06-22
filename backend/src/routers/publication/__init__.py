@@ -5,8 +5,7 @@ from src.model.database import get_db
 from src.routers.publication.controller import controller_get_publications, controller_get_publication_by_id, \
     controller_get_publication_types
 from src.routers.publication.schema import Publication_params
-from src.schemas.routers import SchemePublicationsRouter, SchemePublicationRouter
-
+from src.schemas.routers import SchemePublicationsRouter, SchemePublicationRouter, SchemePublicationTypesRouter
 
 router = APIRouter(
     prefix="/api/publication",
@@ -15,7 +14,7 @@ router = APIRouter(
 )
 
 
-@router.get("/publication_types")
+@router.get("/publication_types", response_model=SchemePublicationTypesRouter)
 async def get_publication_types(db: Session = Depends(get_db)):
     publication_types = await controller_get_publication_types(db)
     return publication_types

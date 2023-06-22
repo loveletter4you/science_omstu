@@ -9,13 +9,13 @@ from src.schemas.schemas import SchemeFeedbackOutput
 
 async def service_create_admin(db: Session):
     admin_role_result = await db.execute(select(Role).filter(Role.name == "Admin"))
-    admin_role = admin_role_result.scalars().one()
+    admin_role = admin_role_result.scalars().first()
     if admin_role is None:
         admin_role = Role(name="Admin")
         db.add(admin_role)
         await db.commit()
     admin_result = await db.execute(select(User).filter(User.login == ADMIN_LOGIN))
-    admin = admin_result.scalars().one()
+    admin = admin_result.scalars().first()
     if admin is None:
         admin = User(login=ADMIN_LOGIN, password=bcrypt.hash(ADMIN_PASSWORD), role=admin_role)
         db.add(admin)

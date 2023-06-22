@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 from src.schemas.schemas import SchemePublication, SchemePublicationPage, SchemeAuthor, \
     SchemeAuthorProfile, SchemeSourceWithType, SchemeSourceWithRating, SchemeFeedback, SchemeFeedbackOutput, \
-    SchemeAnalysis, SchemeAnalysisRating, SchemeAnalysisOrganization
+    SchemeAnalysis, SchemeAnalysisRating, SchemeAnalysisOrganization, SchemePublicationType
 
 
 class SchemePublicationsRouter(BaseModel):
@@ -55,3 +55,7 @@ class SchemeAnalysisRatingRouter(BaseModel):
 
 class SchemeAnalysisOrganizationRouter(BaseModel):
     result: List[SchemeAnalysisOrganization]
+
+
+class SchemePublicationTypesRouter(BaseModel):
+    publication_types: List[SchemePublicationType]
