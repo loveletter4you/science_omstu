@@ -1,7 +1,7 @@
 import datetime
 
 from sqlalchemy import and_
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession as Session
 
 from src.model.model import Identifier, AuthorIdentifier, PublicationLink, Publication, Source, SourceLink, Author, \
     AuthorPublication, AuthorPublicationOrganization, Organization

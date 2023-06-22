@@ -1,6 +1,6 @@
 import pandas as pd
 from sqlalchemy import func, desc, and_
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession as Session
 from fastapi.responses import StreamingResponse
 
 from src.model.model import Publication, PublicationType, SourceRatingType, SourceRating, Source, Organization, \

@@ -1,5 +1,5 @@
 from fastapi import HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession as Session
 
 from src.routers.publication.schema import Publication_params
 from src.routers.publication.service import service_get_publications, service_get_publication, \

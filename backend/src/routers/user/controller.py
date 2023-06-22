@@ -1,5 +1,5 @@
 from fastapi import security, HTTPException, status, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession as Session
 import jwt as _jwt
 
 from settings_env import SECRET_KEY

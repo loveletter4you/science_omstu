@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, security
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession as Session
 from starlette.responses import JSONResponse
 
 from settings_env import DOMAIN, SECURE_COOKIE

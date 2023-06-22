@@ -1,10 +1,10 @@
 from typing import Optional
 
-from fastapi import security, Request, status, HTTPException
+from fastapi import Request, status, HTTPException
 from fastapi.security import OAuth2
 from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
 from fastapi.security.utils import get_authorization_scheme_param
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession as Session
 import jwt as _jwt
 
 from settings_env import SECRET_KEY

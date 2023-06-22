@@ -1,7 +1,6 @@
 from fastapi import HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession as Session
 
-from src.model.database import get_db
 from src.routers.feedback.service import service_post_feedback
 from src.schemas.routers import SchemeFeedbackPostRouter
 

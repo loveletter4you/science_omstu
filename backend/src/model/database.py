@@ -1,32 +1,29 @@
-from sqlalchemy import create_engine, orm
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.orm import sessionmaker
 
 from settings_env import DB_NAME, DB_HOST, DB_ROOT, DB_PASSWORD
 
 
-DATABASE_URL: str = f"postgresql+psycopg2://{DB_ROOT}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
+DATABASE_URL: str = f"postgresql+asyncpg://{DB_ROOT}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
 Base = declarative_base()
 
-engine = create_engine(DATABASE_URL, client_encoding='utf8')
+engine = create_async_engine(DATABASE_URL, echo=True)
 
-session_local = orm.sessionmaker(
+session_local = sessionmaker(
+        engine,
+        class_=AsyncSession,
         autocommit=False,
         autoflush=False,
-        bind=engine,
     )
 
 
-def create_db():
-    Base.metadata.create_all(engine)
+async def init_models():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
 
-def get_db():
-    session: Session = session_local()
-    try:
+async def get_db():
+    async with session_local() as session:
         yield session
-    except Exception:
-        session.rollback()
-        raise
-    finally:
-        session.close()

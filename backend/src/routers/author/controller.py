@@ -1,5 +1,5 @@
-from fastapi import HTTPException, status, UploadFile
-from sqlalchemy.orm import Session
+from fastapi import HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession as Session
 
 from src.routers.admin.service import service_admin_check
 from src.routers.author.service import service_get_authors, service_get_authors_search, \

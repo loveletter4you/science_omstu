@@ -1,13 +1,13 @@
 from datetime import date
 
 from fastapi import HTTPException, status, UploadFile
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession as Session
 
 from src.routers.admin.openalex_service import service_update_from_openalex
 from src.routers.admin.pandas_service import service_fill_authors, service_fill_scopus, service_white_list_fill, \
     service_jcr_list_fill, service_white_list_jcr_citescore, service_fill_vak_journals_rank, \
     service_fill_rsci_journals_rank, service_fill_elibrary, service_fill_author_department
-from src.routers.admin.service import service_create_admin, service_admin_check, service_get_feedbacks
+from src.routers.admin.service import service_admin_check, service_get_feedbacks
 from src.schemas.schemas import SchemeUser
 
 
@@ -18,11 +18,6 @@ async def controller_get_feedbacks(page: int, limit: int, solved: bool, user: Sc
     offset = page * limit
     feedbacks = await service_get_feedbacks(offset, limit, solved, db)
     return feedbacks
-
-
-async def controller_create_admin(db: Session):
-    message = await service_create_admin(db)
-    return message
 
 
 async def controller_fill_authors(file: UploadFile, user: SchemeUser, db: Session):

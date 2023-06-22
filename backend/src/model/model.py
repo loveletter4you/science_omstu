@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String, Boolean, Integer, Date, ForeignKey, Float
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Relationship
 from passlib.hash import bcrypt
 
 from src.model.database import Base
@@ -9,7 +9,7 @@ class Role(Base):
     __tablename__ = "role"
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True)
-    users = relationship("User", backref='role')
+    users = Relationship("User", backref='role')
 
 
 class User(Base):
@@ -19,7 +19,7 @@ class User(Base):
     login = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
     role_id = Column(Integer, ForeignKey('role.id'))
-    author = relationship("Author", uselist=False)
+    author = Relationship("Author", uselist=False)
 
     def verify_password(self, password: str):
         return bcrypt.verify(password, self.password)
@@ -34,16 +34,16 @@ class Author(Base):
     birthday = Column(Date)
     confirmed = Column(Boolean, nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'))
-    author_identifiers = relationship("AuthorIdentifier", backref='author')
-    author_publications = relationship("AuthorPublication", backref='author')
-    author_departments = relationship("AuthorDepartment", backref='author')
+    author_identifiers = Relationship("AuthorIdentifier", backref='author')
+    author_publications = Relationship("AuthorPublication", backref='author')
+    author_departments = Relationship("AuthorDepartment", backref='author')
 
 
 class Faculty(Base):
     __tablename__ = "faculty"
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    departments = relationship("Department", backref='faculty')
+    departments = Relationship("Department", backref='faculty')
 
 
 class Department(Base):
@@ -51,7 +51,7 @@ class Department(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     faculty_id = Column(Integer, ForeignKey('faculty.id'), nullable=False)
-    department_authors = relationship("AuthorDepartment", backref='department')
+    department_authors = Relationship("AuthorDepartment", backref='department')
 
 
 class AuthorDepartment(Base):
@@ -67,7 +67,7 @@ class Identifier(Base):
     __tablename__ = "identifier"
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False, unique=True)
-    author_identifiers = relationship("AuthorIdentifier", backref='identifier')
+    author_identifiers = Relationship("AuthorIdentifier", backref='identifier')
 
 
 class AuthorIdentifier(Base):
@@ -82,21 +82,21 @@ class SourceType(Base):
     __tablename__ = "source_type"
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False, unique=True)
-    sources = relationship("Source", backref="source_type")
+    sources = Relationship("Source", backref="source_type")
 
 
 class SourceLinkType(Base):
     __tablename__ = "source_link_type"
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False, unique=True)
-    source_links = relationship("SourceLink", backref='source_link_type')
+    source_links = Relationship("SourceLink", backref='source_link_type')
 
 
 class SourceRatingType(Base):
     __tablename__ = "source_rating_type"
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False, unique=True)
-    source_ratings = relationship("SourceRating", backref='source_rating_type')
+    source_ratings = Relationship("SourceRating", backref='source_rating_type')
 
 
 class Source(Base):
@@ -104,9 +104,9 @@ class Source(Base):
     id = Column(Integer, primary_key=True)
     source_type_id = Column(Integer, ForeignKey('source_type.id'), nullable=False)
     name = Column(String, nullable=False)
-    source_links = relationship("SourceLink", backref='source')
-    source_ratings = relationship("SourceRating", backref='source')
-    publications = relationship("Publication", backref='source')
+    source_links = Relationship("SourceLink", backref='source')
+    source_ratings = Relationship("SourceRating", backref='source')
+    publications = Relationship("Publication", backref='source')
 
 
 class SourceLink(Base):
@@ -130,7 +130,7 @@ class PublicationType(Base):
     __tablename__ = "publication_type"
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False, unique=True)
-    publications = relationship("Publication", backref='publication_type')
+    publications = Relationship("Publication", backref='publication_type')
 
 
 class Publication(Base):
@@ -142,16 +142,16 @@ class Publication(Base):
     abstract = Column(String)
     publication_date = Column(Date, nullable=False)
     accepted = Column(Boolean, nullable=False)
-    keyword_publications = relationship("KeywordPublication", backref="publication")
-    publication_authors = relationship("AuthorPublication", backref="publication")
-    publication_links = relationship("PublicationLink", backref="publication")
+    keyword_publications = Relationship("KeywordPublication", backref="publication")
+    publication_authors = Relationship("AuthorPublication", backref="publication")
+    publication_links = Relationship("PublicationLink", backref="publication")
 
 
 class Keyword(Base):
     __tablename__ = "keyword"
     id = Column(Integer, primary_key=True)
     keyword = Column(String, nullable=False, unique=True)
-    keyword_publications = relationship("KeywordPublication", backref="keyword")
+    keyword_publications = Relationship("KeywordPublication", backref="keyword")
 
 
 class KeywordPublication(Base):
@@ -167,7 +167,7 @@ class Organization(Base):
     name = Column(String, nullable=False, unique=True)
     country = Column(String)
     city = Column(String)
-    author_publication_organizations = relationship("AuthorPublicationOrganization", backref="organization")
+    author_publication_organizations = Relationship("AuthorPublicationOrganization", backref="organization")
 
 
 class AuthorPublication(Base):
@@ -175,7 +175,7 @@ class AuthorPublication(Base):
     id = Column(Integer, primary_key=True)
     author_id = Column(Integer, ForeignKey("author.id"), nullable=False)
     publication_id = Column(Integer, ForeignKey("publication.id"), nullable=False)
-    author_publication_organizations = relationship("AuthorPublicationOrganization", backref="author_publication")
+    author_publication_organizations = Relationship("AuthorPublicationOrganization", backref="author_publication")
 
 
 class AuthorPublicationOrganization(Base):
@@ -189,7 +189,7 @@ class PublicationLinkType(Base):
     __tablename__ = "publication_link_type"
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False, unique=True)
-    publication_links = relationship("PublicationLink", backref="publication_link_type")
+    publication_links = Relationship("PublicationLink", backref="publication_link_type")
 
 
 class PublicationLink(Base):

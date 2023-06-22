@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from fastapi import UploadFile
 from sqlalchemy import and_, or_
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession as Session
 
 import datetime
 import re

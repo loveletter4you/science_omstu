@@ -1,5 +1,5 @@
 from sqlalchemy import desc
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession as Session
 
 from src.model.model import Department, Faculty, Publication, Author, AuthorPublication, AuthorDepartment
 from src.schemas.schemas import SchemeDepartment, SchemeFaculty, SchemePublication, SchemeAuthor

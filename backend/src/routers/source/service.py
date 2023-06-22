@@ -1,5 +1,5 @@
 from sqlalchemy import func, desc, or_
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession as Session
 
 from src.model.model import Source, Publication, SourceLink, SourceRatingType
 from src.schemas.schemas import SchemeSourceWithType, SchemeSourceWithRating, SchemePublication

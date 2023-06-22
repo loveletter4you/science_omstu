@@ -1,10 +1,10 @@
 from datetime import date
 
 from fastapi import APIRouter, Depends, UploadFile, File
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession as Session
 
 from src.model.database import get_db
-from src.routers.admin.controller import controller_create_admin, controller_get_feedbacks, controller_fill_authors, \
+from src.routers.admin.controller import controller_get_feedbacks, controller_fill_authors, \
     controller_fill_scopus, controller_fill_white_list, controller_jcr_list_fill, controller_whitelist_jcr_citescore, \
     controller_vak_journals_rank, controller_rsci_journals_rank, controller_fill_from_openalex, \
     controller_fill_elibrary, controller_fill_author_departments
@@ -17,12 +17,6 @@ router = APIRouter(
     tags=["admin"],
     responses={404: {"description": "Not found"}}
 )
-
-
-# @router.get("/create_admin")
-# async def create_admin(db: Session = Depends(get_db)):
-#     message = await controller_create_admin(db)
-#     return message
 
 
 @router.get("/feedbacks", response_model=SchemeFeedbacksGetRouter)

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession as Session
 from src.model.database import get_db
 from src.routers.analysis.service import get_service_analysis, get_source_rating, get_organization, \
     get_organization_collaborations, service_author_analysis, service_docent_analysis

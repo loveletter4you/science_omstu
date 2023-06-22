@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession as Session
 
 from src.model.database import get_db
 from src.routers.department.controller import controller_get_departments, controller_get_faculties, \
