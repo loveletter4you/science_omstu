@@ -1,39 +1,20 @@
-.theme {
+.container {
+    display: grid;
+    grid-template-areas:
+            'count search'
+            'filter authors'
+            'pagination pagination';
+    grid-auto-columns: 270px 930px;
+    grid-auto-flow: dense;
     color: var(--color-font);
-}
-
-.item {
-    padding-left: 0px;
-}
-
-.list__item {
-    font-size: 18px;
-    border: none;
-    outline: none;
-    list-style-type: none;
-    margin-bottom: 5px;
-}
-
-.list__item a {
-    text-decoration: none;
-    color: var(--color-font);
-}
-
-.list__item a:hover {
-    color: #06c895;
 }
 
 .block {
-    display: flex;
-    flex-direction: column;
-}
-
-.block__item {
-    display: flex;
-    justify-content: space-between;
+    grid-area: authors;
 }
 
 .size {
+    grid-area: filter;
     padding-top: 15px;
     color: var(--color-font);
 }
@@ -54,4 +35,32 @@
     color: #06c895;
     font-family: 'Aeroport-Bold';
     font-weight: bold;
+}
+
+.blockCount{
+    grid-area: count;
+}
+
+.count{
+    font-size: 24px;
+    color: #06c895;
+}
+
+.ulAuthors{
+    padding-left: 0px;
+}
+
+.ulAuthors li{
+    list-style: none;
+    padding-bottom: 5px;
+}
+
+.ulAuthors li a{
+    font-size: 18px;
+    text-decoration: none;
+    color: black;
+}
+
+.ulAuthors li a:hover{
+    color: #06c895;
 }

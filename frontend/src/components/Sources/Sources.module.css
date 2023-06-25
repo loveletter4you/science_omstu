@@ -1,7 +1,7 @@
 .container {
     display: grid;
     grid-template-areas:
-            'search search'
+            'count search'
             'filter source'
             'pagination pagination';
     grid-auto-columns: 270px 930px;
@@ -32,6 +32,7 @@
 }
 
 .size {
+    grid-area: filter;
     padding-top: 15px;
 }
 
@@ -50,6 +51,15 @@
 .size li:active {
     color: #06c895;
     font-weight: bold;
+}
+.blockCount{
+    grid-area: count;
+    padding: 5px 10px;
+}
+
+.count{
+    font-size: 24px;
+    color: #06c895;
 }
 
 @media (max-width: 1201px) {

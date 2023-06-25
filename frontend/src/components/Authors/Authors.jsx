@@ -42,45 +42,40 @@ const Authors = () => {
         }
     }, [pageSize, debouncedSearch[0]]);
 
-    return (<div color={style.theme}>
-            <div className={style.block}>
-                <input className={styleSearch.search} placeholder='Поиск' type="text" value={search}
-                       onChange={onSearchChange}/>
+    return (<div className={style.container}>
+            <input className={styleSearch.search} placeholder='Поиск' type="text" value={search}
+                   onChange={onSearchChange}/>
+            <div className={style.blockCount}>
+                <div>Колличество найденных <br></br>авторов: <span className={style.count}>{count}</span></div>
+            </div>
+            <div className={style.size}>
+                Отображать по:
+                <ul>
+                    <li onClick={() => {
+                        dispatch(setSize(30));
+                    }}>30
+                    </li>
+                    <li onClick={() => {
+                        dispatch(setSize(60));
+                    }}>60
+                    </li>
+                    <li onClick={() => {
+                        dispatch(setSize(90));
+                    }}>90
+                    </li>
+                </ul>
             </div>
             {isFetching === true ? <Preloader/> :
-                <div>
-                    <div className={style.block}>
-                        <div className={style.size}>
-                            Отображать по:
-                            <ul>
-                                <li onClick={() => {
-                                    dispatch(setSize(30));
-                                }}>30
-                                </li>
-                                <li onClick={() => {
-                                    dispatch(setSize(60));
-                                }}>60
-                                </li>
-                                <li onClick={() => {
-                                    dispatch(setSize(90));
-                                }}>90
-                                </li>
-                            </ul>
-                        </div>
-                        <div className={style.block__item}>
-                            <ul className={style.item}>
-                                {authors.map((author, index) =>
-                                    <li key={index} className={style.list__item}>
-                                        <NavLink to={'/author/' + author.id}>
-                                            {author.surname} {author.name} {author.patronymic}
-                                        </NavLink>
-                                    </li>
-                                )}
-                            </ul>
-
-                        </div>
-
-                    </div>
+                <div className={style.block}>
+                    <ul className={style.ulAuthors}>
+                        {authors.map((author, index) =>
+                            <li key={index}>
+                                <NavLink to={'/author/' + author.id}>
+                                    {author.surname} {author.name} {author.patronymic}
+                                </NavLink>
+                            </li>
+                        )}
+                    </ul>
                 </div>
             }
             <ReactPaginate

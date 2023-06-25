@@ -32,12 +32,10 @@ const AnalysisDate = () => {
             bottom: 50,
             left: 80
         },
-        pixelRatio: "Depends on device",
+
         colors: "#06c895",
 
-        animate: true,
-        motionConfig: "default",
-        isInteractive: true,
+
         colorBy: "id",
         indexBy: "year",
         groupMode: "grouped",
@@ -69,6 +67,7 @@ const AnalysisDate = () => {
             from: "color",
             modifiers: [["darker", "1.6"]]
         },
+        isInteractive: false,
         enableLabel: true,
         labelSkipWidth: 0,
         labelSkipHeight: 0,
@@ -83,8 +82,8 @@ const AnalysisDate = () => {
         <div>
             Колличество публикаций в университете за год
         </div>
-        <div style={{height: 400}}>
-            <ResponsiveBar {...YearData}/>
+        <div id = 'block' style={{height: 400}}>
+            <ResponsiveBar {...YearData} />
         </div>
         <div>
             Колличество публикаций университета в рейтингах
@@ -140,6 +139,7 @@ const AnalysisDate = () => {
                 animate={true}
                 motionConfig="default"
                 isInteractive={true}
+
                 axisBottom={{
                     tickSize: 5,
                     tickPadding: 5,
@@ -182,6 +182,7 @@ const AnalysisDate = () => {
                 margin={{top: 50, right: 130, bottom: 50, left: 60}}
                 padding={0.3}
                 groupMode="grouped"
+
                 valueScale={{type: 'linear'}}
                 indexScale={{type: 'band', round: true}}
                 colors={{scheme: 'nivo'}}
@@ -224,15 +225,7 @@ const AnalysisDate = () => {
                 axisRight={null}
                 animate={true}
                 motionConfig="default"
-                isInteractive={true}
-                axisBottom={{
-                    tickSize: 5,
-                    tickPadding: 5,
-                    tickRotation: 0,
-                    legend: 'Университет',
-                    legendPosition: 'middle',
-                    legendOffset: 32
-                }}
+                axisBottom={null}
                 axisLeft={{
                     tickSize: 5,
                     tickPadding: 5,

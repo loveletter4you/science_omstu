@@ -37,6 +37,9 @@ const Sources = () => {
 
     return <div className={style.container}>
         <input className={styleSearch.search} placeholder='Поиск' type="text" value={search} onChange={onSearchChange}/>
+        <div className={style.blockCount}>
+            <div>Колличество найденных <br></br>источников: <span className={style.count}>{count}</span></div>
+        </div>
         <div className={style.size}>
             Отображать по:
             <ul>

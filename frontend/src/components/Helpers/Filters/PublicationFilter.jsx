@@ -126,7 +126,11 @@ const PublicationFilter = () => {
                     </select>
                 </div>
                 <div>
+<<<<<<< Updated upstream
                     <input className={style.dataName} type={"submit"} value={"Применить"}/>
+=======
+                    <input className={style.dataName} type={"submit"} value={'Применить'}/>
+>>>>>>> Stashed changes
                 </div>
             </form>
         </div>
