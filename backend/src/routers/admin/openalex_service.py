@@ -1,7 +1,8 @@
-import datetime
+from datetime import date
 
-from sqlalchemy import and_
+from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession as Session
+from sqlalchemy.orm import joinedload
 
 from src.model.model import Identifier, AuthorIdentifier, PublicationLink, Publication, Source, SourceLink, Author, \
     AuthorPublication, AuthorPublicationOrganization, Organization
@@ -12,23 +13,25 @@ from src.utils.aiohttp import SingletonAiohttp
 
 
 async def service_update_from_openalex(db: Session):
-    identifier_orcid = db.query(Identifier).filter(Identifier.name == "ORCID").first()
-    pub_link_type_doi = get_or_create_publication_link_type("DOI", db)
-    source_link_type_issn = get_or_create_source_link_type("ISSN", db)
-    source_link_type_eissn = get_or_create_source_link_type("eISSN", db)
-    source_type_journal = get_or_create_source_type("Журнал", db)
-    source_type_conference = get_or_create_source_type("Конференция", db)
-    organization_omstu = get_or_create_organization_omstu(db)
+    identifier_orcid_result = await db.execute(select(Identifier).filter(Identifier.name == "ORCID"))
+    identifier_orcid = identifier_orcid_result.scalars().first()
+    pub_link_type_doi = await get_or_create_publication_link_type("DOI", db)
+    source_link_type_issn = await get_or_create_source_link_type("ISSN", db)
+    source_link_type_eissn = await get_or_create_source_link_type("eISSN", db)
+    source_type_journal = await get_or_create_source_type("Журнал", db)
+    source_type_conference = await get_or_create_source_type("Конференция", db)
+    organization_omstu = await get_or_create_organization_omstu(db)
 
     if identifier_orcid is None:
         return None
-    orcids = db.query(AuthorIdentifier).join(Author).filter(AuthorIdentifier.identifier == identifier_orcid)\
-        .filter(Author.confirmed).all()
+    orcids_result = await db.execute(select(AuthorIdentifier).join(Author)
+                                     .filter(AuthorIdentifier.identifier == identifier_orcid).filter(Author.confirmed))
+    orcids = orcids_result.scalars().all()
     for orcid in orcids:
         filters = f'author.orcid:https://orcid.org/{orcid.identifier_value}'
         filtered_works_url = f'https://api.openalex.org/works?filter={filters}'
         cursor = '*'
-        select = ",".join((
+        select_openalex = ",".join((
             'id',
             'doi',
             'ids',
@@ -49,10 +52,13 @@ async def service_update_from_openalex(db: Session):
         ))
         works = []
         while cursor:
-            url = f'{filtered_works_url}&select={select}&cursor={cursor}'
+            url = f'{filtered_works_url}&select={select_openalex}&cursor={cursor}'
             page_with_results = await SingletonAiohttp.query_url(url)
             results = page_with_results['results']
-            print(results)
+            try:
+                print(results)
+            except:
+                pass
             works.extend(results)
 
             cursor = page_with_results['meta']['next_cursor']
@@ -60,7 +66,8 @@ async def service_update_from_openalex(db: Session):
         for work in works:
             if work['doi']:
                 doi = work['doi'].replace('https://doi.org/', '')
-                link_doi = db.query(PublicationLink).filter(PublicationLink.link == doi).first()
+                link_doi_result = await db.execute(select(PublicationLink).filter(PublicationLink.link == doi))
+                link_doi = link_doi_result.scalars().first()
                 if link_doi is not None:
                     continue
             else:
@@ -69,7 +76,9 @@ async def service_update_from_openalex(db: Session):
                 continue
             if not work['primary_location']['source']:
                 continue
-            publication = db.query(Publication).filter(Publication.title.ilike(work['title'])).first()
+            print(work['doi'])
+            publication_result = await db.execute(select(Publication).filter(Publication.title.ilike(work['title'])))
+            publication = publication_result.scalars().first()
             if publication is not None:
                 continue
             issns = work['primary_location']['source']['issn']
@@ -78,7 +87,7 @@ async def service_update_from_openalex(db: Session):
                 source_title = work['primary_location']['source']['display_name']
             source = None
             if not (issns is None):
-                source = get_source_by_name_or_identifiers(source_title, issns, db)
+                source = await get_source_by_name_or_identifiers(source_title, issns, db)
             if source is None:
                 if source_title == '':
                     continue
@@ -109,16 +118,18 @@ async def service_update_from_openalex(db: Session):
                             link=issns[0]
                         )
                         db.add(source_link_issn)
-            publication_type = get_or_create_publication_type(work["type"].replace('-', ' ').title(), db)
+            publication_type = await get_or_create_publication_type(work["type"].replace('-', ' ').title(), db)
             date_values = [int(i) for i in work['publication_date'].split('-')]
-            date = datetime.date(date_values[0], date_values[1], date_values[2])
+            date_openalex = date(date_values[0], date_values[1], date_values[2])
             abstract: str | None
             if work['abstract_inverted_index']:
                 abstract = inverted_index_to_string(work['abstract_inverted_index'])
             else:
                 abstract = None
-            publication = create_publication(publication_type, source, work['title'], abstract, date, True, db)
-            create_publication_link(publication, pub_link_type_doi, work['doi'].replace('https://doi.org/', ''), db)
+            publication = await create_publication(publication_type, source, work['title'], abstract,
+                                                   date_openalex, True, db)
+            await create_publication_link(publication, pub_link_type_doi,
+                                          work['doi'].replace('https://doi.org/', ''), db)
             for author in work['authorships']:
                 author_db: Author | None
                 author_name = "undefined undefined"
@@ -126,9 +137,11 @@ async def service_update_from_openalex(db: Session):
                     author_name = author['author']['display_name'].split(' ', maxsplit=1)
                 if author['author']['orcid']:
                     orcid = author['author']['orcid'].replace('https://orcid.org/', '')
-                    identifier = db.query(AuthorIdentifier). \
-                        filter(and_(AuthorIdentifier.identifier_id == identifier_orcid.id,
-                                    AuthorIdentifier.identifier_value == orcid)).first()
+                    identifier_result = await db.execute(select(AuthorIdentifier)
+                    .filter(
+                        and_(AuthorIdentifier.identifier_id == identifier_orcid.id,
+                             AuthorIdentifier.identifier_value == orcid)).options(joinedload(AuthorIdentifier.author)))
+                    identifier = identifier_result.scalars().first()
                     if identifier is None:
                         if len(author_name) > 1:
                             author_db = Author(
@@ -153,11 +166,15 @@ async def service_update_from_openalex(db: Session):
                         author_db = identifier.author
                 else:
                     if len(author_name) > 1:
-                        author_db = db.query(Author).filter(and_(Author.name == author_name[0],
-                                                          Author.surname == author_name[1])).first()
+                        author_db_result = await db.execute(select(Author)
+                                                            .filter(and_(Author.name == author_name[0],
+                                                                         Author.surname == author_name[1])))
+                        author_db = author_db_result.scalars().first()
                     else:
-                        author_db = db.query(Author).filter(and_(Author.name == '-',
-                                                                 Author.surname == author_name[0])).first()
+                        author_db_result = await db.execute(select(Author)
+                                                            .filter(and_(Author.name == '-',
+                                                                         Author.surname == author_name[0])))
+                        author_db = author_db_result.scalars().first()
                     if author_db is None:
                         if len(author_name) > 1:
                             author_db = Author(
@@ -187,8 +204,9 @@ async def service_update_from_openalex(db: Session):
                         )
                         db.add(author_publication_organization)
                     else:
-                        organization = db.query(Organization)\
-                            .filter(Organization.name == institute['display_name']).first()
+                        organization_result = await db.execute(select(Organization)
+                                                               .filter(Organization.name == institute['display_name']))
+                        organization = organization_result.scalars().first()
                         if organization is None:
                             organization = Organization(name=institute['display_name'])
                             db.add(organization)
@@ -197,8 +215,8 @@ async def service_update_from_openalex(db: Session):
                             organization=organization
                         )
                         db.add(author_publication_organization)
-                    db.commit()
-            db.commit()
+                    await db.commit()
+            await db.commit()
     return {"message": "OK"}
 
 

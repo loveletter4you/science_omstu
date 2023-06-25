@@ -1,34 +1,37 @@
 from sqlalchemy import func, desc, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession as Session
+from sqlalchemy.orm import joinedload
 
-from src.model.model import Source, Publication, SourceLink, SourceRatingType
+from src.model.model import Source, Publication, SourceLink, SourceRatingType, SourceRating, AuthorPublication
 from src.model.storage import get_count
 from src.schemas.schemas import SchemeSourceWithType, SchemeSourceWithRating, SchemePublication
 
 
 async def service_get_sources(offset: int, limit: int, db: Session):
-    query = select(Source).join(Publication, isouter=True).order_by(desc(func.count(Source.id))).group_by(Source.id)
+    query = select(Source).options(joinedload(Source.source_type))
     sources_result = await db.execute(query.offset(offset).limit(limit))
-    sources = sources_result.scalars().all()
-    count = get_count(query, db)
+    sources = sources_result.scalars().unique().all()
+    count = await get_count(query, db)
     scheme_sources = [SchemeSourceWithType.from_orm(source) for source in sources]
     return dict(sources=scheme_sources, count=count)
 
 
 async def service_get_sources_search(search: str, offset: int, limit: int, db: Session):
-    query = db.query(Source).join(Publication, isouter=True).order_by(desc(func.count(Source.id)))
-    query = query.join(SourceLink)\
-        .filter(or_(func.replace(SourceLink.link, '-', '').contains(search.replace('-', '')),
-                                                         func.lower(Source.name).contains(search.lower())))\
-        .group_by(Source.id)
-    sources = query.offset(offset).limit(limit).all()
-    count = query.count()
+    query = select(Source).options(joinedload(Source.source_type))
+    query = query.filter(func.lower(Source.name).contains(search.lower()))
+    sources_result = await db.execute(query.offset(offset).limit(limit))
+    sources = sources_result.scalars().unique().all()
+    count = await get_count(query, db)
     scheme_sources = [SchemeSourceWithType.from_orm(source) for source in sources]
     return dict(sources=scheme_sources, count=count)
 
 
 async def service_get_source(id: int, db: Session):
-    source = db.query(Source).filter(Source.id == id).first()
+    query = select(Source).filter(Source.id == id).options(joinedload(Source.source_type))\
+        .options(joinedload(Source.source_links).joinedload(SourceLink.source_link_type))\
+        .options(joinedload(Source.source_ratings).joinedload(SourceRating.source_rating_type))
+    source_result = await db.execute(query)
+    source = source_result.scalars().first()
     if source is None:
         return False
     scheme_source = SchemeSourceWithRating.from_orm(source)
@@ -36,11 +39,16 @@ async def service_get_source(id: int, db: Session):
 
 
 async def service_get_source_publications(id: int, offset: int, limit: int, db: Session):
-    query = db.query(Publication).join(Source).order_by(desc(Publication.publication_date))\
+    query = select(Publication).join(Source).order_by(desc(Publication.publication_date))\
         .order_by(Publication.title).filter(Source.id == id)
-    publications = query.offset(offset).limit(limit).all()
+    publications_result = await db.execute(query.options(joinedload(Publication.publication_type))
+                                    .options(joinedload(Publication.source))
+                                    .options(joinedload(Publication.publication_authors)
+                                             .joinedload(AuthorPublication.author))
+                                    .offset(offset).limit(limit))
+    publications = publications_result.scalars().unique().all()
     scheme_publications = [SchemePublication.from_orm(publication) for publication in publications]
-    count = query.count()
+    count = await get_count(query, db)
     return dict(publications=scheme_publications, count=count)
 
 

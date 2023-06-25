@@ -1,9 +1,9 @@
 from sqlalchemy import or_, and_, func, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession as Session
-from sqlalchemy.orm import selectinload, joinedload
+from sqlalchemy.orm import joinedload
 
 from src.model.model import Author, AuthorPublication, Publication, AuthorIdentifier, AuthorPublicationOrganization, \
-    Identifier, AuthorDepartment, Department, Faculty
+    AuthorDepartment, Department
 from src.model.storage import get_or_create_organization_omstu, get_count
 from src.schemas.schemas import SchemePublication, SchemeAuthor, SchemeAuthorProfile
 
@@ -38,8 +38,11 @@ async def service_get_authors_search(search: str, offset: int, limit: int, confi
 
 async def service_get_author(id: int, db: Session):
     author_result = await db.execute(select(Author).filter(Author.id == id)
-                                     .options(joinedload(Author.author_departments),
-                                              joinedload(Author.author_identifiers)))
+                                     .options(joinedload(Author.author_departments).
+                                              joinedload(AuthorDepartment.department).
+                                              joinedload(Department.faculty))
+                                     .options(joinedload(Author.author_identifiers).
+                                              joinedload(AuthorIdentifier.identifier)))
     author = author_result.scalars().first()
     if author is None:
         return False
@@ -51,14 +54,19 @@ async def service_get_author_publications(id: int, offset: int, limit: int, db: 
     query = select(Publication).join(AuthorPublication, Publication.id == AuthorPublication.publication_id) \
         .order_by(desc(Publication.publication_date)) \
         .order_by(Publication.title).filter(AuthorPublication.author_id == id)
-    publications = await db.execute(query.offset(offset).limit(limit))
-    scheme_publications = [SchemePublication.from_orm(publication) for publication in publications.scalars().all()]
-    count = await db.execute(query)
+    publications = await db.execute(query.options(joinedload(Publication.publication_type))
+                                    .options(joinedload(Publication.source))
+                                    .options(joinedload(Publication.publication_authors)
+                                             .joinedload(AuthorPublication.author))
+                                    .offset(offset).limit(limit))
+    scheme_publications = [SchemePublication.from_orm(publication) for publication
+                           in publications.scalars().unique().all()]
+    count = await get_count(query, db)
     return dict(publications=scheme_publications, count=count)
 
 
 async def service_get_unconfirmed_omstu_authors(search: str, offset: int, limit: int, db: Session):
-    organization_omstu = get_or_create_organization_omstu(db)
+    organization_omstu = await get_or_create_organization_omstu(db)
     if not search:
         query = select(Author).filter(Author.confirmed == False).join(AuthorPublication) \
             .join(AuthorPublicationOrganization) \
@@ -96,7 +104,7 @@ async def service_merge_authors(id_base: int, id_merge: int, db: Session):
     merge_author_publcations = merge_author_publcations_result.scalars().all()
     merge_author_identifiers_result = await db.execute(select(AuthorIdentifier)
                                                        .filter(AuthorIdentifier.author == merged_author))
-    merge_author_identifiers = await merge_author_identifiers_result.scalars().all()
+    merge_author_identifiers = merge_author_identifiers_result.scalars().all()
     for identifier in merge_author_identifiers:
         identifier.author = base_author
         await db.commit()

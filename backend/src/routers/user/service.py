@@ -4,6 +4,7 @@ from fastapi import Request, status, HTTPException
 from fastapi.security import OAuth2
 from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
 from fastapi.security.utils import get_authorization_scheme_param
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession as Session
 import jwt as _jwt
 
@@ -13,7 +14,8 @@ from src.schemas.schemas import SchemeUser
 
 
 async def service_get_user_by_login(login: str, db: Session):
-    user = db.query(User).filter(User.login == login).first()
+    user_result = await db.execute(select(User).filter(User.login == login))
+    user = user_result.scalars().first()
     return user
 
 
@@ -24,7 +26,8 @@ async def service_create_token(user: User):
 
 
 async def service_get_user_by_id(id: int, db: Session):
-    user = db.query(User).filter(User.id == id).first()
+    user_result = await db.execute(select(User).filter(User.id == id))
+    user = user_result.scalars().first()
     return user
 
 

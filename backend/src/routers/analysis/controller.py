@@ -1,15 +1,21 @@
-# from fastapi import HTTPException, status
-# from sqlalchemy.orm import Session
-#
-# from src.routers.publication.service import service_get_publications, \
-#     service_get_publications_search, service_get_publication
-#
-#
-# async def controller_get_publications(search: str, page: int, limit: int, accepted: bool, db: Session):
-#     offset = page * limit
-#     if search is None:
-#         publications = await service_get_publications(offset, limit, accepted, db)
-#         return publications
-#     else:
-#         publications = await service_get_publications_search(search, offset, limit, accepted, db)
-#         return publications
+from sqlalchemy.ext.asyncio import AsyncSession as Session
+from datetime import date
+
+from src.routers.analysis.service import service_get_publication_count, service_get_source_rating_publications, \
+    service_get_organization_publication
+
+
+async def controller_get_publication_count(from_date: date, to_date: date, db: Session):
+    result = await service_get_publication_count(from_date, to_date, db)
+    return result
+
+
+async def controller_get_source_rating_publications(from_date: date, to_date: date, db: Session):
+    result = await service_get_source_rating_publications(from_date, to_date, db)
+    return result
+
+
+async def controller_get_organization_publications(search: str, max_count: int,
+                                                   from_date: date, to_date: date, db: Session):
+    result = await service_get_organization_publication(search, max_count, from_date, to_date, db)
+    return result

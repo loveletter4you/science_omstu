@@ -4,6 +4,7 @@ from passlib.hash import bcrypt
 
 from settings_env import ADMIN_LOGIN, ADMIN_PASSWORD
 from src.model.model import Role, User, Feedback
+from src.model.storage import get_count
 from src.schemas.schemas import SchemeFeedbackOutput
 
 
@@ -23,7 +24,8 @@ async def service_create_admin(db: Session):
 
 
 async def service_admin_check(role_id: int, db: Session):
-    role = db.query(Role).filter(Role.id == role_id).first()
+    role_result = await db.execute(select(Role).filter(Role.id == role_id))
+    role = role_result.scalars().first()
     if role is None:
         return False
     if role.name == "Admin":
@@ -32,8 +34,9 @@ async def service_admin_check(role_id: int, db: Session):
 
 
 async def service_get_feedbacks(offset: int, limit: int, solved: bool, db: Session):
-    query = db.query(Feedback).filter(Feedback.solved == solved).order_by(desc(Feedback.date))
-    feedbacks = query.offset(offset).limit(limit).all()
+    query = select(Feedback).filter(Feedback.solved == solved).order_by(desc(Feedback.date))
+    feedbacks_result = await db.execute(query.offset(offset).limit(limit))
+    feedbacks = feedbacks_result.scalars().all()
     scheme_feedbacks = [SchemeFeedbackOutput.from_orm(feedback) for feedback in feedbacks]
-    count = query.count()
+    count = await get_count(query, db)
     return dict(feedbacks=scheme_feedbacks, count=count)
