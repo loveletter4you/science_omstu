@@ -1,9 +1,9 @@
-from sqlalchemy import or_, and_, func, desc, select
+from sqlalchemy import or_, and_, func, desc, select, delete
 from sqlalchemy.ext.asyncio import AsyncSession as Session
 from sqlalchemy.orm import joinedload
 
 from src.model.model import Author, AuthorPublication, Publication, AuthorIdentifier, AuthorPublicationOrganization, \
-    AuthorDepartment, Department
+    AuthorDepartment, Department, Identifier
 from src.model.storage import get_or_create_organization_omstu, get_count
 from src.schemas.schemas import SchemePublication, SchemeAuthor, SchemeAuthorProfile
 
@@ -118,3 +118,49 @@ async def service_merge_authors(id_base: int, id_merge: int, db: Session):
     await db.commit()
 
     return dict(author_id=id_base)
+
+
+async def service_update_authors(id: int, name: str, surname: str, patronymic: str, confirmed: bool, db: Session):
+    author_result = await db.execute(select(Author).filter(Author.id == id))
+    author = author_result.scalars().first()
+
+    if author:
+        if name:
+            author.name = name
+        if surname:
+            author.surname = surname
+        if patronymic:
+            author.patronymic = patronymic
+        if not confirmed is None:
+            author.confirmed = confirmed
+        await db.commit()
+    return author
+
+
+async def service_update_author_identifier(author_iden_id: int, identifier_value: str, db: Session):
+    author_identifier_result = await db.execute(select(AuthorIdentifier).options(joinedload(AuthorIdentifier.identifier))
+                                                .filter(AuthorIdentifier.id == author_iden_id))
+    author_identifier = author_identifier_result.scalars().first()
+    if author_identifier:
+        author_identifier.identifier_value = identifier_value
+        await db.commit()
+    return author_identifier
+
+
+async def service_delete_author_identifier(item_id: int, db: Session):
+    await db.execute(delete(AuthorIdentifier).filter(AuthorIdentifier.id == item_id))
+    await db.commit()
+    return dict(message="OK")
+
+
+async def service_post_author_identifier(author_id: int, identifier_id: int, identifier_value: str, db: Session):
+    identifier_result = await db.execute(select(Identifier).filter(Identifier.id == identifier_id))
+    identifier = identifier_result.scalars().first()
+    author_identifier = AuthorIdentifier(
+        author_id=author_id,
+        identifier=identifier,
+        identifier_value=identifier_value
+    )
+    db.add(author_identifier)
+    await db.commit()
+    return author_identifier

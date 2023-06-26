@@ -3,7 +3,9 @@ from sqlalchemy.ext.asyncio import AsyncSession as Session
 
 from src.routers.admin.service import service_admin_check
 from src.routers.author.service import service_get_authors, service_get_authors_search, \
-    service_get_author, service_get_author_publications, service_merge_authors, service_get_unconfirmed_omstu_authors
+    service_get_author, service_get_author_publications, service_merge_authors, service_get_unconfirmed_omstu_authors, \
+    service_update_author_identifier, service_delete_author_identifier, service_update_authors, \
+    service_post_author_identifier
 from src.schemas.schemas import SchemeUser
 
 
@@ -41,4 +43,37 @@ async def controller_merge_authors(user: SchemeUser, id_base: int, id_merge: int
     if not is_admin:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Доступ запрещен")
     message = await service_merge_authors(id_base, id_merge, db)
+    return message
+
+
+async def controller_post_author_identifier(user: SchemeUser, id: int, identifier_id: int, identifier_value: str, db: Session):
+    is_admin = await service_admin_check(user.role_id, db)
+    if not is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Доступ запрещен")
+    message = await service_post_author_identifier(id, identifier_id, identifier_value, db)
+    return message
+
+
+async def controller_delete_author_identifier(user: SchemeUser, id: int, db: Session):
+    is_admin = await service_admin_check(user.role_id, db)
+    if not is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Доступ запрещен")
+    message = await service_delete_author_identifier(id, db)
+    return message
+
+
+async def controller_update_author_identifier(user: SchemeUser, id: int, identifier_value: str, db: Session):
+    is_admin = await service_admin_check(user.role_id, db)
+    if not is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Доступ запрещен")
+    message = await service_update_author_identifier(id, identifier_value, db)
+    return message
+
+
+async def controller_update_author(user: SchemeUser, id: int, name: str, surname: str, patronymic: str,
+                                   confirmed: bool, db: Session):
+    is_admin = await service_admin_check(user.role_id, db)
+    if not is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Доступ запрещен")
+    message = await service_update_authors(id, name, surname, patronymic, confirmed, db)
     return message

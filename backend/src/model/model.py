@@ -58,7 +58,7 @@ class AuthorDepartment(Base):
     __tablename__ = "author_department"
     id = Column(Integer, primary_key=True)
     position = Column(String)
-    rate = Column(Float, default='1', nullable=False)
+    rate = Column(Float, default=1.0, nullable=False)
     author_id = Column(Integer, ForeignKey('author.id'), nullable=False)
     department_id = Column(Integer, ForeignKey('department.id'), nullable=False)
 

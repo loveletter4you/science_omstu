@@ -11,7 +11,7 @@ async def service_post_feedback(feedback: SchemeFeedbackPostRouter, db: Session)
         'secret': RECAPTCHA_SECRET_KEY,
         'response': feedback.token
     })
-    if r.json()['success']:
+    if r['success']:
         feedback_model = Feedback(
             name=feedback.feedback.name,
             mail=feedback.feedback.mail,

@@ -55,10 +55,6 @@ async def service_update_from_openalex(db: Session):
             url = f'{filtered_works_url}&select={select_openalex}&cursor={cursor}'
             page_with_results = await SingletonAiohttp.query_url(url)
             results = page_with_results['results']
-            try:
-                print(results)
-            except:
-                pass
             works.extend(results)
 
             cursor = page_with_results['meta']['next_cursor']
@@ -76,7 +72,6 @@ async def service_update_from_openalex(db: Session):
                 continue
             if not work['primary_location']['source']:
                 continue
-            print(work['doi'])
             publication_result = await db.execute(select(Publication).filter(Publication.title.ilike(work['title'])))
             publication = publication_result.scalars().first()
             if publication is not None:

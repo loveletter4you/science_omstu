@@ -1,8 +1,9 @@
 import pandas as pd
 import numpy as np
 from fastapi import UploadFile
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, or_, select, delete, update
 from sqlalchemy.ext.asyncio import AsyncSession as Session
+from sqlalchemy.orm import joinedload
 
 import datetime
 import re
@@ -20,18 +21,18 @@ async def service_fill_scopus(date: datetime.date, file: UploadFile, db: Session
     scopus_df = pd.read_csv(file.file, on_bad_lines='skip')
     scopus_df = scopus_df.replace(np.nan, "")
 
-    pub_link_type_doi = get_or_create_publication_link_type("DOI", db)
-    pub_link_type_scopus = get_or_create_publication_link_type("Scopus", db)
-    source_type_journal = get_or_create_source_type("Журнал", db)
-    source_type_conference = get_or_create_source_type("Конференция", db)
-    source_link_type_issn = get_or_create_source_link_type("ISSN", db)
-    identifier_scopus = get_or_create_identifier("Scopus Author ID", db)
-    organization_omstu = get_or_create_organization_omstu(db)
+    pub_link_type_doi = await get_or_create_publication_link_type("DOI", db)
+    pub_link_type_scopus = await get_or_create_publication_link_type("Scopus", db)
+    source_type_journal = await get_or_create_source_type("Журнал", db)
+    source_type_conference = await get_or_create_source_type("Конференция", db)
+    source_link_type_issn = await get_or_create_source_link_type("ISSN", db)
+    identifier_scopus = await get_or_create_identifier("Scopus Author ID", db)
+    organization_omstu = await get_or_create_organization_omstu(db)
 
     for _, row in scopus_df.iterrows():
         issn = str(row['ISSN']).rjust(8, '0')
         issn = issn[:4] + '-' + issn[4:]
-        source = get_source_by_name_or_identifiers(str(row['Source title']), [issn], db)
+        source = await get_source_by_name_or_identifiers(str(row['Source title']), [issn], db)
         if source is None:
             source = Source(name=row['Source title'])
             if row['Document Type'] == "Conference Paper":
@@ -46,32 +47,36 @@ async def service_fill_scopus(date: datetime.date, file: UploadFile, db: Session
                     link=issn
                 )
                 db.add(source_link)
-            db.commit()
-        publication_type = get_or_create_publication_type(row["Document Type"], db)
+            await db.commit()
+        publication_type = await get_or_create_publication_type(row["Document Type"], db)
         date = datetime.date(int(row['Year']), 1, 1)
         if row['DOI'] != "":
-            link_doi = db.query(PublicationLink).filter(PublicationLink.link == row['DOI']).first()
+            link_doi_result = await db.execute(select(PublicationLink).filter(PublicationLink.link == row['DOI']))
+            link_doi = link_doi_result.scalars().first()
             if link_doi is not None:
                 continue
-        link_scopus = db.query(PublicationLink).filter(PublicationLink.link == row['Link']).first()
+        link_scopus_result = await db.execute(select(PublicationLink).filter(PublicationLink.link == row['Link']))
+        link_scopus = link_scopus_result.scalars().first()
         if link_scopus is not None:
             continue
-        publication = db.query(Publication).filter(or_(Publication.title.ilike(row['Title']))).first()
+        publication_result = await db.execute(select(Publication).filter(or_(Publication.title.ilike(row['Title']))))
+        publication = publication_result.scalars().first()
         if publication is not None:
             continue
-        publication = create_publication(publication_type, source, row["Title"], row["Abstract"], date, True, db)
-        create_publication_link(publication, pub_link_type_scopus, row["Link"], db)
+        publication = await create_publication(publication_type, source, row["Title"], row["Abstract"], date, True, db)
+        await create_publication_link(publication, pub_link_type_scopus, row["Link"], db)
         if row['DOI'] != "":
-            create_publication_link(publication, pub_link_type_doi, row["DOI"], db)
+            await create_publication_link(publication, pub_link_type_doi, row["DOI"], db)
         authors_orgs = row['Authors with affiliations'].split(';')
         authors_scopus = row['Author(s) ID'].split(';')
         for i, author_row in enumerate(authors_orgs):
             if i >= len(authors_scopus):
                 continue
             author_data = author_row.split(', ')
-            identifier = db.query(AuthorIdentifier). \
-                filter(and_(AuthorIdentifier.identifier_id == identifier_scopus.id,
-                            AuthorIdentifier.identifier_value == authors_scopus[i])).first()
+            identifier_result = await db.execute(select(AuthorIdentifier).options(joinedload(AuthorIdentifier.author)).
+                                                 filter(and_(AuthorIdentifier.identifier_id == identifier_scopus.id,
+                                                             AuthorIdentifier.identifier_value == authors_scopus[i])))
+            identifier = identifier_result.scalars().first()
             author: Author
             if identifier is None:
                 author: Author
@@ -108,7 +113,8 @@ async def service_fill_scopus(date: datetime.date, file: UploadFile, db: Session
                 )
                 db.add(author_publication_organization)
             elif len(author_data) > 2:
-                organization = db.query(Organization).filter(Organization.name == author_data[2]).first()
+                organization_result = await db.execute(select(Organization).filter(Organization.name == author_data[2]))
+                organization = organization_result.scalars().first()
                 if organization is None:
                     organization = Organization(name=author_data[2])
                     db.add(organization)
@@ -117,11 +123,12 @@ async def service_fill_scopus(date: datetime.date, file: UploadFile, db: Session
                     organization=organization
                 )
                 db.add(author_publication_organization)
-            db.commit()
+            await db.commit()
         if row['Author Keywords'] != "":
             keywords = set(row['Author Keywords'].split('; '))
             for keyword_value in keywords:
-                keyword = db.query(Keyword).filter(Keyword.keyword == keyword_value).first()
+                keyword_result = await db.execute(select(Keyword).filter(Keyword.keyword == keyword_value))
+                keyword = keyword_result.scalars().first()
                 if keyword is None:
                     keyword = Keyword(
                         keyword=keyword_value
@@ -132,8 +139,8 @@ async def service_fill_scopus(date: datetime.date, file: UploadFile, db: Session
                     keyword=keyword
                 )
                 db.add(publication_keyword)
-        db.commit()
-    db.commit()
+        await db.commit()
+    await db.commit()
     return {'Message': 'OK'}
 
 
@@ -141,14 +148,14 @@ async def service_fill_elibrary(file: UploadFile, db: Session):
     elibrary_df = pd.read_csv(file.file, on_bad_lines='skip')
     elibrary_df = elibrary_df.replace(np.nan, "")
 
-    pub_link_type_doi = get_or_create_publication_link_type("DOI", db)
-    pub_link_type_elibrary = get_or_create_publication_link_type("Elibrary", db)
-    source_type_journal = get_or_create_source_type("Журнал", db)
-    source_link_type_issn = get_or_create_source_link_type("ISSN", db)
-    source_link_type_eissn = get_or_create_source_link_type("eISSN", db)
-    identifier_elibrary = get_or_create_identifier("Elibrary ID", db)
-    publication_type = get_or_create_publication_type('Article', db)
-    organization_omstu = get_or_create_organization_omstu(db)
+    pub_link_type_doi = await get_or_create_publication_link_type("DOI", db)
+    pub_link_type_elibrary = await get_or_create_publication_link_type("Elibrary", db)
+    source_type_journal = await get_or_create_source_type("Журнал", db)
+    source_link_type_issn = await get_or_create_source_link_type("ISSN", db)
+    source_link_type_eissn = await get_or_create_source_link_type("eISSN", db)
+    identifier_elibrary = await get_or_create_identifier("Elibrary ID", db)
+    publication_type = await get_or_create_publication_type('Article', db)
+    organization_omstu = await get_or_create_organization_omstu(db)
 
     for _, row in elibrary_df.iterrows():
         issns = []
@@ -156,7 +163,7 @@ async def service_fill_elibrary(file: UploadFile, db: Session):
             issns.append(row['ISSN'])
         if row['eISSN'] != '-':
             issns.append(row['ISSN'])
-        source = get_source_by_name_or_identifiers(str(row['Журнал']), issns, db)
+        source = await get_source_by_name_or_identifiers(str(row['Журнал']), issns, db)
         if source is None:
             source = Source(name=row['Журнал'])
             source.source_type = source_type_journal
@@ -175,19 +182,23 @@ async def service_fill_elibrary(file: UploadFile, db: Session):
                     link=row['eISSN']
                 )
                 db.add(source_link)
-            db.commit()
+            await db.commit()
         date = datetime.date(int(row['Год']), 1, 1)
         if row['DOI'] != "-":
-            link_doi = db.query(PublicationLink).filter(PublicationLink.link == row['DOI']).first()
+            link_doi_result = await db.execute(select(PublicationLink).filter(PublicationLink.link == row['DOI']))
+            link_doi = link_doi_result.scalars().first()
             if link_doi is not None:
                 continue
-        publication = db.query(Publication).filter(or_(Publication.title.ilike(row['Название']))).first()
+        publication_result = await db.execute(select(Publication).filter(or_(Publication.title.ilike(row['Название']))))
+        publication = publication_result.scalars().first()
         if publication is not None:
             continue
-        publication = create_publication(publication_type, source, row["Название"], row["Аннотация"], date, True, db)
-        create_publication_link(publication, pub_link_type_elibrary, f'https://www.elibrary.ru{row["Ссылка"]}', db)
+        publication = await create_publication(publication_type, source, row["Название"],
+                                               row["Аннотация"], date, True, db)
+        await create_publication_link(publication, pub_link_type_elibrary, f'https://www.elibrary.ru{row["Ссылка"]}',
+                                      db)
         if row['DOI'] != "":
-            create_publication_link(publication, pub_link_type_doi, row["DOI"], db)
+            await  create_publication_link(publication, pub_link_type_doi, row["DOI"], db)
         authors = row['Авторы'].split('|')
         authors_id = row['ID авторов'].split('|')
         authors_org = row['Аффилиации в публикации'].split('|')
@@ -200,9 +211,12 @@ async def service_fill_elibrary(file: UploadFile, db: Session):
                 continue
             author: Author | None
             if authors_id[i] != '-':
-                identifier = db.query(AuthorIdentifier). \
-                    filter(and_(AuthorIdentifier.identifier_id == identifier_elibrary.id,
-                                AuthorIdentifier.identifier_value == authors_id[i])).first()
+                identifier_result = await db.execute(select(AuthorIdentifier)
+                                                     .options(joinedload(AuthorIdentifier.author))
+                                                     .filter(and_(AuthorIdentifier.identifier_id ==
+                                                                  identifier_elibrary.id,
+                                                                  AuthorIdentifier.identifier_value == authors_id[i])))
+                identifier = identifier_result.scalars().first()
                 if identifier is None:
                     if len(author_data) > 2:
                         author = Author(
@@ -228,12 +242,14 @@ async def service_fill_elibrary(file: UploadFile, db: Session):
                     author = identifier.author
             else:
                 if len(author_data) > 2:
-                    author = db.query(Author).filter(and_(Author.name == author_data[1],
-                                                          Author.surname == author_data[0],
-                                                          Author.patronymic == author_data[2])).first()
+                    author_result = await db.execute(select(Author).filter(and_(Author.name == author_data[1],
+                                                                                Author.surname == author_data[0],
+                                                                                Author.patronymic == author_data[2])))
+                    author = author_result.scalars().first()
                 else:
-                    author = db.query(Author).filter(and_(Author.name == author_data[1],
-                                                          Author.surname == author_data[0])).first()
+                    author_result = await db.execute(select(Author).filter(and_(Author.name == author_data[1],
+                                                                                Author.surname == author_data[0])))
+                    author = author_result.scalars().first()
                 if author is None:
                     if len(author_data) > 2:
                         author = Author(
@@ -267,7 +283,9 @@ async def service_fill_elibrary(file: UploadFile, db: Session):
                         )
                         db.add(author_publication_organization)
                     else:
-                        organization = db.query(Organization).filter(Organization.name == author_org).first()
+                        organization_result = await db.execute(select(Organization)
+                                                               .filter(Organization.name == author_org))
+                        organization = organization_result.scalars().first()
                         if organization is None:
                             organization = Organization(name=author_org)
                             db.add(organization)
@@ -276,40 +294,46 @@ async def service_fill_elibrary(file: UploadFile, db: Session):
                             organization=organization
                         )
                         db.add(author_publication_organization)
-                    db.commit()
-            db.commit()
-        db.commit()
+                    await db.commit()
+            await db.commit()
+        await db.commit()
     return {'Message': 'OK'}
 
 
 async def service_fill_authors(file: UploadFile, db: Session):
     author_df = pd.read_csv(file.file)
     author_df = author_df.replace(np.nan, "")
-    identifier_spin = db.query(Identifier).filter(Identifier.name == "SPIN-код").first()
+    identifier_spin_result = await db.execute(select(Identifier).filter(Identifier.name == "SPIN-код"))
+    identifier_spin = identifier_spin_result.scalars().first()
     if identifier_spin is None:
         identifier_spin = Identifier(name="SPIN-код")
         db.add(identifier_spin)
-    identifier_orcid = db.query(Identifier).filter(Identifier.name == "ORCID").first()
+    identifier_orcid_result = await db.execute(select(Identifier).filter(Identifier.name == "ORCID"))
+    identifier_orcid = identifier_orcid_result.scalars().first()
     if identifier_orcid is None:
         identifier_orcid = Identifier(name="ORCID")
         db.add(identifier_orcid)
-    identifier_scopus = db.query(Identifier).filter(Identifier.name == "Scopus Author ID").first()
+    identifier_scopus_result = await db.execute(select(Identifier).filter(Identifier.name == "Scopus Author ID"))
+    identifier_scopus = identifier_scopus_result.scalars().first()
     if identifier_scopus is None:
         identifier_scopus = Identifier(name="Scopus Author ID")
         db.add(identifier_scopus)
-    identifier_researcher = db.query(Identifier).filter(Identifier.name == "ResearcherID").first()
+    identifier_researcher_result = await db.execute(select(Identifier).filter(Identifier.name == "ResearcherID"))
+    identifier_researcher = identifier_researcher_result.scalars().first()
     if identifier_researcher is None:
         identifier_researcher = Identifier(name="ResearcherID")
         db.add(identifier_researcher)
-    identifier_elibrary_id = db.query(Identifier).filter(Identifier.name == "Elibrary ID").first()
+    identifier_elibrary_id_result = await db.execute(select(Identifier).filter(Identifier.name == "Elibrary ID"))
+    identifier_elibrary_id = identifier_elibrary_id_result.scalars().first()
     if identifier_elibrary_id is None:
         identifier_elibrary_id = Identifier(name="Elibrary ID")
         db.add(identifier_elibrary_id)
 
     for _, row in author_df.iterrows():
-        author = db.query(Author).filter(and_(Author.name == row['name'].title(),
-                                              Author.surname == row['surname'].title(),
-                                              Author.patronymic == row['patronymic'].title())).first()
+        author_result = await db.execute(select(Author).filter(and_(Author.name == row['name'].title(),
+                                                                    Author.surname == row['surname'].title(),
+                                                                    Author.patronymic == row['patronymic'].title())))
+        author = author_result.scalars().first()
         if author is None:
             author = Author(
                 name=row['name'].title(),
@@ -318,24 +342,28 @@ async def service_fill_authors(file: UploadFile, db: Session):
                 confirmed=True
             )
             db.add(author)
-            db.commit()
+            await db.commit()
         if row['faculty'] != "":
-            faculty = db.query(Faculty).filter(Faculty.name == row['faculty']).first()
+            faculty_result = await db.execute(select(Faculty).filter(Faculty.name == row['faculty']))
+            faculty = faculty_result.scalars().first()
             if faculty is None:
                 faculty = Faculty(name=row['faculty'])
                 db.add(faculty)
-                db.commit()
-            department = db.query(Department).filter(and_(Department.name == row['department'],
-                                                          Department.faculty == faculty)).first()
+                await db.commit()
+            department_result = await db.execute(select(Department).filter(and_(Department.name == row['department'],
+                                                                                Department.faculty == faculty)))
+            department = department_result.scalars().first()
             if department is None:
                 department = Department(
                     name=row['department'],
                     faculty=faculty
                 )
                 db.add(department)
-                db.commit()
-            author_department = db.query(AuthorDepartment).filter(and_(AuthorDepartment.department == department,
-                                                                       AuthorDepartment.author == author)).first()
+                await db.commit()
+            author_department_result = await db.execute(select(AuthorDepartment)
+                                                        .filter(and_(AuthorDepartment.department == department,
+                                                                     AuthorDepartment.author == author)))
+            author_department = author_department_result.scalars().first()
             if author_department is None:
                 author_department = AuthorDepartment(
                     department=department,
@@ -344,83 +372,98 @@ async def service_fill_authors(file: UploadFile, db: Session):
                 )
                 db.add(author_department)
         if str(row['spin']) != "0":
-            author_identifier_spin = db.query(AuthorIdentifier) \
-                .filter(and_(AuthorIdentifier.author == author,
-                             AuthorIdentifier.identifier == identifier_spin,
-                             AuthorIdentifier.identifier_value == str(row['spin']))).first()
+            author_identifier_spin_result = await db.execute(select(AuthorIdentifier)
+                                                             .filter(and_(AuthorIdentifier.author == author,
+                                                                          AuthorIdentifier.identifier == identifier_spin,
+                                                                          AuthorIdentifier.identifier_value == str(
+                                                                              row['spin']))))
+            author_identifier_spin = author_identifier_spin_result.scalars().first()
             if author_identifier_spin is None:
                 author_identifier_spin = AuthorIdentifier(
                     author=author,
                     identifier=identifier_spin,
-                    identifier_value=row['spin']
+                    identifier_value=str(row['spin'])
                 )
                 db.add(author_identifier_spin)
         if str(row['orcid']) != "0":
-            author_identifier_orcid = db.query(AuthorIdentifier) \
-                .filter(and_(AuthorIdentifier.author == author,
-                             AuthorIdentifier.identifier == identifier_orcid,
-                             AuthorIdentifier.identifier_value == str(row['orcid']))).first()
+            author_identifier_orcid_result = await db.execute(select(AuthorIdentifier)
+                                                              .filter(and_(AuthorIdentifier.author == author,
+                                                                           AuthorIdentifier.identifier ==
+                                                                           identifier_orcid,
+                                                                           AuthorIdentifier.identifier_value == str(
+                                                                               row['orcid']))))
+            author_identifier_orcid = author_identifier_orcid_result.scalars().first()
             if author_identifier_orcid is None:
                 author_identifier_orcid = AuthorIdentifier(
                     author=author,
                     identifier=identifier_orcid,
-                    identifier_value=row['orcid']
+                    identifier_value=str(row['orcid'])
                 )
                 db.add(author_identifier_orcid)
         if str(row['scopus author id']) != "0":
-            author_identifier_scopus = db.query(AuthorIdentifier) \
-                .filter(and_(AuthorIdentifier.author == author,
-                             AuthorIdentifier.identifier == identifier_scopus,
-                             AuthorIdentifier.identifier_value == str(row['scopus author id']))).first()
+            author_identifier_scopus_result = await db.execute(select(AuthorIdentifier)
+                                                               .filter(and_(AuthorIdentifier.author == author,
+                                                                            AuthorIdentifier.identifier
+                                                                            == identifier_scopus,
+                                                                            AuthorIdentifier.identifier_value == str(
+                                                                                row['scopus author id']))))
+            author_identifier_scopus = author_identifier_scopus_result.scalars().first()
             if author_identifier_scopus is None:
                 author_identifier_scopus = AuthorIdentifier(
                     author=author,
                     identifier=identifier_scopus,
-                    identifier_value=row['scopus author id']
+                    identifier_value=str(row['scopus author id'])
                 )
                 db.add(author_identifier_scopus)
         if str(row['researcher id']) != "0":
-            author_identifier_researcher = db.query(AuthorIdentifier) \
-                .filter(and_(AuthorIdentifier.author == author,
-                             AuthorIdentifier.identifier == identifier_researcher,
-                             AuthorIdentifier.identifier_value == str(row['researcher id']))).first()
+            author_identifier_researcher_result = await db.execute(select(AuthorIdentifier)
+                                                                   .filter(and_(AuthorIdentifier.author == author,
+                                                                                AuthorIdentifier.identifier
+                                                                                == identifier_researcher,
+                                                                                AuthorIdentifier.identifier_value == str(
+                                                                                    row['researcher id']))))
+            author_identifier_researcher = author_identifier_researcher_result.scalars().first()
             if author_identifier_researcher is None:
                 author_identifier_researcher = AuthorIdentifier(
                     author=author,
                     identifier=identifier_researcher,
-                    identifier_value=row['researcher id']
+                    identifier_value=str(row['researcher id'])
                 )
                 db.add(author_identifier_researcher)
         if str(row['elibrary id']) != "0":
-            author_identifier_elibrary = db.query(AuthorIdentifier) \
-                .filter(and_(AuthorIdentifier.author == author,
-                             AuthorIdentifier.identifier == identifier_researcher,
-                             AuthorIdentifier.identifier_value == str(row['elibrary id']))).first()
+            author_identifier_elibrary_result = await db.execute(select(AuthorIdentifier)
+                                                                 .filter(and_(AuthorIdentifier.author == author,
+                                                                              AuthorIdentifier.identifier
+                                                                              == identifier_researcher,
+                                                                              AuthorIdentifier.identifier_value == str(
+                                                                                  row['elibrary id']))))
+            author_identifier_elibrary = author_identifier_elibrary_result.scalars().first()
             if author_identifier_elibrary is None:
                 author_identifier_elibrary = AuthorIdentifier(
                     author=author,
                     identifier=identifier_elibrary_id,
-                    identifier_value=row['elibrary id']
+                    identifier_value=str(row['elibrary id'])
                 )
                 db.add(author_identifier_elibrary)
-        db.commit()
+        await db.commit()
     return {"message": "OK"}
 
 
 async def service_fill_author_department(file: UploadFile, db: Session):
     authors_df = pd.read_excel(file.file)
-    db.query(AuthorDepartment).delete()
-    db.query(Department).delete()
-    db.query(Faculty).delete()
-    db.query(Author).update({Author.confirmed: False}, synchronize_session=False)
-    db.commit()
+    await db.execute(delete(AuthorDepartment))
+    await db.execute(delete(Department))
+    await db.execute(delete(Faculty))
+    await db.execute(update(Author).values(confirmed=False))
+    await db.commit()
     for _, row in authors_df.iterrows():
         name = row['Сотрудник'].split(' ')
         if len(name) < 3:
             name.append("")
-        author = db.query(Author).filter(and_(Author.name == name[1].title(),
-                                              Author.surname == name[0].title(),
-                                              Author.patronymic == name[2].title())).first()
+        author_result = await db.execute(select(Author).filter(and_(Author.name == name[1].title(),
+                                                                    Author.surname == name[0].title(),
+                                                                    Author.patronymic == name[2].title())))
+        author = author_result.scalars().first()
         if author is None:
             author = Author(
                 name=name[1].title(),
@@ -431,31 +474,37 @@ async def service_fill_author_department(file: UploadFile, db: Session):
         author.confirmed = True
         birthday = row['Дата рождения'].split('.')
         author.birthday = datetime.date(year=int(birthday[2]), month=int(birthday[1]), day=int(birthday[0]))
-        db.commit()
+        await db.commit()
         if row['Подразделение.Группа подразделений (Подразделения)'] == "ПО":
             workplace = row['Полное наименование подразделения'].split('/')
             if len(workplace) == 1:
                 workplace.append('')
             if len(workplace) > 2:
                 workplace = [workplace[0], '/'.join(workplace[1:])]
-            faculty = db.query(Faculty).filter(Faculty.name == workplace[0]).first()
+            faculty_result = await db.execute(select(Faculty).filter(Faculty.name == workplace[0]))
+            faculty = faculty_result.scalars().first()
             if faculty is None:
                 faculty = Faculty(name=workplace[0])
                 db.add(faculty)
-                db.commit()
-            department = db.query(Department).filter(and_(Department.name == workplace[1],
-                                                          Department.faculty == faculty)).first()
+                await db.commit()
+            department_result = await db.execute(select(Department).filter(and_(Department.name == workplace[1],
+                                                                                Department.faculty == faculty)))
+            department = department_result.scalars().first()
             if department is None:
                 department = Department(
                     name=workplace[1],
                     faculty=faculty
                 )
                 db.add(department)
-                db.commit()
-            author_department = db.query(AuthorDepartment)\
-                .filter(and_(AuthorDepartment.author_id == author.id,
-                             AuthorDepartment.department_id == department.id,
-                             AuthorDepartment.position == row['Должность, Код по ОКЗ, Категории ВПО-1 (Должности)'].split(',')[0])).first()
+                await db.commit()
+            author_department_result = await db.execute(select(AuthorDepartment)
+                                                        .filter(and_(AuthorDepartment.author_id == author.id,
+                                                                     AuthorDepartment.department_id == department.id,
+                                                                     AuthorDepartment.position ==
+                                                                     row[
+                                                                         'Должность, Код по ОКЗ, Категории ВПО-1 (Должности)']
+                                                                     .split(',')[0])))
+            author_department = author_department_result.scalars().first()
             if author_department is None:
                 author_department = AuthorDepartment(
                     department=department,
@@ -466,23 +515,20 @@ async def service_fill_author_department(file: UploadFile, db: Session):
                 db.add(author_department)
             else:
                 author_department.rate += float(row['Количество ставок'])
-            db.commit()
+            await db.commit()
     return dict(message="OK")
-
-
-
 
 
 async def service_white_list_fill(date: datetime.date, file: UploadFile, db: Session):
     white_list_df = pd.read_csv(file.file, on_bad_lines='skip', sep='\t')
     white_list_df = white_list_df.replace(np.nan, "")
-    white_list_rating_type = get_or_create_source_rating_type('«Белый список» РЦНИ', db)
-    source_link_type_issn = get_or_create_source_link_type("ISSN", db)
-    source_link_type_eissn = get_or_create_source_link_type("eISSN", db)
-    source_type_journal = get_or_create_source_type("Журнал", db)
+    white_list_rating_type = await get_or_create_source_rating_type('«Белый список» РЦНИ', db)
+    source_link_type_issn = await get_or_create_source_link_type("ISSN", db)
+    source_link_type_eissn = await get_or_create_source_link_type("eISSN", db)
+    source_type_journal = await get_or_create_source_type("Журнал", db)
     for _, row in white_list_df.iterrows():
         issns = row['ISSN'].split('|')
-        source = get_source_by_name_or_identifiers(str(row['Title']), issns, db)
+        source = await get_source_by_name_or_identifiers(str(row['Title']), issns, db)
         if not (source is None):
             source_rating_white_list = SourceRating(
                 source_rating_type=white_list_rating_type,
@@ -525,20 +571,20 @@ async def service_white_list_fill(date: datetime.date, file: UploadFile, db: Ses
                     link=issns[0]
                 )
                 db.add(source_link_issn)
-    db.commit()
+    await db.commit()
     return dict(message="OK")
 
 
 async def service_fill_vak_journals_rank(date: datetime.date, file: UploadFile, db: Session):
     vak_df = pd.read_excel(file.file, 'rank')
     vak_df = vak_df.replace(np.nan, "")
-    vak_rating_type = get_or_create_source_rating_type('ВАК', db)
-    source_link_type_issn = get_or_create_source_link_type("ISSN", db)
-    source_link_type_eissn = get_or_create_source_link_type("eISSN", db)
-    source_type_journal = get_or_create_source_type("Журнал", db)
+    vak_rating_type = await get_or_create_source_rating_type('ВАК', db)
+    source_link_type_issn = await get_or_create_source_link_type("ISSN", db)
+    source_link_type_eissn = await get_or_create_source_link_type("eISSN", db)
+    source_type_journal = await get_or_create_source_type("Журнал", db)
     for _, row in vak_df.iterrows():
         issns = row['issn'].split(',')
-        source = get_source_by_name_or_identifiers(str(row['title']), issns, db)
+        source = await get_source_by_name_or_identifiers(str(row['title']), issns, db)
         if not (source is None):
             source_rating_white_list = SourceRating(
                 source_rating_type=vak_rating_type,
@@ -581,24 +627,24 @@ async def service_fill_vak_journals_rank(date: datetime.date, file: UploadFile, 
                     link=issns[0]
                 )
                 db.add(source_link_issn)
-    db.commit()
+    await db.commit()
     return dict(message='OK')
 
 
 async def service_fill_rsci_journals_rank(date: datetime.date, file: UploadFile, db: Session):
     rsci_df = pd.read_csv(file.file, on_bad_lines='skip')
     rsci_df = rsci_df.replace(np.nan, "")
-    rsci_rating_type = get_or_create_source_rating_type('RSCI', db)
-    source_link_type_issn = get_or_create_source_link_type("ISSN", db)
-    source_link_type_eissn = get_or_create_source_link_type("eISSN", db)
-    source_type_journal = get_or_create_source_type("Журнал", db)
+    rsci_rating_type = await get_or_create_source_rating_type('RSCI', db)
+    source_link_type_issn = await get_or_create_source_link_type("ISSN", db)
+    source_link_type_eissn = await get_or_create_source_link_type("eISSN", db)
+    source_type_journal = await get_or_create_source_type("Журнал", db)
     for _, row in rsci_df.iterrows():
         issns = []
         if row['issn1'] != 'NA':
             issns.append(row['issn1'])
         if row['issn2'] != 'NA':
             issns.append(row['issn2'])
-        source = get_source_by_name_or_identifiers(str(row['title']), issns, db)
+        source = await get_source_by_name_or_identifiers(str(row['title']), issns, db)
         if not (source is None):
             source_rating_white_list = SourceRating(
                 source_rating_type=rsci_rating_type,
@@ -635,22 +681,22 @@ async def service_fill_rsci_journals_rank(date: datetime.date, file: UploadFile,
                     link=row['issn2']
                 )
                 db.add(source_link_issn)
-    db.commit()
+    await db.commit()
     return dict(message="OK")
 
 
 async def service_white_list_jcr_citescore(date: datetime.date, file: UploadFile, db: Session):
     white_list_df = pd.read_csv(file.file, on_bad_lines='skip')
     white_list_df = white_list_df.replace(np.nan, "")
-    white_list_rating_type = get_or_create_source_rating_type('«Белый список» РЦНИ', db)
-    jcr_rating_type = get_or_create_source_rating_type('Journal Citation Reports WoS', db)
-    citescore_rating_type = get_or_create_source_rating_type('CiteScore Scopus', db)
-    source_link_type_issn = get_or_create_source_link_type("ISSN", db)
-    source_link_type_eissn = get_or_create_source_link_type("eISSN", db)
-    source_type_journal = get_or_create_source_type("Журнал", db)
+    white_list_rating_type = await get_or_create_source_rating_type('«Белый список» РЦНИ', db)
+    jcr_rating_type = await get_or_create_source_rating_type('Journal Citation Reports WoS', db)
+    citescore_rating_type = await get_or_create_source_rating_type('CiteScore Scopus', db)
+    source_link_type_issn = await get_or_create_source_link_type("ISSN", db)
+    source_link_type_eissn = await get_or_create_source_link_type("eISSN", db)
+    source_type_journal = await get_or_create_source_type("Журнал", db)
     for _, row in white_list_df.iterrows():
         issns = row['ISSN'].split('|')
-        source = get_source_by_name_or_identifiers(str(row['Title']), issns, db)
+        source = await get_source_by_name_or_identifiers(str(row['Title']), issns, db)
         if not (source is None):
             source_rating_white_list = SourceRating(
                 source_rating_type=white_list_rating_type,
@@ -725,19 +771,19 @@ async def service_white_list_jcr_citescore(date: datetime.date, file: UploadFile
                     link=issns[0]
                 )
                 db.add(source_link_issn)
-    db.commit()
+    await db.commit()
     return dict(message="OK")
 
 
 async def service_jcr_list_fill(date: datetime.date, file: UploadFile, db: Session):
     jcr_df = pd.read_excel(file.file)
     jcr_df = jcr_df.replace(np.nan, "")
-    jcr_rating_type = get_or_create_source_rating_type('Journal Citation Reports WoS', db)
-    source_link_type_issn = get_or_create_source_link_type("ISSN", db)
-    source_link_type_eissn = get_or_create_source_link_type("eISSN", db)
-    source_type_journal = get_or_create_source_type("Журнал", db)
+    jcr_rating_type = await get_or_create_source_rating_type('Journal Citation Reports WoS', db)
+    source_link_type_issn = await get_or_create_source_link_type("ISSN", db)
+    source_link_type_eissn = await get_or_create_source_link_type("eISSN", db)
+    source_type_journal = await get_or_create_source_type("Журнал", db)
     for _, row in jcr_df.iterrows():
-        source = get_source_by_name_or_identifiers(str(row['Title']), [row['issn'], row['eissn']], db)
+        source = await get_source_by_name_or_identifiers(str(row['Title']), [row['issn'], row['eissn']], db)
         if not (source is None):
             source_rating_white_list = SourceRating(
                 source_rating_type=jcr_rating_type,
@@ -773,5 +819,5 @@ async def service_jcr_list_fill(date: datetime.date, file: UploadFile, db: Sessi
                 link=row['eissn']
             )
             db.add(source_link_issn)
-    db.commit()
+    await db.commit()
     return dict(message="OK")

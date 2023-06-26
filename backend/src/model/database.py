@@ -9,7 +9,7 @@ from settings_env import DB_NAME, DB_HOST, DB_ROOT, DB_PASSWORD
 DATABASE_URL: str = f"postgresql+asyncpg://{DB_ROOT}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
 Base = declarative_base()
 
-engine = create_async_engine(DATABASE_URL, echo=True)
+engine = create_async_engine(DATABASE_URL)
 
 session_local = sessionmaker(
         engine,

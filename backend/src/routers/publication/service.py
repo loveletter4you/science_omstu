@@ -1,4 +1,4 @@
-from sqlalchemy import func, desc, select
+from sqlalchemy import func, desc, select, and_
 from sqlalchemy.ext.asyncio import AsyncSession as Session
 from sqlalchemy.orm import joinedload
 
@@ -64,3 +64,32 @@ async def service_get_publication(id: int, db: Session):
 async def service_get_publication_publication_types(db: Session):
     publcation_types = await db.execute(select(PublicationType))
     return dict(publication_types=publcation_types.scalars().all())
+
+
+async def service_post_author_publication(id: int, author_id: int, db: Session):
+    author_publication = AuthorPublication(
+        publication_id=id,
+        author_id=author_id,
+    )
+    db.add(author_publication)
+    await db.commit()
+    return dict(publication=id)
+
+
+async def service_delete_author_publication(id: int, author_id: int, db: Session):
+    author_publication_result = await db.execute(select(AuthorPublication)
+                                                 .filter(and_(AuthorPublication.publication_id == id,
+                                                              AuthorPublication.author_id == author_id)))
+    author_publication = author_publication_result.scalars().first()
+    if not author_publication:
+        return None
+
+    author_publication_organizations_result = await db.execute(select(AuthorPublicationOrganization)
+                                                               .filter(AuthorPublicationOrganization
+                                                                       .author_publication == author_publication))
+    author_publication_organizations = author_publication_organizations_result.scalars().all()
+    for author_publication_organization in author_publication_organizations:
+        await db.delete(author_publication_organization)
+    await db.delete(author_publication)
+    await db.commit()
+    return dict(message="OK")
