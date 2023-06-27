@@ -11,7 +11,7 @@ from src.schemas.schemas import SchemeUser
 
 async def controller_get_authors(search: str, page: int, limit: int, confirmed: bool, db: Session):
     offset = page * limit
-    if search is None or search != "":
+    if search is None and search != "":
         authors = await service_get_authors(offset, limit, confirmed, db)
         return authors
     else:

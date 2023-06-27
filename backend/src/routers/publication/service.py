@@ -14,7 +14,7 @@ async def service_get_publications(params: Publication_params, db: Session):
     query = query.filter(Publication.publication_date >= params.from_date) \
         .filter(Publication.publication_date <= params.to_date)
 
-    if not (params.search is None) or params.search != "":
+    if not (params.search is None) and params.search != "":
         query = query.filter(func.lower(Publication.title).contains(params.search.lower()))
     if not (params.source_rating_type_id is None):
         query = query.join(Source).join(SourceRating) \
