@@ -123,19 +123,19 @@ export const PublicationsAPI = {
                           source_rating_type_id, from_date, to_date,
                           page, pageSize=20) {
         let url = '/api/publication?';
-        if (search !== null)
+        if (search)
             url += `search=${search}&`
-        if (publication_type_id !== null)
+        if (publication_type_id)
             url += `publication_type_id=${publication_type_id}&`
-        if (author_id !== null)
+        if (author_id)
             url += `author_id=${author_id}&`
-        if (source_rating_type_id !== null)
+        if (source_rating_type_id)
             url += `source_rating_type_id=${source_rating_type_id}&`
 	if (from_date)
             url += `from_date=${from_date}&`
         if (to_date)
             url += `to_date=${to_date}&`
-        return instance.get(`${url}from_date=${from_date}&to_date=${to_date}&page=${page}&limit=${pageSize}`)
+        return instance.get(`${url}page=${page}&limit=${pageSize}`)
     },
     getPublications(page, pageSize) {
         return instance.get(`/api/publication?page=${page}&limit=${pageSize}`)
