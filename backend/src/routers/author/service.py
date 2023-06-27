@@ -25,7 +25,7 @@ async def service_get_authors_search(search: str, offset: int, limit: int, confi
         authors_count = await get_count(authors_query, db)
         authors = await db.execute(authors_query.offset(offset).limit(limit))
         scheme_authors = [SchemeAuthor.from_orm(author) for author in authors.scalars().all()]
-        return dict(authors=scheme_authors, count=len(authors_count.scalars().all()))
+        return dict(authors=scheme_authors, count=authors_count)	
     else:
         authors_query = select(Author).filter(or_(Author.confirmed, Author.confirmed == confirmed)).filter(
             or_(and_(func.lower(Author.name).contains(name[0]), func.lower(Author.surname).contains(name[1])),
@@ -33,7 +33,7 @@ async def service_get_authors_search(search: str, offset: int, limit: int, confi
         authors_count = await get_count(authors_query, db)
         authors = await db.execute(authors_query.offset(offset).limit(limit))
         scheme_authors = [SchemeAuthor.from_orm(author) for author in authors.scalars().all()]
-        return dict(authors=scheme_authors, count=len(authors_count.scalars().all()))
+        return dict(authors=scheme_authors, count=authors_count)
 
 
 async def service_get_author(id: int, db: Session):

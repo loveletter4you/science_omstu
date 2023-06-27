@@ -131,6 +131,10 @@ export const PublicationsAPI = {
             url += `author_id=${author_id}&`
         if (source_rating_type_id !== null)
             url += `source_rating_type_id=${source_rating_type_id}&`
+	if (from_date)
+            url += `from_date=${from_date}&`
+        if (to_date)
+            url += `to_date=${to_date}&`
         return instance.get(`${url}from_date=${from_date}&to_date=${to_date}&page=${page}&limit=${pageSize}`)
     },
     getPublications(page, pageSize) {
