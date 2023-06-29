@@ -1,0 +1,2 @@
+DB_ROOT = "db_user"
+DB_PASSWORD = "db_password"

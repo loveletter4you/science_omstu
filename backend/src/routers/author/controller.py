@@ -5,7 +5,7 @@ from src.routers.admin.service import service_admin_check
 from src.routers.author.service import service_get_authors, service_get_authors_search, \
     service_get_author, service_get_author_publications, service_merge_authors, service_get_unconfirmed_omstu_authors, \
     service_update_author_identifier, service_delete_author_identifier, service_update_authors, \
-    service_post_author_identifier
+    service_post_author_identifier, service_post_authors, service_delete_author
 from src.schemas.schemas import SchemeUser
 
 
@@ -24,6 +24,23 @@ async def controller_get_author(id: int, db: Session):
     if not author:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return author
+
+
+async def controller_post_author(user: SchemeUser, name: str, surname: str, patronymic: str,
+                                   confirmed: bool, db: Session):
+    is_admin = await service_admin_check(user.role_id, db)
+    if not is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Доступ запрещен")
+    message = await service_post_authors(name, surname, patronymic, confirmed, db)
+    return message
+
+
+async def controller_delete_author(id: int, user: SchemeUser, db: Session):
+    is_admin = await service_admin_check(user.role_id, db)
+    if not is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Доступ запрещен")
+    message = await service_delete_author(id, db)
+    return message
 
 
 async def controller_get_author_publications(id: int, page: int, limit: int, db: Session):

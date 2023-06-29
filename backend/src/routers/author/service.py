@@ -50,6 +50,42 @@ async def service_get_author(id: int, db: Session):
     return dict(author=scheme_author)
 
 
+async def service_post_authors(name: str, surname: str, patronymic: str, confirmed: bool, db: Session):
+    author = Author(
+        name=name,
+        surname=surname,
+        patronymic=patronymic,
+        confirmed=confirmed
+    )
+    db.add(author)
+    await db.commit()
+    await db.refresh(author)
+    return author
+
+
+async def service_update_authors(id: int, name: str, surname: str, patronymic: str, confirmed: bool, db: Session):
+    author_result = await db.execute(select(Author).filter(Author.id == id))
+    author = author_result.scalars().first()
+
+    if author:
+        if name:
+            author.name = name
+        if surname:
+            author.surname = surname
+        if patronymic:
+            author.patronymic = patronymic
+        if not confirmed is None:
+            author.confirmed = confirmed
+        await db.commit()
+    return author
+
+
+async def service_delete_author(id: int, db: Session):
+    await db.execute(delete(Author).filter(Author.id == id))
+    await db.commit()
+    return dict(message="OK")
+
+
 async def service_get_author_publications(id: int, offset: int, limit: int, db: Session):
     query = select(Publication).join(AuthorPublication, Publication.id == AuthorPublication.publication_id) \
         .order_by(desc(Publication.publication_date)) \
@@ -119,22 +155,6 @@ async def service_merge_authors(id_base: int, id_merge: int, db: Session):
 
     return dict(author_id=id_base)
 
-
-async def service_update_authors(id: int, name: str, surname: str, patronymic: str, confirmed: bool, db: Session):
-    author_result = await db.execute(select(Author).filter(Author.id == id))
-    author = author_result.scalars().first()
-
-    if author:
-        if name:
-            author.name = name
-        if surname:
-            author.surname = surname
-        if patronymic:
-            author.patronymic = patronymic
-        if not confirmed is None:
-            author.confirmed = confirmed
-        await db.commit()
-    return author
 
 
 async def service_update_author_identifier(author_iden_id: int, identifier_value: str, db: Session):

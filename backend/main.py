@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
 
-from src.model.database import init_models, get_db, session_local
+from src.model.database import init_models, session_local
 from src.routers import author, publication, source, feedback, user, admin, analysis, department
 from src.routers.admin.service import service_create_admin
 

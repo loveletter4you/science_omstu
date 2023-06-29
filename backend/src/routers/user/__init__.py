@@ -23,7 +23,7 @@ async def login(form_data: security.OAuth2PasswordRequestForm = Depends(), db: S
     :return: JWT-token
     """
     token = await controller_generate_token(form_data, db)
-    response = JSONResponse(dict(message='OK'))
+    response = JSONResponse(dict(Bearer=token['access_token']))
     response.set_cookie("Authorization",
                         value=f"Bearer {token['access_token']}",
                         httponly=True,
