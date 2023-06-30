@@ -81,7 +81,9 @@ async def service_update_authors(id: int, name: str, surname: str, patronymic: s
 
 
 async def service_delete_author(id: int, db: Session):
-    await db.execute(delete(Author).filter(Author.id == id))
+    author_result = await db.execute(select(Author).filter(Author.id == id))
+    author = author_result.scalars().first()
+    await db.delete(author)
     await db.commit()
     return dict(message="OK")
 

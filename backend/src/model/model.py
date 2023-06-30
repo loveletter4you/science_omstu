@@ -34,9 +34,9 @@ class Author(Base):
     birthday = Column(Date)
     confirmed = Column(Boolean, nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'))
-    author_identifiers = Relationship("AuthorIdentifier", backref='author')
-    author_publications = Relationship("AuthorPublication", backref='author')
-    author_departments = Relationship("AuthorDepartment", backref='author')
+    author_identifiers = Relationship("AuthorIdentifier", backref='author', cascade='save-update, merge, delete')
+    author_publications = Relationship("AuthorPublication", backref='author', cascade='save-update, merge, delete')
+    author_departments = Relationship("AuthorDepartment", backref='author', cascade='save-update, merge, delete')
 
 
 class Faculty(Base):
