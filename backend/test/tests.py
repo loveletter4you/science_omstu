@@ -47,7 +47,7 @@ async def init_base():
         await service_create_admin(db)
 
 
-loop = asyncio.get_event_loop()
+loop = asyncio.new_event_loop()
 loop.run_until_complete(init_base())
 loop.close()
 

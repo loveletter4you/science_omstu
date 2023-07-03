@@ -9,10 +9,11 @@ from src.schemas.schemas import SchemePublication, SchemeAuthor, SchemeAuthorPro
 
 
 async def service_get_authors(offset: int, limit: int, confirmed: bool, db: Session):
-    query = select(Author).filter(Author.confirmed == confirmed).order_by(Author.surname)
+    query = select(Author).filter(Author.confirmed == confirmed).options(joinedload(Author.author_publications)).\
+        join(Author.author_publications, isouter=True).order_by(desc(func.count(Author.author_publications))).group_by(Author.id)
     authors_count = await get_count(query, db)
     authors = await db.execute(query.offset(offset).limit(limit))
-    scheme_authors = [SchemeAuthor.from_orm(author) for author in authors.scalars().all()]
+    scheme_authors = [SchemeAuthor.from_orm(author) for author in authors.scalars().unique().all()]
     return dict(authors=scheme_authors, count=authors_count)
 
 

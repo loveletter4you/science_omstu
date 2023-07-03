@@ -32,6 +32,7 @@ async def startup_init_tables():
     await init_models()
     db = session_local()
     await service_create_admin(db)
+    await db.close()
 
 
 @app.get("/openapi.json", include_in_schema=False)
