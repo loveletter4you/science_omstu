@@ -4,6 +4,7 @@ import {createSlice} from "@reduxjs/toolkit";
 const initialState = {
     publicationType: [],
     sourceRatingTypes: [],
+    departments: [],
 };
 
 const filterSlices = createSlice({
@@ -15,11 +16,14 @@ const filterSlices = createSlice({
         },
         getSourceRatingTypes(state, action) {
             state.sourceRatingTypes = action.payload;
+        },
+        getDepartments(state, action) {
+            state.departments = action.payload;
         }
     }
 });
 
 
-export const {getPublicationType, getSourceRatingTypes} = filterSlices.actions;
+export const {getPublicationType, getSourceRatingTypes, getDepartments} = filterSlices.actions;
 
 export default filterSlices.reducer;

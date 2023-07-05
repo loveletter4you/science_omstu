@@ -12,11 +12,11 @@ export const fetchPublications = createAsyncThunk(
     });
 export const fetchPublicationsSearch = createAsyncThunk(
     "publications/fetchPublicationsSearch", async ({search,publication_type_id,author_id,
-                                                       source_rating_type_id, from_date, to_date,
+                                                       source_rating_type_id, department, from_date, to_date,
                                                        page, pageSize}, {rejectWithValue}) => {
         try {
             const res = await PublicationsAPI.getPublicationsSearch(search,publication_type_id,author_id,
-                source_rating_type_id, from_date, to_date,
+                source_rating_type_id, department, from_date, to_date,
                 page, pageSize)
             return res.data;
         } catch (err) {

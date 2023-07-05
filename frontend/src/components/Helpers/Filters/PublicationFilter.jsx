@@ -2,7 +2,7 @@
 import React, {useState} from "react";
 import {FilterAPI} from "../../../store/api";
 import {useDispatch, useSelector} from "react-redux";
-import {getPublicationType, getSourceRatingTypes} from "../../../store/slices/FilterSlices";
+import {getPublicationType, getSourceRatingTypes, getDepartments} from "../../../store/slices/FilterSlices";
 import {useForm} from "react-hook-form";
 import {fetchAuthorSearch} from "../../../store/slices/AuthorsSlice";
 import {useDebounce} from "use-debounce";
@@ -13,7 +13,7 @@ const PublicationFilter = () => {
 
     const {register, formState: {errors}, handleSubmit} = useForm();
     const dispatch = useDispatch();
-    const {publicationType, sourceRatingTypes} = useSelector(state => state.filter)
+    const {publicationType, sourceRatingTypes, departments} = useSelector(state => state.filter)
     const [search, setSearch] = useState('');
     const {authors, count} = useSelector(state => state.authors);
     const debouncedSearch = useDebounce(search, 500);
@@ -34,9 +34,14 @@ const PublicationFilter = () => {
             const res = await FilterAPI.getSourceRatingTypes();
             dispatch(getSourceRatingTypes(res.data.source_rating_types))
         }
+        const getAllDepartments = async () => {
+            const res = await FilterAPI.getDepartments();
+            dispatch(getDepartments(res.data.departments))
+        }
 
         getType();
         getSourceRating();
+        getAllDepartments();
 
     }, [])
 
@@ -59,6 +64,9 @@ const PublicationFilter = () => {
         if (data.SourceRating === '') {
             data.SourceRating = null
         }
+        if (data.department === '') {
+            data.department = null
+        }
         if (data.beforeTime === '') {
             data.beforeTime = `2013-06-12`
         }
@@ -71,7 +79,8 @@ const PublicationFilter = () => {
             try {
                 dispatch(fetchPublicationsSearch({
                     search: null, publication_type_id: data.publicationType,
-                    author_id: data.authorName, source_rating_type_id: data.SourceRating, from_date: data.beforeTime,
+                    author_id: data.authorName, source_rating_type_id: data.SourceRating, department: data.department,
+                    from_date: data.beforeTime,
                     to_date: data.afterTime, page: 0, pageSize
                 }));
             } catch (e) {
@@ -109,6 +118,19 @@ const PublicationFilter = () => {
                         <option>{null}</option>
                         {sourceRatingTypes.map((type, index) =>
                             <option key={index} value={type.id}>{type.name}</option>
+                        )}
+                    </select>
+                </div>
+                <div>
+                    <label htmlFor="department">Кафедра:</label>
+                    <select className={style.dataName} {...register("department")}>
+                        <option>{null}</option>
+                        {departments.map((type, index) => {
+                            if (type.name !== '')
+                            {
+                                return <option key={index} value={type.id}>{type.name}</option>
+                            }
+                        }
                         )}
                     </select>
                 </div>
