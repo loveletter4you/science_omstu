@@ -109,13 +109,50 @@ class SchemeSource(BaseModel):
         orm_mode = True
 
 
+class SchemePublicationLinkType(BaseModel):
+    id: int
+    name: str
+
+    class Config:
+        orm_mode = True
+
+
+class SchemePublicationLink(BaseModel):
+    publication_link_type: SchemePublicationLinkType
+    link: str
+
+    class Config:
+        orm_mode = True
+
+
+class SchemeSourceLinkType(BaseModel):
+    id: int
+    name: str
+
+    class Config:
+        orm_mode = True
+
+
+class SchemeSourceLink(BaseModel):
+    source_link_type: SchemeSourceLinkType
+    link: str
+
+    class Config:
+        orm_mode = True
+
+
+class SchemeSourceWithLink(SchemeSource):
+    source_links: List[SchemeSourceLink]
+
+
 class SchemePublication(BaseModel):
     id: int
     publication_type: SchemePublicationType
-    source: SchemeSource
+    source: SchemeSourceWithLink
     title: str
     publication_date: date
     publication_authors: List[SchemeAuthorPublication]
+    publication_links: List[SchemePublicationLink]
 
     class Config:
         orm_mode = True
@@ -131,22 +168,6 @@ class SchemeKeyword(BaseModel):
 
 class SchemeKeywordPublication(BaseModel):
     keyword: SchemeKeyword
-
-    class Config:
-        orm_mode = True
-
-
-class SchemePublicationLinkType(BaseModel):
-    id: int
-    name: str
-
-    class Config:
-        orm_mode = True
-
-
-class SchemePublicationLink(BaseModel):
-    publication_link_type: SchemePublicationLinkType
-    link: str
 
     class Config:
         orm_mode = True
@@ -187,22 +208,6 @@ class SchemeSourceRating(BaseModel):
     source_rating_type: SchemeSourceRatingType
     rating: str
     rating_date: date
-
-    class Config:
-        orm_mode = True
-
-
-class SchemeSourceLinkType(BaseModel):
-    id: int
-    name: str
-
-    class Config:
-        orm_mode = True
-
-
-class SchemeSourceLink(BaseModel):
-    source_link_type: SchemeSourceLinkType
-    link: str
 
     class Config:
         orm_mode = True

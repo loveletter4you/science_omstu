@@ -22,7 +22,8 @@ async def service_get_sources_search(search: str, offset: int, limit: int, db: S
     query = select(Source).options(joinedload(Source.source_type)).options(joinedload(Source.publications))\
         .join(Source.publications, isouter=True)\
         .order_by(desc(func.count(Source.publications))).group_by(Source.id)
-    query = query.filter(func.lower(Source.name).contains(search.lower()))
+    query = query.options(joinedload(Source.source_links)).join(Source.source_links)\
+        .filter(func.lower(Source.name).contains(search.lower()))
     sources_result = await db.execute(query.offset(offset).limit(limit))
     sources = sources_result.scalars().unique().all()
     count = await get_count(query, db)

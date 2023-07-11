@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession as Session
 from sqlalchemy.orm import joinedload
 
 from src.model.model import Publication, AuthorPublication, Source, SourceRating, PublicationType, \
-    Author, AuthorDepartment, KeywordPublication, PublicationLink, AuthorPublicationOrganization
+    Author, AuthorDepartment, KeywordPublication, PublicationLink, AuthorPublicationOrganization, SourceLink
 from src.model.storage import get_count
 from src.routers.publication.schema import Publication_params
 from src.schemas.schemas import SchemePublication, SchemePublicationPage
@@ -30,9 +30,13 @@ async def service_get_publications(params: Publication_params, db: Session):
     publications_result = await db.execute(query.order_by(desc(Publication.publication_date))
                                            .order_by(Publication.title)
                                            .options(joinedload(Publication.publication_type))
-                                           .options(joinedload(Publication.source))
+                                           .options(joinedload(Publication.source)
+                                                    .joinedload(Source.source_links)
+                                                    .joinedload(SourceLink.source_link_type))
                                            .options(joinedload(Publication.publication_authors)
                                                     .joinedload(AuthorPublication.author))
+                                           .options(joinedload(Publication.publication_links)
+                                                    .joinedload(PublicationLink.publication_link_type))
                                            .offset(offset).limit(params.limit))
     publications = publications_result.scalars().unique().all()
     scheme_publications = [SchemePublication.from_orm(publication) for publication in publications]

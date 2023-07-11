@@ -25,13 +25,15 @@ const Publications = () => {
 
     const handlePageClick = (e) => {
         dispatch(fetchPublicationsSearch({search,publication_type_id: data.publicationType,author_id: data.authorName,
-            source_rating_type_id: data.SourceRating, from_date: data.beforeTime, to_date: data.afterTime, page: e.selected, pageSize}));
+            source_rating_type_id: data.SourceRating, department: data.department, from_date: data.beforeTime,
+            to_date: data.afterTime, page: e.selected, pageSize}));
     }
 
     React.useEffect(() => {
         if (debouncedSearch[0] !== '') {
             dispatch(fetchPublicationsSearch({search,publication_type_id: data.publicationType,author_id: data.authorName,
-                source_rating_type_id: data.SourceRating, from_date: data.beforeTime, to_date: data.afterTime, page: 0, pageSize}))
+                source_rating_type_id: data.SourceRating, department: data.department,
+                from_date: data.beforeTime, to_date: data.afterTime, page: 0, pageSize}))
         } else {
             dispatch(fetchPublications({page: 0, pageSize}))
         }
