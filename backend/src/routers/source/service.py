@@ -2,7 +2,8 @@ from sqlalchemy import func, desc, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession as Session
 from sqlalchemy.orm import joinedload
 
-from src.model.model import Source, Publication, SourceLink, SourceRatingType, SourceRating, AuthorPublication
+from src.model.model import Source, Publication, SourceLink, SourceRatingType, SourceRating, AuthorPublication, \
+    PublicationLink
 from src.model.storage import get_count
 from src.schemas.schemas import SchemeSourceWithType, SchemeSourceWithRating, SchemePublication
 
@@ -47,10 +48,15 @@ async def service_get_source_publications(id: int, offset: int, limit: int, db: 
     query = select(Publication).join(Source).order_by(desc(Publication.publication_date))\
         .order_by(Publication.title).filter(Source.id == id)
     publications_result = await db.execute(query.options(joinedload(Publication.publication_type))
-                                    .options(joinedload(Publication.source))
-                                    .options(joinedload(Publication.publication_authors)
-                                             .joinedload(AuthorPublication.author))
-                                    .offset(offset).limit(limit))
+                                           .options(joinedload(Publication.source)
+                                                    .joinedload(Source.source_links)
+                                                    .joinedload(SourceLink.source_link_type))
+                                           .options(joinedload(Publication.publication_authors)
+                                                    .joinedload(AuthorPublication.author))
+                                           .options(joinedload(Publication.publication_links)
+                                                    .joinedload(PublicationLink.publication_link_type))
+                                           .offset(offset).limit(limit))
+
     publications = publications_result.scalars().unique().all()
     scheme_publications = [SchemePublication.from_orm(publication) for publication in publications]
     count = await get_count(query, db)

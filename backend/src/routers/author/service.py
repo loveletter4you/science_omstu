@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession as Session
 from sqlalchemy.orm import joinedload
 
 from src.model.model import Author, AuthorPublication, Publication, AuthorIdentifier, AuthorPublicationOrganization, \
-    AuthorDepartment, Department, Identifier
+    AuthorDepartment, Department, Identifier, Source, SourceLink, PublicationLink
 from src.model.storage import get_or_create_organization_omstu, get_count
 from src.schemas.schemas import SchemePublication, SchemeAuthor, SchemeAuthorProfile
 
@@ -94,9 +94,13 @@ async def service_get_author_publications(id: int, offset: int, limit: int, db: 
         .order_by(desc(Publication.publication_date)) \
         .order_by(Publication.title).filter(AuthorPublication.author_id == id)
     publications = await db.execute(query.options(joinedload(Publication.publication_type))
-                                    .options(joinedload(Publication.source))
+                                    .options(joinedload(Publication.source)
+                                             .joinedload(Source.source_links)
+                                             .joinedload(SourceLink.source_link_type))
                                     .options(joinedload(Publication.publication_authors)
                                              .joinedload(AuthorPublication.author))
+                                    .options(joinedload(Publication.publication_links)
+                                             .joinedload(PublicationLink.publication_link_type))
                                     .offset(offset).limit(limit))
     scheme_publications = [SchemePublication.from_orm(publication) for publication
                            in publications.scalars().unique().all()]

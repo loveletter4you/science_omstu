@@ -3,7 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession as Session
 
 from src.model.database import get_db
 from src.routers.publication.controller import controller_get_publications, controller_get_publication_by_id, \
-    controller_get_publication_types, controller_post_author_publication, controller_delete_author_publication
+    controller_get_publication_types, controller_post_author_publication, controller_delete_author_publication, \
+    controller_get_publications_excel
 from src.routers.publication.schema import Publication_params
 from src.routers.user import controller_get_current_user
 from src.schemas.routers import SchemePublicationsRouter, SchemePublicationRouter, SchemePublicationTypesRouter
@@ -26,6 +27,12 @@ async def get_publication_types(db: Session = Depends(get_db)):
 async def get_publications(params: Publication_params = Depends(), db: Session = Depends(get_db)):
     publications = await controller_get_publications(params, db)
     return publications
+
+
+@router.get("/excel")
+async def get_publication_excel(params: Publication_params = Depends(), db: Session = Depends(get_db)):
+    excel = await controller_get_publications_excel(params, db)
+    return excel
 
 
 @router.get("/{id}", response_model=SchemePublicationRouter)

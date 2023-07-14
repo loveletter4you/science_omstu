@@ -4,13 +4,19 @@ from sqlalchemy.ext.asyncio import AsyncSession as Session
 from src.routers.admin.service import service_admin_check
 from src.routers.publication.schema import Publication_params
 from src.routers.publication.service import service_get_publications, service_get_publication, \
-    service_get_publication_publication_types, service_post_author_publication, service_delete_author_publication
+    service_get_publication_publication_types, service_post_author_publication, service_delete_author_publication, \
+    service_get_publications_excel
 from src.schemas.schemas import SchemeUser
 
 
 async def controller_get_publications(params: Publication_params, db: Session):
     publications = await service_get_publications(params, db)
     return publications
+
+
+async def controller_get_publications_excel(params: Publication_params, db: Session):
+    excel = await service_get_publications_excel(params, db)
+    return excel
 
 
 async def controller_get_publication_by_id(id: int, db: Session):
