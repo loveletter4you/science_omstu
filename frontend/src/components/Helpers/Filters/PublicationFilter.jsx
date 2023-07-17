@@ -1,6 +1,6 @@
 
 import React, {useState} from "react";
-import {FilterAPI} from "../../../store/api";
+import {FilterAPI, PublicationsAPI} from "../../../store/api";
 import {useDispatch, useSelector} from "react-redux";
 import {getPublicationType, getSourceRatingTypes, getDepartments} from "../../../store/slices/FilterSlices";
 import {useForm} from "react-hook-form";
@@ -19,6 +19,9 @@ const PublicationFilter = () => {
     const debouncedSearch = useDebounce(search, 500);
     const {publications, pageSize} = useSelector(state => state.publications);
     let date = new Date().toLocaleDateString('en-ca')
+    const state = {
+        button: 1
+    };
 
     const onSearchChange = (e) => {
         const {value} = e.target
@@ -54,7 +57,6 @@ const PublicationFilter = () => {
     }, [debouncedSearch[0]])
 
     const onSubmit = (data) => {
-
         if (data.publicationType === '') {
             data.publicationType = null
         }
@@ -87,8 +89,41 @@ const PublicationFilter = () => {
                 console.log(e)
             }
         }
-        sendFilters();
+        if (state.button === 1)
+            sendFilters();
+        if (state.button === 2){
+            try {
+                let url = '/api/publication/excel?';
+                if (data.publicationType)
+                    url += `publication_type_id=${data.publicationType}&`
+                if (data.authorName)
+                    url += `author_id=${data.authorName}&`
+                if (data.SourceRating)
+                    url += `source_rating_type_id=${data.SourceRating}&`
+                if (data.department)
+                    url += `department_id=${data.department}&`
+                if (data.beforeTime)
+                    url += `from_date=${data.beforeTime}&`
+                if (data.afterTime)
+                    url += `to_date=${data.afterTime}&`
+                url += `limit=1000`
+                fetch(url).then(res => {
+                    return res.blob();
+                }).then(blob => {
+                    const href = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.download = 'output.xlsx';
+                    a.href = href;
+                    a.click();
+                    a.href = '';
+                })
+            }
+            catch (e){
+                console.log(e)
+            }
+        }
     }
+
 
     return <div className={style.filter}>
         <div>Фильтры</div>
@@ -148,7 +183,10 @@ const PublicationFilter = () => {
                     </select>
                 </div>
                 <div>
-                    <input className={style.dataName} type={"submit"} value={"Применить"}/>
+                    <input className={style.dataName} type={"submit"} value={"Применить"} onClick={() => (state.button = 1)}/>
+                </div>
+                <div>
+                    <input className={style.dataName} type={"submit"} value={"Скачать в Excel"} onClick={() => (state.button = 2)}/>
                 </div>
             </form>
         </div>
