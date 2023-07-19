@@ -8,7 +8,7 @@ from starlette.responses import StreamingResponse
 
 from src.model.model import Publication, AuthorPublication, Source, SourceRating, PublicationType, \
     Author, AuthorDepartment, KeywordPublication, PublicationLink, AuthorPublicationOrganization, SourceLink, \
-    AuthorIdentifier
+    AuthorIdentifier, PublicationTypeView
 from src.model.storage import get_count
 from src.routers.publication.schema import Publication_params
 from src.schemas.schemas import SchemePublication, SchemePublicationPage
@@ -25,7 +25,7 @@ async def service_get_publications(params: Publication_params, db: Session):
         query = query.join(Source).join(SourceRating) \
             .filter(SourceRating.source_rating_type_id == params.source_rating_type_id)
     if not (params.publication_type_id is None):
-        query = query.filter(Publication.type_id == params.publication_type_id)
+        query = query.join(PublicationType).filter(PublicationType.view_id == params.publication_type_id).distinct()
     if not (params.author_id is None):
         query = query.join(AuthorPublication).filter(AuthorPublication.author_id == params.author_id).distinct()
     if not (params.department_id is None):
@@ -60,7 +60,7 @@ async def service_get_publications_excel(params: Publication_params, db: Session
         query = query.join(Source).join(SourceRating) \
             .filter(SourceRating.source_rating_type_id == params.source_rating_type_id)
     if not (params.publication_type_id is None):
-        query = query.filter(Publication.type_id == params.publication_type_id)
+        query = query.join(PublicationType).filter(PublicationType.view_id == params.publication_type_id).distinct()
     if not (params.author_id is None):
         query = query.join(AuthorPublication).filter(AuthorPublication.author_id == params.author_id).distinct()
     if not (params.department_id is None):
@@ -148,7 +148,7 @@ async def service_get_publication(id: int, db: Session):
 
 
 async def service_get_publication_publication_types(db: Session):
-    publcation_types = await db.execute(select(PublicationType))
+    publcation_types = await db.execute(select(PublicationTypeView))
     return dict(publication_types=publcation_types.scalars().all())
 
 

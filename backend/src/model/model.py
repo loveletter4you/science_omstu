@@ -130,7 +130,15 @@ class PublicationType(Base):
     __tablename__ = "publication_type"
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False, unique=True)
+    view_id = Column(Integer, ForeignKey('publication_type_view.id'))
     publications = Relationship("Publication", backref='publication_type')
+
+
+class PublicationTypeView(Base):
+    __tablename__ = "publication_type_view"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False, unique=True)
+    publication_types = Relationship("PublicationType", backref='publication_type_view')
 
 
 class Publication(Base):
@@ -208,3 +216,4 @@ class Feedback(Base):
     message = Column(String, nullable=False)
     date = Column(Date, nullable=False)
     solved = Column(Boolean, nullable=False)
+

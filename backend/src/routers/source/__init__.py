@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession as Session
 
 from src.model.database import get_db
 from src.routers.source.controller import controller_get_sources, controller_get_source, \
-    controller_get_source_publications, controller_source_rating_types
+    controller_get_source_publications, controller_source_rating_types, controller_get_source_types
 from src.schemas.routers import SchemeSourcesRouter, SchemeSourceRouter, SchemePublicationsRouter
 
 router = APIRouter(
@@ -18,6 +18,12 @@ async def get_sources(search: str = None,
                       page: int = 0, limit: int = 20, db: Session = Depends(get_db)):
     sources = await controller_get_sources(search, page, limit, db)
     return sources
+
+
+@router.get('/source_types')
+async def get_source_types(db: Session = Depends(get_db)):
+    source_types = await controller_get_source_types(db)
+    return source_types
 
 
 @router.get("/source_rating_types")
