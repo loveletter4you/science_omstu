@@ -129,7 +129,9 @@ async def service_get_publications_excel(params: Publication_params, db: Session
 async def service_get_publication(id: int, db: Session):
     publication_result = await db.execute(select(Publication).filter(Publication.id == id)
                                           .options(joinedload(Publication.publication_type))
-                                          .options(joinedload(Publication.source))
+                                          .options(joinedload(Publication.source)
+                                                   .joinedload(Source.source_links)
+                                                   .joinedload(SourceLink.source_link_type))
                                           .options(joinedload(Publication.publication_authors)
                                                    .joinedload(AuthorPublication.author))
                                           .options(joinedload(Publication.publication_authors)
