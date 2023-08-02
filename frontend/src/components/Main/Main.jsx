@@ -26,15 +26,15 @@ const Main = () => {
 
         <div className={style.counts}>
             <div className={style.block}>
-                <div className={style.countTitle}>Колличество публикаций <br></br> за последние 10 лет</div>
+                <div className={style.countTitle}>Количество публикаций <br></br> за последние 10 лет</div>
                 <div className={style.count}>{publication.count}</div>
             </div>
             <div className={style.block}>
-                <div className={style.countTitle}>Колличество авторов</div>
+                <div className={style.countTitle}>Количество авторов</div>
                 <div className={style.count}>{author.count}</div>
             </div>
             <div className={style.block}>
-                <div className={style.countTitle}>Колличество источников</div>
+                <div className={style.countTitle}>Количество источников</div>
                 <div className={style.count}>{source.count}</div>
             </div>
         </div>

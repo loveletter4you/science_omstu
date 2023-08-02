@@ -25,7 +25,7 @@ const SignIn = () => {
                     dispatch(setIsAuth(true));
                 data.checkbox === true ? setCookies('isAuth', true, {
                         path: '/',
-                        maxAge: 60 * 60 * 24 * 30,
+                        maxAge: 60 * 24 * 30,
                         domain: DOMAIN,
                         secure: SECURE
                     }) :

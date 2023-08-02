@@ -33,6 +33,13 @@ async def post_author(name: str, surname: str, patronymic: str, confirmed: bool,
     return author
 
 
+@router.get("/unconfirmed_omstu", response_model=SchemeAuthorsRouter)
+async def get_unconfirmed_omstu_authors(search: str = None,
+                                        page: int = 0, limit: int = 20, db: Session = Depends(get_db)):
+    authors = await controller_get_unconfirmed_omstu_authors(search, page, limit, db)
+    return authors
+
+
 @router.get("/{id}", response_model=SchemeAuthorRouter)
 async def get_author_by_id(id: int, db: Session = Depends(get_db)):
     author = await controller_get_author(id, db)
@@ -72,13 +79,6 @@ async def update_author_identifier(id: int, identifier_value: str,
 async def delete_author_identifier(id: int, user: SchemeUser = Depends(controller_get_current_user), db: Session = Depends(get_db)):
     author_identifier = await controller_delete_author_identifier(user, id, db)
     return author_identifier
-
-
-@router.get("/unconfirmed_omstu", response_model=SchemeAuthorsRouter)
-async def get_unconfirmed_omstu_authors(search: str = None,
-                                        page: int = 0, limit: int = 20, db: Session = Depends(get_db)):
-    authors = await controller_get_unconfirmed_omstu_authors(search, page, limit, db)
-    return authors
 
 
 @router.get("/{id}/publications", response_model=SchemePublicationsRouter)

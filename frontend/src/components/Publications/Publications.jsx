@@ -43,7 +43,7 @@ const Publications = () => {
             <input className={styleSearch.search} placeholder='Поиск' type="text" value={search}
                    onChange={onSearchChange}/>
             <div className={style.blockCount}>
-                <div>Колличество найденных <br></br>публикаций: <span className={style.count}>{count}</span></div>
+                <div>Количество найденных <br></br>публикаций: <span className={style.count}>{count}</span></div>
             </div>
             <PublicationFilterSize min={20} mid={40} max={80}/>
             {isFetching === true ? <Preloader/> :

@@ -46,7 +46,7 @@ const Authors = () => {
             <input className={styleSearch.search} placeholder='Поиск' type="text" value={search}
                    onChange={onSearchChange}/>
             <div className={style.blockCount}>
-                <div>Колличество найденных <br></br>авторов: <span className={style.count}>{count}</span></div>
+                <div>Количество найденных <br></br>авторов: <span className={style.count}>{count}</span></div>
             </div>
             <div className={style.size}>
                 Отображать по:

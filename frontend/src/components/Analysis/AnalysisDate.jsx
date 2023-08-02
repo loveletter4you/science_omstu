@@ -46,7 +46,7 @@ const AnalysisDate = () => {
             tickSize: 5,
             tickPadding: 5,
             tickRotation: 0,
-            legend: "Колличество публикаций",
+            legend: "Количество публикаций",
             legendPosition: "middle",
             legendOffset: -40,
         },
@@ -80,13 +80,13 @@ const AnalysisDate = () => {
 
     return <div>
         <div>
-            Колличество публикаций в университете за год
+            Количество публикаций в университете за год
         </div>
         <div id = 'block' style={{height: 400}}>
             <ResponsiveBar {...YearData} />
         </div>
         <div>
-            Колличество публикаций университета в рейтингах
+            Количество публикаций университета в рейтингах
         </div>
         <div style={{height: 400}}>
             <ResponsiveBar
@@ -172,7 +172,7 @@ const AnalysisDate = () => {
             />
         </div>
         <div>
-            Колличество публикаций университетов
+            Количество публикаций университетов
         </div>
         <div style={{height: 400}}>
             <ResponsiveBar
