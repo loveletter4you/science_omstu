@@ -110,7 +110,8 @@ async def service_get_publications_excel(params: Publication_params, db: Session
             'ISSN': issn,
             'eISSN': eissn,
             'Ratings': '/'.join([f'{source_rating.source_rating_type.name}: {source_rating.rating}'
-                                 for source_rating in publication.source.source_ratings])
+                                 for source_rating in publication.source.source_ratings]),
+            'OmSTU fraction': f"{publication.rate}:.{6}f"
         }
         data_list.append(data)
     df = pandas.DataFrame(data_list)

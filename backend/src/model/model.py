@@ -150,6 +150,7 @@ class Publication(Base):
     abstract = Column(String)
     publication_date = Column(Date, nullable=False)
     accepted = Column(Boolean, nullable=False)
+    rate = Column(Float)
     keyword_publications = Relationship("KeywordPublication", backref="publication")
     publication_authors = Relationship("AuthorPublication", backref="publication")
     publication_links = Relationship("PublicationLink", backref="publication")
