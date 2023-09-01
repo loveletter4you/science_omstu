@@ -10,11 +10,13 @@ import re
 
 from src.model.model import Identifier, Source, SourceLink, Publication, PublicationLink, \
     AuthorIdentifier, AuthorPublication, Author, AuthorPublicationOrganization, Keyword, \
-    KeywordPublication, SourceRating, Organization, Department, Faculty, AuthorDepartment
+    KeywordPublication, SourceRating, Organization, Department, Faculty, AuthorDepartment, Subject, \
+    SourceRatingSubject
 from src.model.storage import get_or_create_publication_link_type, get_or_create_source_type, \
     get_or_create_source_link_type, get_or_create_identifier, get_or_create_source_rating_type, \
     get_or_create_organization_omstu, get_source_by_name_or_identifiers, get_or_create_publication_type, \
-    create_publication, create_publication_link
+    create_publication, create_publication_link, create_source, create_source_link, get_publication_by_doi_or_name, \
+    get_subject_by_code
 
 
 empty_annotations = [None, '-', '', '[краткое описание не найдено]', '[No abstract available]']
@@ -23,7 +25,6 @@ empty_annotations = [None, '-', '', '[краткое описание не на�
 async def service_fill_scopus(date: datetime.date, file: UploadFile, db: Session):
     scopus_df = pd.read_csv(file.file, on_bad_lines='skip')
     scopus_df = scopus_df.replace(np.nan, "")
-
     pub_link_type_doi = await get_or_create_publication_link_type("DOI", db)
     pub_link_type_scopus = await get_or_create_publication_link_type("Scopus", db)
     source_type_journal = await get_or_create_source_type("Журнал", db)
@@ -31,113 +32,96 @@ async def service_fill_scopus(date: datetime.date, file: UploadFile, db: Session
     source_link_type_issn = await get_or_create_source_link_type("ISSN", db)
     identifier_scopus = await get_or_create_identifier("Scopus Author ID", db)
     organization_omstu = await get_or_create_organization_omstu(db)
+
     for _, row in scopus_df.iterrows():
+
         issn = str(row['ISSN']).rjust(8, '0')
         issn = issn[:4] + '-' + issn[4:]
         source = await get_source_by_name_or_identifiers(str(row['Source title']), [issn], db)
         if source is None:
-            source = Source(name=row['Source title'])
             if row['Document Type'] == "Conference Paper":
-                source.source_type = source_type_conference
+                source = await create_source(row['Source title'], source_type_conference, db)
             else:
-                source.source_type = source_type_journal
-            db.add(source)
+                source = await create_source(row['Source title'], source_type_journal, db)
             if row['ISSN'] != "":
-                source_link = SourceLink(
-                    source=source,
-                    source_link_type=source_link_type_issn,
-                    link=issn
-                )
-                db.add(source_link)
-            await db.commit()
+                await create_source_link(source, source_link_type_issn, row['ISSN'], db)
+
         publication_type = await get_or_create_publication_type(row["Document Type"], db)
         date = datetime.date(int(row['Year']), 1, 1)
-        publication_result = await db.execute(select(Publication)
-                                              .join(Publication.publication_links)
-                                              .options(joinedload(Publication.publication_links))
-                                              .filter(or_(Publication.title.ilike(row['Title']),
-                                                          PublicationLink.link == row["DOI"])).distinct(Publication.id))
-        publication = publication_result.scalars().first()
-        is_founded: bool
+        publication = await get_publication_by_doi_or_name(row["DOI"], row['Title'], db)
         if publication is None:
-            publication = await create_publication(publication_type, source, row["Title"], row["Abstract"], date, True,
-                                                   db)
+            publication = await create_publication(publication_type, source, row["Title"], row["Abstract"], date, True, db)
             await create_publication_link(publication, pub_link_type_scopus, row["Link"], db)
             if row['DOI'] != "":
                 await create_publication_link(publication, pub_link_type_doi, row["DOI"], db)
-            is_founded = False
         else:
             if publication.abstract in empty_annotations:
                 publication.abstract = row["Abstract"]
-            publication_link_scopus = [link for link in publication.publication_links if
-                                       link.link_type_id == pub_link_type_scopus.id]
-            if len(publication_link_scopus) == 0:
+            publication_link_types_ids = [link.link_type_id for link in publication.publication_links]
+            if publication_link_scopus.id not in publication_link_types_ids:
                 await create_publication_link(publication, pub_link_type_scopus, row["Link"], db)
-            if row['DOI'] != "":
-                publication_link_doi = [link for link in publication.publication_links if
-                                        link.link_type_id == pub_link_type_doi.id]
-                if len(publication_link_doi) == 0:
-                    await create_publication_link(publication, pub_link_type_doi, row["DOI"], db)
-            is_founded = True
+            if row['DOI'] != "" and (pub_link_type_doi.id not in publication_link_types_ids):
+                await create_publication_link(publication, pub_link_type_doi, row["DOI"], db)
+            continue
+
         authors_orgs = row['Authors with affiliations'].split(';')
         authors_scopus = row['Author(s) ID'].split(';')
-        if not is_founded:
-            for i, author_row in enumerate(authors_orgs):
-                if i >= len(authors_scopus):
-                    continue
-                author_data = author_row.split(', ')
-                identifier_result = await db.execute(select(AuthorIdentifier).options(joinedload(AuthorIdentifier.author)).
-                                                     filter(and_(AuthorIdentifier.identifier_id == identifier_scopus.id,
-                                                                 AuthorIdentifier.identifier_value == authors_scopus[i])))
-                identifier = identifier_result.scalars().first()
+        for i, author_row in enumerate(authors_orgs):
+            if i >= len(authors_scopus):
+                continue
+            author_data = author_row.split(', ')
+            identifier_result = await db.execute(select(AuthorIdentifier).options(joinedload(AuthorIdentifier.author)).
+                                                 filter(and_(AuthorIdentifier.identifier_id == identifier_scopus.id,
+                                                             AuthorIdentifier.identifier_value == authors_scopus[i])))
+            identifier = identifier_result.scalars().first()
+            author: Author
+            if identifier is None:
                 author: Author
-                if identifier is None:
-                    author: Author
-                    if len(author_data) > 1:
-                        author = Author(
-                            name=author_data[1],
-                            surname=author_data[0],
-                            confirmed=False
-                        )
-                    else:
-                        author = Author(
-                            name='-',
-                            surname=author_data[0],
-                            confirmed=False
-                        )
-                    db.add(author)
-                    author_identifier = AuthorIdentifier(
-                        author=author,
-                        identifier=identifier_scopus,
-                        identifier_value=authors_scopus[i]
+                if len(author_data) > 1:
+                    author = Author(
+                        name=author_data[1],
+                        surname=author_data[0],
+                        confirmed=False
                     )
-                    db.add(author_identifier)
                 else:
-                    author = identifier.author
-                author_publication = AuthorPublication(
-                    publication=publication,
-                    author=author
+                    author = Author(
+                        name='-',
+                        surname=author_data[0],
+                        confirmed=False
+                    )
+                db.add(author)
+                author_identifier = AuthorIdentifier(
+                    author=author,
+                    identifier=identifier_scopus,
+                    identifier_value=authors_scopus[i]
                 )
-                db.add(author_publication)
-                if 'Omsk State Technical University' in author_data:
-                    author_publication_organization = AuthorPublicationOrganization(
-                        author_publication=author_publication,
-                        organization=organization_omstu
-                    )
-                    db.add(author_publication_organization)
-                elif len(author_data) > 2:
-                    organization_result = await db.execute(select(Organization).filter(Organization.name == author_data[2]))
-                    organization = organization_result.scalars().first()
-                    if organization is None:
-                        organization = Organization(name=author_data[2])
-                        db.add(organization)
-                    author_publication_organization = AuthorPublicationOrganization(
-                        author_publication=author_publication,
-                        organization=organization
-                    )
-                    db.add(author_publication_organization)
-                await db.commit()
-        if row['Author Keywords'] != "" and not is_founded:
+                db.add(author_identifier)
+            else:
+                author = identifier.author
+            author_publication = AuthorPublication(
+                publication=publication,
+                author=author
+            )
+            db.add(author_publication)
+            if 'Omsk State Technical University' in author_data:
+                author_publication_organization = AuthorPublicationOrganization(
+                    author_publication=author_publication,
+                    organization=organization_omstu
+                )
+                db.add(author_publication_organization)
+            elif len(author_data) > 2:
+                organization_result = await db.execute(select(Organization).filter(Organization.name == author_data[2]))
+                organization = organization_result.scalars().first()
+                if organization is None:
+                    organization = Organization(name=author_data[2])
+                    db.add(organization)
+                author_publication_organization = AuthorPublicationOrganization(
+                    author_publication=author_publication,
+                    organization=organization
+                )
+                db.add(author_publication_organization)
+            await db.commit()
+        if row['Author Keywords'] != "":
             keywords = set(row['Author Keywords'].split('; '))
             for keyword_value in keywords:
                 keyword_result = await db.execute(select(Keyword).filter(Keyword.keyword == keyword_value))
@@ -832,5 +816,75 @@ async def service_jcr_list_fill(date: datetime.date, file: UploadFile, db: Sessi
                 link=row['eissn']
             )
             db.add(source_link_issn)
+    await db.commit()
+    return dict(message="OK")
+
+
+async def service_vak_list_fill(file: UploadFile, db: Session):
+    df = pd.read_excel(file.file, 'subjects')
+    df = df.replace(np.nan, "")
+    source_type_journal = await get_or_create_source_type("Журнал", db)
+    source_link_type_issn = await get_or_create_source_link_type("ISSN", db)
+    source_link_type_eissn = await get_or_create_source_link_type("eISSN", db)
+    vak_list_rating_type = await get_or_create_source_rating_type('ВАК "Список журналов"', db)
+
+    for _, row in df.iterrows():
+        issns = row['issn'].split(',')
+        source = await get_source_by_name_or_identifiers(str(row['title_main']), issns, db)
+        if source is None:
+            source = Source(
+                name=row['title_main'],
+                source_type=source_type_journal
+            )
+            if len(issns) > 1:
+                source_link_issn = SourceLink(
+                    source=source,
+                    source_link_type=source_link_type_issn,
+                    link=issns[0]
+                )
+                db.add(source_link_issn)
+                source_link_eissn = SourceLink(
+                    source=source,
+                    source_link_type=source_link_type_eissn,
+                    link=issns[1]
+                )
+                db.add(source_link_eissn)
+            else:
+                source_link_issn = SourceLink(
+                    source=source,
+                    source_link_type=source_link_type_issn,
+                    link=issns[0]
+                )
+                db.add(source_link_issn)
+            await db.commit()
+        source_rating = await db.execute(select(SourceRating)
+                                         .filter(and_(SourceRating.source_id == source.id,
+                                                      SourceRating.source_rating_type_id == vak_list_rating_type.id)))
+        source_rating = source_rating.scalars().first()
+        if source_rating is None:
+            source_rating = SourceRating(
+                source=source,
+                source_rating_type=vak_list_rating_type
+            )
+            db.add(source_rating)
+            await db.commit()
+
+        to_rating_date = datetime.date(9999, 1, 1) if str(row['till']) == '' \
+            else datetime.datetime.strptime(str(row['till']), "%d.%m.%Y").date()
+
+        subject = await get_subject_by_code(row['subj_code'], db)
+        if subject is None:
+            subject = Subject(
+                subj_code=row['subj_code'],
+                name=row['subj_name']
+            )
+        source_rating_subject = SourceRatingSubject(
+                rating_date=datetime.datetime.strptime(str(row['from']), "%d.%m.%Y").date(),
+                to_rating_date=to_rating_date,
+                active=True if row['status'] == 'Active' else False,
+                subject=subject,
+                source_rating=source_rating,
+        )
+        db.add(source_rating_subject)
     await db.commit()
     return dict(message="OK")

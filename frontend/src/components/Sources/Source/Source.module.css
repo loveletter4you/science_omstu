@@ -9,10 +9,26 @@
 .blockRating {
     border: 1px solid;
     padding: 10px;
+    margin: 10px 0;
     font-size: 16px;
     border-radius: 10px;
-    width: 42vw;
-    flex-basis: 47.7%;
+    cursor: pointer;
+}
+
+.blockText{
+    margin-left: 10px;
+}
+
+.thRowRating{
+    margin: 10px;
+}
+
+.tableRating{
+    border: 1px solid;
+    padding: 10px;
+    border-radius: 10px;
+    width: 100%;
+    font-size: 16px;
 }
 
 .lineBlock {

@@ -70,7 +70,7 @@ const PublicationFilter = () => {
             data.department = null
         }
         if (data.beforeTime === '') {
-            data.beforeTime = `2013-06-12`
+            data.beforeTime = `1960-06-12`
         }
         if (data.afterTime === '') {
             data.afterTime = date

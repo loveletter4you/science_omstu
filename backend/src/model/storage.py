@@ -1,12 +1,13 @@
 from datetime import date
 
-from sqlalchemy import Select, select
+from sqlalchemy import Select, select, or_
+from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import func
 from sqlalchemy.ext.asyncio import AsyncSession as Session
 
 
 from src.model.model import PublicationLinkType, SourceType, SourceLinkType, Identifier, SourceRatingType, Organization, \
-    Source, SourceLink, PublicationType, Publication, PublicationLink
+    Source, SourceLink, PublicationType, Publication, PublicationLink, Subject
 
 
 async def get_count(q: Select, db: Session):
@@ -127,3 +128,41 @@ async def create_publication_link(publication: Publication,
     db.add(publication_link)
     await db.commit()
     return publication_link
+
+
+async def create_source(name: str, source_type: SourceType, db: Session):
+    source = Source(name=name, source_type=source_type)
+    db.add(source)
+    await db.commit()
+    return source
+
+
+async def create_source_link(source: Source, source_link_type: SourceLinkType, link: str, db: Session):
+    source_link = SourceLink(
+        source=source,
+        source_link_type=source_link_type,
+        link=link
+    )
+    db.add(source_link)
+    await db.commit()
+    return source_link
+
+
+async def get_publication_by_doi_or_name(doi: str, name: str, db: Session):
+    publication_result = await db.execute(select(Publication)
+                                          .join(Publication.publication_links)
+                                          .options(joinedload(Publication.publication_links))
+                                          .filter(or_(Publication.title.ilike(name),
+                                                      PublicationLink.link == doi)).distinct(Publication.id))
+    publication = publication_result.scalars().first()
+    return publication
+
+
+async def get_subject_by_code(subj_code: str, db: Session):
+    subject_result = await db.execute(select(Subject).filter(Subject.subj_code == subj_code))
+    subject = subject_result.scalars().first()
+    return subject
+
+
+async def get_author_by_identifier(identifier_type: Identifier, value: str, db: Session):
+    pass

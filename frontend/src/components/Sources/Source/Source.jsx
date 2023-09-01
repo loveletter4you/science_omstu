@@ -10,6 +10,7 @@ import {setData} from "../../../store/slices/PublicationsSlice";
 
 const Source = () => {
 
+
     const params = useParams();
     const dispatch = useDispatch();
     const source = useSelector(state => state.source)
@@ -50,12 +51,8 @@ const Source = () => {
                 </div>
                 <div>
 
-                    <div className={style.lineBlock}>{source.source_ratings.map((ratings, index) =>
-                            <div key = {index} className={style.blockRating}>
-                        <div>{ratings.source_rating_type.name}</div>
-                        <div>{ratings.rating}</div>
-                        <div>{ratings.rating_date}</div>
-                    </div>
+                    <div >{source.source_ratings.map((ratings, index) =>
+                        <Dropdown source_rating={ratings}></Dropdown>
                     )}
                     </div>
                 </div>
@@ -65,5 +62,45 @@ const Source = () => {
         }
     </div>
 }
+
+const Dropdown = (source_rating) => {
+    const [isOpen, setOpen] = useState(false);
+
+    const handleChangeOpen = () => setOpen(!isOpen);
+    return (
+            <div ><div className={style.blockRating} onClick={handleChangeOpen}>
+                <div>{source_rating.source_rating.source_rating_type.name}</div>
+
+                <div>{source_rating.source_rating.rating === null ? null : source_rating.source_rating.rating}</div>
+
+
+                <div>{source_rating.source_rating.source_rating_dates.length !== 0 ? source_rating.source_rating.source_rating_dates.map((rating_dates, index) => <div key = {index}>
+
+                    <div>{rating_dates.rating_date === null ? null : ''}</div>
+                    {rating_dates.rating_date} {" – "}
+                    {rating_dates.active === false ? rating_dates.to_rating_date : 'Active' }
+                </div>) : null}
+                </div>
+            </div>
+                {isOpen && (
+                    <div>
+                            <table className={style.tableRating}>
+                                <tbody>
+                                {source_rating.source_rating.source_rating_subjects.map((rating_subjects, index) =>
+                                    <tr key={index}>
+                                    <td>{rating_subjects.subject.subj_code}</td>
+                                    <td>{rating_subjects.subject.name}</td>
+                                    <td>{rating_subjects.rating_date}</td>
+                                    <td>{rating_subjects.active === false ? rating_subjects.to_rating_date : 'Active' }</td>
+                                    </tr>
+                                )}
+
+                                </tbody>
+                            </table>
+                    </div>)
+                }
+            </div>
+    );
+};
 
 export default Source;

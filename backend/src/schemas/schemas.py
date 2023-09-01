@@ -204,10 +204,39 @@ class SchemeSourceRatingType(BaseModel):
         orm_mode = True
 
 
+class SchemeSubject(BaseModel):
+    subj_code: str
+    name: str
+
+    class Config:
+        orm_mode = True
+
+
+class SchemeSourceRatingSubject(BaseModel):
+    subject: SchemeSubject
+    rating_date: date
+    to_rating_date: date
+    active: bool
+
+    class Config:
+        orm_mode = True
+
+
+class SchemeSourceRatingDate(BaseModel):
+    active: bool
+    rating_date: date
+    to_rating_date: date
+
+
+    class Config:
+        orm_mode = True
+
+
 class SchemeSourceRating(BaseModel):
     source_rating_type: SchemeSourceRatingType
-    rating: str
-    rating_date: date
+    source_rating_subjects: List[SchemeSourceRatingSubject]
+    source_rating_dates: List[SchemeSourceRatingDate]
+    rating: str | None
 
     class Config:
         orm_mode = True

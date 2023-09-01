@@ -117,13 +117,41 @@ class SourceLink(Base):
     link = Column(String, nullable=False)
 
 
+class SourceRatingDate(Base):
+    __tablename__ = 'source_rating_date'
+    id = Column(Integer, primary_key=True)
+    source_rating_id = Column(Integer, ForeignKey('source_rating.id'), nullable=False)
+    rating_date = Column(Date, nullable=False)
+    to_rating_date = Column(Date, nullable=False)
+    active = Column(Boolean, nullable=False)
+
+
+class SourceRatingSubject(Base):
+    __tablename__ = 'source_rating_subject'
+    id = Column(Integer, primary_key=True)
+    source_rating_id = Column(Integer, ForeignKey('source_rating.id'), nullable=False)
+    subject_id = Column(Integer, ForeignKey('subject.id'), nullable=False)
+    active = Column(Boolean, nullable=False)
+    rating_date = Column(Date, nullable=False)
+    to_rating_date = Column(Date, nullable=False)
+
+
 class SourceRating(Base):
     __tablename__ = "source_rating"
     id = Column(Integer, primary_key=True)
     source_id = Column(Integer, ForeignKey('source.id'), nullable=False)
     source_rating_type_id = Column(Integer, ForeignKey('source_rating_type.id'), nullable=False)
-    rating = Column(String, nullable=False)
-    rating_date = Column(Date, nullable=False)
+    rating = Column(String)
+    source_rating_dates = Relationship("SourceRatingDate", backref='source_rating')
+    source_rating_subjects = Relationship("SourceRatingSubject", backref='source_rating')
+
+
+class Subject(Base):
+    __tablename__ = "subject"
+    id = Column(Integer, primary_key=True)
+    subj_code = Column(String, nullable=False)
+    name = Column(String, nullable=False)
+    source_rating_subjects = Relationship("SourceRatingSubject", backref='subject')
 
 
 class PublicationType(Base):
