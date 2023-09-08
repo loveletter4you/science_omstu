@@ -14,3 +14,4 @@ class Publication_params(BaseModel):
     to_date: date = date.today()
     page: int = 0
     limit: int = 20
+
