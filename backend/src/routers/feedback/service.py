@@ -2,13 +2,13 @@ from sqlalchemy.ext.asyncio import AsyncSession as Session
 from datetime import date
 from src.model.model import Feedback
 from src.schemas.routers import SchemeFeedbackPostRouter
-from settings_env import RECAPTCHA_SECRET_KEY
+from settings_env import settings
 from src.utils.aiohttp import SingletonAiohttp
 
 
 async def service_post_feedback(feedback: SchemeFeedbackPostRouter, db: Session):
     r = await SingletonAiohttp.post_query_url(f"https://www.google.com/recaptcha/api/siteverify", data={
-        'secret': RECAPTCHA_SECRET_KEY,
+        'secret': settings.RECAPTCHA_SECRET_KEY,
         'response': feedback.token
     })
     if r['success']:

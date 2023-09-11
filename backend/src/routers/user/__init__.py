@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, security
 from sqlalchemy.ext.asyncio import AsyncSession as Session
 from starlette.responses import JSONResponse
 
-from settings_env import DOMAIN, SECURE_COOKIE
+from settings_env import settings
 from src.model.database import get_db
 from src.routers.user.controller import controller_generate_token, controller_get_current_user
 
@@ -27,8 +27,8 @@ async def login(form_data: security.OAuth2PasswordRequestForm = Depends(), db: S
     response.set_cookie("Authorization",
                         value=f"Bearer {token['access_token']}",
                         httponly=True,
-                        domain=DOMAIN,
-                        secure=SECURE_COOKIE,
+                        domain=settings.DOMAIN,
+                        secure=settings.SECURE_COOKIE,
                         max_age=1800,
                         expires=1800,)
     return response

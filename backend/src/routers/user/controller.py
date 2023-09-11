@@ -2,7 +2,7 @@ from fastapi import security, HTTPException, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession as Session
 import jwt as _jwt
 
-from settings_env import SECRET_KEY
+from settings_env import settings
 from src.model.database import get_db
 from src.routers.user.service import service_get_user_by_login, service_create_token, \
     service_oauth2scheme, service_get_user_by_id
@@ -28,7 +28,7 @@ async def controller_auth_user(login: str, password: str, db: Session):
 
 async def controller_get_current_user(token: str = Depends(service_oauth2scheme()), db: Session = Depends(get_db)):
     try:
-        payload = _jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        payload = _jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
         user = await service_get_user_by_id(payload["id"], db)
     except:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Ошибка в логине или пароле")

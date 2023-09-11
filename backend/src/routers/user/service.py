@@ -8,7 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession as Session
 import jwt as _jwt
 
-from settings_env import SECRET_KEY
+from settings_env import settings
 from src.model.model import User
 from src.schemas.schemas import SchemeUser
 
@@ -21,7 +21,7 @@ async def service_get_user_by_login(login: str, db: Session):
 
 async def service_create_token(user: User):
     user_object = SchemeUser.from_orm(user)
-    token = _jwt.encode(user_object.dict(), SECRET_KEY)
+    token = _jwt.encode(user_object.dict(), settings.SECRET_KEY)
     return dict(access_token=token, token_type="bearer")
 
 
