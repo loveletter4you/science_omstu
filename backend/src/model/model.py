@@ -246,3 +246,13 @@ class Feedback(Base):
     date = Column(Date, nullable=False)
     solved = Column(Boolean, nullable=False)
 
+class Test(Base):
+    __tablename__ = "test"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    mail = Column(String, nullable=False)
+    message = Column(String, nullable=False)
+    date = Column(Date, nullable=False)
+    solved = Column(Boolean, nullable=False)
+    solvedee = Column(Boolean, nullable=False)
+

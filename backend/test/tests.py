@@ -1,6 +1,5 @@
 import asyncio
 import os
-
 import httpx
 import pytest
 from fastapi.testclient import TestClient
@@ -8,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from settings_env import ADMIN_LOGIN, ADMIN_PASSWORD
+from settings_env import settings
 from src.model.database import Base
 from src.model.database import get_db
 from main import app
@@ -56,14 +55,16 @@ app.dependency_overrides[get_db] = override_get_db
 
 @pytest.fixture(scope="session")
 def client():
+    assert settings.MODE == "TEST"
     with TestClient(app, base_url='http://localhost') as c:
         yield c
 
 
 def test_author_crud(client):
+    print(f"{settings.ADMIN_LOGIN=}")
     response = client.post(
         "/api/user/token",
-        data={"username": ADMIN_LOGIN, "password": ADMIN_PASSWORD},
+        data={"username": settings.ADMIN_LOGIN, "password": settings.ADMIN_PASSWORD},
         headers={"content-type": "application/x-www-form-urlencoded"}
     )
     assert response.status_code == 200, response.text
