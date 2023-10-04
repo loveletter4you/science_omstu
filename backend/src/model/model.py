@@ -149,9 +149,17 @@ class SourceRating(Base):
 class Subject(Base):
     __tablename__ = "subject"
     id = Column(Integer, primary_key=True)
+    subject_type_id = Column(Integer, ForeignKey('subject_type.id'))
     subj_code = Column(String, nullable=False)
     name = Column(String, nullable=False)
     source_rating_subjects = Relationship("SourceRatingSubject", backref='subject')
+
+
+class SubjectType(Base):
+    __tablename__ = "subject_type"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False, unique=True)
+    subject = Relationship("Subject", backref='subject')
 
 
 class PublicationType(Base):
@@ -189,6 +197,7 @@ class Keyword(Base):
     id = Column(Integer, primary_key=True)
     keyword = Column(String, nullable=False, unique=True)
     keyword_publications = Relationship("KeywordPublication", backref="keyword")
+    keyword_nioktr = Relationship("KeywordNioktr", backref="keyword")
 
 
 class KeywordPublication(Base):
@@ -198,13 +207,41 @@ class KeywordPublication(Base):
     keyword_id = Column(Integer, ForeignKey("keyword.id"), nullable=False)
 
 
+class KeywordNioktr(Base):
+    __tablename__ = "keywords_nioktr"
+    id = Column(Integer, primary_key=True)
+    nioktr_id = Column(Integer, ForeignKey("nioktr.id"), nullable=False)
+    keyword_id = Column(Integer, ForeignKey("keyword.id"), nullable=False)
+
+
 class Organization(Base):
     __tablename__ = "organization"
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False, unique=True)
     country = Column(String)
     city = Column(String)
+    ogrn = Column(Integer, nullable=True)
+    inn = Column(Integer, nullable=True)
+    organization_coexecutor = Relationship("OrganizationCoexecutor", backref='organization')
     author_publication_organizations = Relationship("AuthorPublicationOrganization", backref="organization")
+    organization_identifiers = Relationship("OrganizationIdentifier", backref='organization')
+
+
+class OrganizationCoexecutor(Base):
+    __tablename__ = "organization_coexecutor"
+    id = Column(Integer, primary_key=True)
+    organization_id = Column(Integer, ForeignKey("organization.id"), nullable=False)
+    coexecutor_id = Column(Integer, ForeignKey("coexecutor.id"), nullable=False)
+
+
+class Coexecutor(Base):
+    __tablename__ = "coexecutor"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False, unique=True)
+    short_name = Column(String, nullable=False, unique=True)
+    ogrn = Column(Integer, nullable=True)
+    inn = Column(Integer, nullable=True)
+    organization_coexecutor = Relationship("OrganizationCoexecutor", backref='coexecutor')
 
 
 class AuthorPublication(Base):
@@ -246,13 +283,92 @@ class Feedback(Base):
     date = Column(Date, nullable=False)
     solved = Column(Boolean, nullable=False)
 
-class Test(Base):
-    __tablename__ = "test"
+
+class Nioktr(Base):
+    __tablename__ = "nioktr"
+    id = Column(Integer, primary_key=True)
+    work_supervisor_id = Column(Integer, ForeignKey("author.id"), nullable=False)
+    organization_supervisor_id = Column(Integer, ForeignKey("author.id"), nullable=False)
+    organization_executor_id = Column(Integer, ForeignKey("organization.id"), nullable=False)
+
+    rosrid_id = Column(String)
+    name = Column(String, nullable=False)
+    annotation = Column(String)
+    created_date = Column(Date, nullable=False)
+    document_date = Column(Date, nullable=False)
+    work_start_date = Column(Date, nullable=False)
+    work_end_date = Column(Date, nullable=False)
+    contract_number = Column(String)
+    customer_name = Column(String)
+
+    types_nioktrs = Relationship("NioktrTypes", backref="nioktr")
+    keyword_nioktrs = Relationship("KeywordNioktr", backref="nioktr")
+    priority_nioktrs = Relationship("NioktrPriorityDirections", backref="nioktr")
+    tech_id = Relationship("NioktrCriticalTechnologies", backref="nioktr")
+    nioktr_budget = Relationship("NioktrBudget", backref="nioktr")
+
+
+class OrganizationIdentifier(Base):
+    __tablename__ = "organization_identifier"
+    id = Column(Integer, primary_key=True)
+    organization_id = Column(Integer, ForeignKey('organization.id'), nullable=False)
+    identifier_id = Column(Integer, ForeignKey('identifier.id'), nullable=False)
+    identifier_value = Column(String)
+
+
+class BudgetType(Base):
+    __tablename__ = "budget_type"
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    nioktr_budget = Relationship("NioktrBudget", backref='budget_type')
+
+
+class NioktrBudget(Base):
+    __tablename__ = "nioktr_budget"
+    id = Column(Integer, primary_key=True)
+    funds = Column(Integer, nullable=False)
+    kbk = Column(String, nullable=False)
+    budget_type_id = Column(Integer, ForeignKey("budget_type.id"), nullable=False)
+    nioktr_id = Column(Integer, ForeignKey("nioktr.id"), nullable=False)
+
+
+class NioktrTypes(Base):
+    __tablename__ = "nioktr_types"
+    id = Column(Integer, primary_key=True)
+    nioktr_id = Column(Integer, ForeignKey("nioktr.id"), nullable=False)
+    types_n_id = Column(Integer, ForeignKey("types_n.id"), nullable=False)
+
+
+class NioktrPriorityDirections(Base):
+    __tablename__ = "nioktr_priority_directions"
+    id = Column(Integer, primary_key=True)
+    nioktr_id = Column(Integer, ForeignKey("nioktr.id"), nullable=False)
+    priority_directions_id = Column(Integer, ForeignKey("priority_directions.id"), nullable=False)
+
+
+class NioktrCriticalTechnologies(Base):
+    __tablename__ = "nioktr_critical_tech"
+    id = Column(Integer, primary_key=True)
+    critical_tech_id = Column(Integer, ForeignKey("critical_tech.id"), nullable=False)
+    nioktr_id = Column(Integer, ForeignKey("nioktr.id"), nullable=False)
+
+
+class CriticalTechnologies(Base):
+    __tablename__ = "critical_tech"
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    mail = Column(String, nullable=False)
-    message = Column(String, nullable=False)
-    date = Column(Date, nullable=False)
-    solved = Column(Boolean, nullable=False)
-    solvedee = Column(Boolean, nullable=False)
+    nioktr_critical_tech = Relationship("NioktrCriticalTechnologies", backref='critical_tech')
 
+
+class PriorityDirections(Base):
+    __tablename__ = "priority_directions"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    nioktr_priority_directions = Relationship("NioktrPriorityDirections", backref='priority_directions')
+
+
+class TypesN(Base):
+    __tablename__ = "types_n"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    nioktr_types = Relationship("NioktrTypes", backref='types_n')
