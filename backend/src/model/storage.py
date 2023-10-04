@@ -7,7 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession as Session
 
 
 from src.model.model import PublicationLinkType, SourceType, SourceLinkType, Identifier, SourceRatingType, Organization, \
-    Source, SourceLink, PublicationType, Publication, PublicationLink, Subject
+    Source, SourceLink, PublicationType, Publication, PublicationLink, Subject, PriorityDirections, \
+    CriticalTechnologies, BudgetType, TypesN, Author, Nioktr
 
 
 async def get_count(q: Select, db: Session):
@@ -166,3 +167,72 @@ async def get_subject_by_code(subj_code: str, db: Session):
 
 async def get_author_by_identifier(identifier_type: Identifier, value: str, db: Session):
     pass
+
+
+# async def get_or_create_priority_directions(name: str, db: Session):
+#     prioritu_directions_result = await db.execute(select(PriorityDirections).filter(PriorityDirections.name == name))
+#     prioritu_directions = prioritu_directions_result.scalars().first()
+#     if prioritu_directions is None:
+#         prioritu_directions = PriorityDirections(name=name)
+#         db.add(prioritu_directions)
+#         await db.commit()
+#     return prioritu_directions
+#
+#
+# async def get_or_create_critical_tech(name: str, db: Session):
+#     critical_tech_result = await db.execute(select(CriticalTechnologies).filter(CriticalTechnologies.name == name))
+#     critical_tech = critical_tech_result.scalars().first()
+#     if critical_tech is None:
+#         critical_tech = PriorityDirections(name=name)
+#         db.add(critical_tech)
+#         await db.commit()
+#     return critical_tech
+
+
+async def get_or_create_budget_type(name: str, db: Session):
+    budget_type_result = await db.execute(select(BudgetType).filter(BudgetType.name == name))
+    budget_type = budget_type_result.scalars().first()
+    if budget_type is None:
+        budget_type = BudgetType(name=name)
+        db.add(budget_type)
+        await db.commit()
+    return budget_type
+
+
+async def get_or_create_types_n(name: str, db: Session):
+    types_n_result = await db.execute(select(TypesN).filter(TypesN.name == name))
+    types_n = types_n_result.scalars().first()
+    if types_n is None:
+        types_n = TypesN(name=name)
+        db.add(types_n)
+        await db.commit()
+    return types_n
+
+
+async def create_nioktr(author: Author, organization: Organization,
+                       rosrid_id: str, name: str, annotation: str, created_date: date,
+                        document_date: date, work_start_date: date, work_end_date: date,
+                        contact_number: str,
+                        db: Session):
+    nioktr = Nioktr(
+        author=author,
+        organization=organization,
+        rosrid_id=rosrid_id,
+        name=name,
+        annotation=annotation,
+        created_date=created_date,
+        document_date=document_date,
+        work_start_date=work_start_date,
+        work_end_date=work_end_date,
+        contact_number=contact_number
+
+    )
+    db.add(nioktr)
+    await db.commit()
+    return nioktr
+
+
+async def get_nioktr_by_name(name: str, db: Session):
+    nioktr_result = await db.execute(select(Nioktr).filter(Nioktr.title.ilike(name)))
+    nioktr = nioktr_result.scalars().first()
+    return nioktr

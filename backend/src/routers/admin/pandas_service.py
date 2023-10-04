@@ -827,6 +827,7 @@ async def service_vak_list_fill(file: UploadFile, db: Session):
     source_link_type_issn = await get_or_create_source_link_type("ISSN", db)
     source_link_type_eissn = await get_or_create_source_link_type("eISSN", db)
     vak_list_rating_type = await get_or_create_source_rating_type('ВАК "Список журналов"', db)
+    # subj-type vak
 
     for _, row in df.iterrows():
         issns = row['issn'].split(',')
@@ -876,7 +877,8 @@ async def service_vak_list_fill(file: UploadFile, db: Session):
         if subject is None:
             subject = Subject(
                 subj_code=row['subj_code'],
-                name=row['subj_name']
+                name=row['subj_name'],
+                #subj-type_id vak
             )
         source_rating_subject = SourceRatingSubject(
                 rating_date=datetime.datetime.strptime(str(row['from']), "%d.%m.%Y").date(),

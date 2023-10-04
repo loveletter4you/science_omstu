@@ -42,8 +42,7 @@ function App() {
                 <Header/>
                 <div className='app-wrapper-content'>
                     <Routes>
-                        <Route exact path = '/'
-                               element = {<Main/>}/>
+                        <Route exact path = '/' element = {<Main/>}/>
                         <Route exact path='/author/:id'
                                element={<Author/>}/>
                         <Route exact path='/author'

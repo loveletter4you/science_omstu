@@ -45,6 +45,7 @@ const Navbar = () => {
             <div className={Active ? style.back : null}>
                 <div className={Active ? style.menu + " " + style.active : style.menu}>
 
+
                     <div className={style.item} onClick={toggle}>
                         <NavLink to="/publication"
                                  className={navData => navData.isActive ? style.active : null}>Публикации</NavLink>
@@ -60,6 +61,14 @@ const Navbar = () => {
                     <div className={style.item} onClick={toggle}>
                         <NavLink to="/analysis"
                                  className={navData => navData.isActive ? style.active : null}>Аналитика</NavLink>
+                    </div>
+                    <div className={style.item} onClick={toggle}>
+                        <NavLink to="/nioktr"
+                                 className={navData => navData.isActive ? style.active : null}>НИОКТР</NavLink>
+                    </div>
+                    <div className={style.item} onClick={toggle}>
+                        <NavLink to="/rid"
+                                 className={navData => navData.isActive ? style.active : null}>РИД</NavLink>
                     </div>
                     {cookies.isAuth? <div className={style.item} onClick={toggle}>
                         <NavLink to="/admin/unconfirmed">Администратор</NavLink>

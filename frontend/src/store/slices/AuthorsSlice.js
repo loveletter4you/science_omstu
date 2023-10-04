@@ -24,7 +24,7 @@ export const fetchAuthorSearch = createAsyncThunk(
 const initialState = {
     authors: [],
     pageSize: 30,
-    count: 1,
+    count: null,
     currentPage: 1,
     confirmed: true,
     isFetching: false,

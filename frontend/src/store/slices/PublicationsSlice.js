@@ -40,7 +40,7 @@ const initialState = {
         publication_authors: []
     }],
     pageSize: 20,
-    count: 1,
+    count: null,
     currentPage: 1,
     isFetching: false,
     data:[]
