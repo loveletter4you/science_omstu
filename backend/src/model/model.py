@@ -153,6 +153,7 @@ class Subject(Base):
     subj_code = Column(String, nullable=False)
     name = Column(String, nullable=False)
     source_rating_subjects = Relationship("SourceRatingSubject", backref='subject')
+    nioktrs = Relationship("Nioktr", backref='subject')
 
 
 class SubjectType(Base):
@@ -290,6 +291,7 @@ class Nioktr(Base):
     work_supervisor_id = Column(Integer, ForeignKey("author.id"), nullable=False)
     organization_supervisor_id = Column(Integer, ForeignKey("author.id"), nullable=False)
     organization_executor_id = Column(Integer, ForeignKey("organization.id"), nullable=False)
+    subject_id = Column(Integer, ForeignKey("subject.id"), nullable=False)
 
     rosrid_id = Column(String)
     name = Column(String, nullable=False)
@@ -303,8 +305,6 @@ class Nioktr(Base):
 
     types_nioktrs = Relationship("NioktrTypes", backref="nioktr")
     keyword_nioktrs = Relationship("KeywordNioktr", backref="nioktr")
-    priority_nioktrs = Relationship("NioktrPriorityDirections", backref="nioktr")
-    tech_id = Relationship("NioktrCriticalTechnologies", backref="nioktr")
     nioktr_budget = Relationship("NioktrBudget", backref="nioktr")
 
 
@@ -337,34 +337,6 @@ class NioktrTypes(Base):
     id = Column(Integer, primary_key=True)
     nioktr_id = Column(Integer, ForeignKey("nioktr.id"), nullable=False)
     types_n_id = Column(Integer, ForeignKey("types_n.id"), nullable=False)
-
-
-class NioktrPriorityDirections(Base):
-    __tablename__ = "nioktr_priority_directions"
-    id = Column(Integer, primary_key=True)
-    nioktr_id = Column(Integer, ForeignKey("nioktr.id"), nullable=False)
-    priority_directions_id = Column(Integer, ForeignKey("priority_directions.id"), nullable=False)
-
-
-class NioktrCriticalTechnologies(Base):
-    __tablename__ = "nioktr_critical_tech"
-    id = Column(Integer, primary_key=True)
-    critical_tech_id = Column(Integer, ForeignKey("critical_tech.id"), nullable=False)
-    nioktr_id = Column(Integer, ForeignKey("nioktr.id"), nullable=False)
-
-
-class CriticalTechnologies(Base):
-    __tablename__ = "critical_tech"
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-    nioktr_critical_tech = Relationship("NioktrCriticalTechnologies", backref='critical_tech')
-
-
-class PriorityDirections(Base):
-    __tablename__ = "priority_directions"
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-    nioktr_priority_directions = Relationship("NioktrPriorityDirections", backref='priority_directions')
 
 
 class TypesN(Base):
