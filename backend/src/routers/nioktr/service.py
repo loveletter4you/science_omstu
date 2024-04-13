@@ -71,6 +71,7 @@ async def service_update_nioktr(start_date, end_date, uid, db: Session):
     while True:
         try:
             resp = session.request("POST", search_url, verify=False, data=json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+            print(payload)
             if resp.status_code == 200:
                 json_resp = resp.json()
                 page = payload['page']
@@ -84,9 +85,9 @@ async def service_update_nioktr(start_date, end_date, uid, db: Session):
                 payload['page'] += 1
 
         except BaseException as e:
+            print(e)
             await db.rollback()
-            print('Retry connection', str(e))
-            search_results = await service_update_nioktr(start_date, end_date, uid,db)
+            return 'error'
 
     return 'ok'
 
@@ -106,7 +107,10 @@ async def upload_nioktr(json_resp, identifier_nioktr, db: Session):
 
                     new_work_supervisor_fullname = work_supervisor_surname.split(' ')
                     if len(new_work_supervisor_fullname) >= 3:
-                        new_work_supervisor_fullname = new_work_supervisor_fullname[::len(new_work_supervisor_fullname) - 1]
+                        if '.' in new_work_supervisor_fullname:
+                            new_work_supervisor_fullname = new_work_supervisor_fullname[::len(new_work_supervisor_fullname) - 1]
+                        else:
+                            new_work_supervisor_fullname[1] = new_work_supervisor_fullname[1]+'.'+new_work_supervisor_fullname[2]
                     new_work_supervisor_name_and_patronymic = new_work_supervisor_fullname[1].split('.')
 
                     work_supervisor_result = await db.execute(
@@ -275,6 +279,11 @@ async def upload_nioktr(json_resp, identifier_nioktr, db: Session):
 
                 # Nioktr
 
+                if nioktr['_source']['contract_date'] is None:
+                    contract_date = datetime.strptime('9999-01-01', "%Y-%m-%d").date()
+                else:
+                    contract_date = datetime.strptime(nioktr['_source']['contract_date'], "%Y-%m-%d").date()
+
                 nioktr_create = await create_nioktr(work_supervisor,
                                                     organization_supervisor,
                                                     organization_executor,
@@ -286,7 +295,7 @@ async def upload_nioktr(json_resp, identifier_nioktr, db: Session):
                                                     nioktr['_source']['last_status']['registration_number'],
                                                     datetime.strptime(nioktr['_source']['last_status']['created_date'][:10],
                                                                       "%Y-%m-%d").date(),
-                                                    datetime.strptime(nioktr['_source']['contract_date'], "%Y-%m-%d").date(),
+                                                    contract_date,
                                                     datetime.strptime(nioktr['_source']['start_date'], "%Y-%m-%d").date(),
                                                     datetime.strptime(nioktr['_source']['end_date'], "%Y-%m-%d").date(),
                                                     db)
