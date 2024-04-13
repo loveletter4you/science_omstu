@@ -14,8 +14,8 @@ router = APIRouter(
 
 
 @router.post("/update/nioktr")
-async def nioktr_update(db: Session = Depends(get_db)):
-    message = await service_update_nioktr(db)
+async def nioktr_update(start_date:str, end_date:str, uid: str, db: Session = Depends(get_db)):
+    message = await service_update_nioktr(start_date, end_date, uid, db)
     return message
 
 

@@ -14,15 +14,15 @@ from src.schemas.schemas import SchemeNioktr, SchemeNioktrPage
 
 # Создаём сессию и проставляем стандартные заголовки, что бы не сильно отличаться от браузера
 
-async def service_update_nioktr(db: Session):
+async def service_update_nioktr(start_date, end_date, uid, db: Session):
     identifier_nioktr = await get_or_create_identifier("Nioktr", db)
-    uid = []
-    uid.append('9569096')  # ОмГТУ
+    # uid = []
+    # uid.append('9569096')  # ОмГТУ
     # start_date = '2022-11-30'
     # start_date = '2014-06-30'
     # end_date = '2024-01-01'
-    start_date = '2022-06-06'
-    end_date = '2023-01-01'
+    # start_date = '2022-06-06'
+    # end_date = '2023-01-01'
     items_in_page = 10
 
     # URL API, который осуществляет поиск по ИС
@@ -36,7 +36,7 @@ async def service_update_nioktr(db: Session):
         "full_text_available": False,
         "ikrbses": False,
         "nioktrs": True,
-        "organization": uid,
+        "organization": [uid],
         "page": 1,
         "priority_directions": [],
         "rids": False,
@@ -86,7 +86,7 @@ async def service_update_nioktr(db: Session):
         except BaseException as e:
             await db.rollback()
             print('Retry connection', str(e))
-            search_results = await service_update_nioktr(db)
+            search_results = await service_update_nioktr(start_date, end_date, uid,db)
 
     return 'ok'
 
