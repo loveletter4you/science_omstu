@@ -381,7 +381,7 @@ class SchemeNioktrType(BaseModel):
 class SchemeNioktr(BaseModel):
     id: int
     title: str
-    contract_number: str
+    contract_number: str | None
     registration_number: str
     nioktr_date: date
     work_supervisor: SchemeAuthor
