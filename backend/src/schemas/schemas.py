@@ -365,7 +365,7 @@ class SchemeBudgetType(BaseModel):
 class SchemeNioktrBudget(BaseModel):
     budget_type: SchemeBudgetType
     funds: float
-    kbk: str
+    kbk: str | None
 
     class Config:
         orm_mode = True
