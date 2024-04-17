@@ -14,8 +14,8 @@ router = APIRouter(
 
 
 @router.post("/upload/rid")
-async def rid_update(db: Session = Depends(get_db)):
-    message = await service_update_rid(db)
+async def rid_update(start_date: str, end_date: str, uid: str = 9569096, db: Session = Depends(get_db)):
+    message = await service_update_rid(start_date, end_date, uid, db)
     return message
 
 

@@ -102,6 +102,20 @@ class SchemeAuthorRid(BaseModel):
         orm_mode = True
 
 
+class SchemeAuthorSupervisorsDissertation(BaseModel):
+    author: SchemeAuthor
+
+    class Config:
+        orm_mode = True
+
+
+class SchemeAuthorOpponentsDissertation(BaseModel):
+    author: SchemeAuthor
+
+    class Config:
+        orm_mode = True
+
+
 class SchemeAuthorPublicationOrganization(BaseModel):
     organization: SchemeOrganization
 
@@ -210,6 +224,13 @@ class SchemeKeywordPublication(BaseModel):
         orm_mode = True
 
 
+class SchemeKeywordsDissertation(BaseModel):
+    keyword: SchemeKeyword
+
+    class Config:
+        orm_mode = True
+
+
 class SchemePublicationPage(SchemePublication):
     abstract: str | None
     accepted: bool
@@ -257,6 +278,13 @@ class SchemeNioktrSubject(BaseModel):
 
 
 class SchemeRidSubject(BaseModel):
+    subject: SchemeSubject
+
+    class Config:
+        orm_mode = True
+
+
+class SchemeDissertationSubject(BaseModel):
     subject: SchemeSubject
 
     class Config:
@@ -433,6 +461,42 @@ class SchemeRidPage(SchemeRid):
     rid_subject: List[SchemeRidSubject]
     rid_authors: List[SchemeAuthorRid]
     organization_executor: List[OrganizationExecutor]
+
+    class Config:
+        orm_mode = True
+
+
+class SchemeDissertation(BaseModel):
+    id: int
+    title: str
+    registration_number: str
+    dissertation_date: date
+    chairman_dissertation_council: SchemeAuthor
+    dissertation_keywords: List[SchemeKeywordsDissertation]
+
+    class Config:
+        orm_mode = True
+
+class SchemeDissertationPage(SchemeDissertation):
+    rosrid_id: str
+    abstract: str | None
+    protection_date: date
+    dissertation_type: str
+    dissertation_report_type: str
+    tables_count: int
+    pictures_count: int
+    applications_count: int
+    pages_count: int
+    sources_count: int
+    books_count: int
+    bibliography: str
+    organization_supervisor: SchemeAuthor
+    author_organization: SchemeOrganization
+    protection_organization: SchemeOrganization
+    dissertation_subject: List[SchemeDissertationSubject]
+    dissertation_supervisors: List[SchemeAuthorSupervisorsDissertation]
+    dissertation_opponents: List[SchemeAuthorOpponentsDissertation]
+
 
     class Config:
         orm_mode = True

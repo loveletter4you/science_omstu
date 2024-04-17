@@ -14,12 +14,12 @@ from src.schemas.schemas import SchemeRid, SchemeRidPage
 
 # Создаём сессию и проставляем стандартные заголовки, что бы не сильно отличаться от браузера
 
-async def service_update_rid(db: Session):
+async def service_update_rid(start_date, end_date, uid, db: Session):
     identifier_rid = await get_or_create_identifier("Rid", db)
-    uid = []
-    uid.append('9569096')  # ОмГТУ
-    start_date = '2014-12-23'
-    end_date = '2024-03-01'
+    # uid = []
+    # uid.append('9569096')  # ОмГТУ
+    # start_date = '2014-12-23'
+    # end_date = '2024-03-01'
     items_in_page = 10
 
     # URL API, который осуществляет поиск по ИС

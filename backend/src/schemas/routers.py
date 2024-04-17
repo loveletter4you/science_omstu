@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from src.schemas.schemas import SchemePublication, SchemePublicationPage, SchemeAuthor, \
     SchemeAuthorProfile, SchemeSourceWithType, SchemeSourceWithRating, SchemeFeedback, SchemeFeedbackOutput, \
     SchemeAnalysis, SchemeAnalysisRating, SchemeAnalysisOrganization, SchemePublicationType, SchemeNioktr, \
-    SchemeNioktrPage, SchemeRid, SchemeRidPage
+    SchemeNioktrPage, SchemeRid, SchemeRidPage, SchemeDissertation, SchemeDissertationPage
 
 
 class SchemePublicationsRouter(BaseModel):
@@ -79,6 +79,14 @@ class SchemeRidsRouter(BaseModel):
 class SchemeRidRouter(BaseModel):
     rid: SchemeRidPage
 
+
+class SchemeDissertationsRouter(BaseModel):
+    dissertations: List[SchemeDissertation]
+    count: int
+
+
+class SchemeDissertationRouter(BaseModel):
+    dissertation: SchemeDissertationPage
 
 # class SchemePublicationRouter(BaseModel):
 #     publication: SchemePublicationPage

@@ -1,16 +1,16 @@
 from datetime import datetime
 import requests
 import json
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, func, desc
 from sqlalchemy.ext.asyncio import AsyncSession as Session
 from sqlalchemy.orm import joinedload
 
 from src.model.model import Keyword, Author, Organization, Subject, \
     OrganizationIdentifier, Dissertation, \
     KeywordDissertation, DissertationSubject, AuthorSupervisorsDissertation, AuthorOpponentsDissertation
-from src.model.storage import get_or_create_identifier, create_dissertation
-
-
+from src.model.storage import get_or_create_identifier, create_dissertation, get_count
+from src.routers.dissertation import Dissertation_params
+from src.schemas.schemas import SchemeDissertation, SchemeDissertationPage
 
 
 # Создаём сессию и проставляем стандартные заголовки, что бы не сильно отличаться от браузера
@@ -19,8 +19,8 @@ async def service_update_dissertation(db: Session):
     identifier_dissertation = await get_or_create_identifier("Dissertation", db)
     uid = []
     uid.append('9569096')  # ОмГТУ
-    start_date = '2014-02-03'
-    end_date = '2024-01-01'
+    start_date = '2008-01-10'
+    end_date = '2024-04-17'
     items_in_page = 10
 
     # URL API, который осуществляет поиск по ИС
@@ -55,7 +55,7 @@ async def service_update_dissertation(db: Session):
         'accept': 'application/json, text/plain, */*',
         'sec-ch-ua-mobile': '?0',
         'content-type': 'application/json;charset=UTF-8',
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
         'sec-ch-ua-platform': '"Linux"',
         'origin': 'https://rosrid.ru',
         'sec-fetch-site': 'same-origin',
@@ -64,10 +64,11 @@ async def service_update_dissertation(db: Session):
         'referer': 'https://rosrid.ru/global-search',
         'accept-language': 'ru,en-US;q=0.9,en;q=0.8,ru-RU;q=0.7'
     })
-    while True:
 
+    while True:
         try:
-            resp = session.request("POST", search_url, verify=False, data=json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+            resp = session.request("POST", search_url, data=json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+            print(payload)
             if resp.status_code == 200:
                 json_resp = resp.json()
                 page = payload['page']
@@ -76,21 +77,20 @@ async def service_update_dissertation(db: Session):
                 count_of_pages = (int(total / items_in_page) + 1) if total % items_in_page else total / items_in_page
                 print(f"Downloaded data from page {page} of {count_of_pages}")
                 await upload_dissertation(json_resp, identifier_dissertation, db)
-
                 if page >= count_of_pages:
                     break
                 payload['page'] += 1
 
         except BaseException as e:
             await db.rollback()
-            print('Retry connection', str(e))
-            search_results = await service_update_dissertation(db)
+            return 'error'
     return 'ok'
 
 
 async def upload_dissertation(json_resp, identifier_dissertation, db: Session):
 
     for dissertation in json_resp['hits']['hits']:
+        print(dissertation['_source']['supervisors'])
         count_dissertation = 0
         if dissertation['_id']:
             dissertation_id_result = await db.execute(select(Dissertation).filter(Dissertation.rosrid_id == dissertation['_id']))
@@ -103,8 +103,12 @@ async def upload_dissertation(json_resp, identifier_dissertation, db: Session):
 
                     new_chairman_dissertation_council_fullname = chairman_dissertation_council_surname.split(' ')
                     if len(new_chairman_dissertation_council_fullname) >= 3:
-                        new_chairman_dissertation_council_fullname = new_chairman_dissertation_council_fullname[
-                                                       ::len(new_chairman_dissertation_council_fullname) - 1]
+                        if '.' in new_chairman_dissertation_council_fullname:
+
+                            new_chairman_dissertation_council_fullname = new_chairman_dissertation_council_fullname[
+                                                           ::len(new_chairman_dissertation_council_fullname) - 1]
+                        else:
+                            new_chairman_dissertation_council_fullname[1] = new_chairman_dissertation_council_fullname[1]+'.'+new_chairman_dissertation_council_fullname[2]
                     new_work_chairman_dissertation_name_and_patronymic = new_chairman_dissertation_council_fullname[1].split('.')
 
                     chairman_dissertation_council_result = await db.execute(
@@ -146,8 +150,13 @@ async def upload_dissertation(json_resp, identifier_dissertation, db: Session):
                 organization_supervisor_surname = dissertation['_source']['organization_supervisor']['surname']
 
                 if organization_supervisor_name is None:
-
                     new_organization_supervisor_fullname = organization_supervisor_surname.split(' ')
+                    if len(new_organization_supervisor_fullname) >= 3:
+                        if '.' in new_organization_supervisor_fullname:
+                            new_organization_supervisor_fullname = new_organization_supervisor_fullname[::len(new_organization_supervisor_fullname) - 1]
+                        else:
+                            new_organization_supervisor_fullname[1] = new_organization_supervisor_fullname[1] + '.' + new_organization_supervisor_fullname[2]
+
                     new_organization_supervisor_name_and_patronymic = new_organization_supervisor_fullname[1].split('.')
                     organization_supervisor_result = await db.execute(
                         select(Author).filter(and_(Author.name == new_organization_supervisor_name_and_patronymic[0],
@@ -178,7 +187,7 @@ async def upload_dissertation(json_resp, identifier_dissertation, db: Session):
                     if organization_supervisor is None:
                         organization_supervisor = Author(
                             name=organization_supervisor_name,
-                            surname=organization_supervisor_surname,
+                            surname=dissertation['_source']['organization_supervisor']['surname'],
                             patronymic=organization_supervisor_patronymic,
                             confirmed=False
                         )
@@ -313,12 +322,63 @@ async def upload_dissertation(json_resp, identifier_dissertation, db: Session):
 
 
 
+                author_surname = dissertation['_source']['author_surname']
+                author_name = dissertation['_source']['author_name']
+                author_patronymic = dissertation['_source']['author_patronymic']
+
+                if author_name is None:
+
+                    new_author_fullname = author_surname.split(' ')
+                    if len(new_author_fullname) >= 3:
+                        if '.' in new_author_fullname:
+                            new_author_fullname = new_author_fullname[::len(new_author_fullname) - 1]
+                        else:
+                            new_author_fullname[1] = new_author_fullname[1]+'.'+ new_author_fullname[2]
+
+                    new_author_name_and_patronymic = new_author_fullname[1].split('.')
+                    author_result = await db.execute(
+                        select(Author).filter(and_(Author.name == new_author_name_and_patronymic[0],
+                                                   Author.surname == new_author_fullname[0],
+                                                   Author.patronymic == new_author_name_and_patronymic[
+                                                       1])))
+
+                    author = author_result.scalars().first()
+
+                    if author is None:
+                        author = Author(
+                            name=new_author_name_and_patronymic[0],
+                            surname=new_author_fullname[0],
+                            patronymic=new_author_name_and_patronymic[1],
+                            confirmed=False
+                        )
+                        db.add(author)
+                        await db.commit()
+                else:
+
+                    author_result = await db.execute(select(Author).filter(and_(
+                        Author.name == author_name,
+                        Author.surname == author_surname,
+                        Author.patronymic == author_patronymic)))
+                    author = author_result.scalars().first()
+
+                    if author is None:
+                        author = Author(
+                            name=author_name,
+                            surname=author_surname,
+                            patronymic=author_patronymic,
+                            confirmed=False
+                        )
+                        db.add(author)
+                        await db.commit()
+                    await db.commit()
+
                 # Diss
 
                 dissertation_create = await create_dissertation(chairman_dissertation_council,
                                                     organization_supervisor,
                                                     author_organization,
                                                     protection_organization,
+                                                    author,
                                                     dissertation['_id'],
                                                     dissertation['_source']['name'],
                                                     dissertation['_source']['abstract'],
@@ -463,30 +523,71 @@ async def upload_dissertation(json_resp, identifier_dissertation, db: Session):
                 # #написать функцию в storage, чтобы код не дублировался  ???
 
 
-
+#Разбраться с добавлением
                 supervisors_len = len(dissertation['_source']['supervisors'])
                 count_supervisors = 0
                 for supervisors_value in range(supervisors_len):
                     if count_supervisors < supervisors_len:
                         supervisors_fio = dissertation['_source']['supervisors']['fio']
-                        supervisors_fio_new = supervisors_fio.split(' ')
-                        supervisors_fio_new = supervisors_fio_new[::len(supervisors_fio_new) - 1]
-                        supervisors_name_and_patronymic = supervisors_fio_new[1].split('.')
+                        supervisors_fio_new = supervisors_fio.split('.')
+                        if supervisors_fio_new[2] == '':
+                            supervisors_split = supervisors_fio_new[0].split(' ')
+                            supervisors_result = await db.execute(
+                                select(Author).filter(
+                                    and_(Author.name == supervisors_split[1],
+                                         Author.surname == supervisors_split[0],
+                                         Author.patronymic == supervisors_fio_new[1].strip())))
+                            supervisors = supervisors_result.scalars().first()
 
-                        supervisors_result = await db.execute(
-                            select(Author).filter(
-                                and_(Author.name == supervisors_name_and_patronymic[0], Author.surname == supervisors_fio_new[0],
-                                     Author.patronymic == supervisors_name_and_patronymic[1])))
-                        supervisors = supervisors_result.scalars().first()
-                        if supervisors is None:
-                            supervisors = Author(
-                                name=supervisors_name_and_patronymic[0],
-                                surname=supervisors_fio_new[0],
-                                patronymic=supervisors_name_and_patronymic[1],
-                                confirmed=False
-                            )
+                            if supervisors is None:
+                                supervisors = Author(
+                                    name=supervisors_split[1],
+                                    surname=supervisors_split[0],
+                                    patronymic=supervisors_fio_new[1].strip(),
+                                    confirmed=False
+                                )
 
-                            db.add(supervisors)
+                                db.add(supervisors)
+
+                        else:
+
+                            supervisors_more = supervisors_fio.split('.')
+                            supervisors_result = await db.execute(
+                                select(Author).filter(
+                                    and_(Author.name == supervisors_more[1],
+                                         Author.surname == supervisors_more[0],
+                                         Author.patronymic == supervisors_more[2].strip())))
+                            supervisors = supervisors_result.scalars().first()
+
+                            if supervisors is None:
+                                supervisors = Author(
+                                    name=supervisors_more[1],
+                                    surname=supervisors_more[0],
+                                    patronymic=supervisors_more[2].strip(),
+                                    confirmed=False
+                                )
+
+                                db.add(supervisors)
+
+
+
+                        # supervisors_fio_new = supervisors_fio_new[::len(supervisors_fio_new) - 1]
+                        # supervisors_name_and_patronymic = supervisors_fio_new[1].split('.')
+
+                        # supervisors_result = await db.execute(
+                        #     select(Author).filter(
+                        #         and_(Author.name == supervisors_name_and_patronymic[0], Author.surname == supervisors_fio_new[0],
+                        #              Author.patronymic == supervisors_name_and_patronymic[1])))
+                        # supervisors = supervisors_result.scalars().first()
+                        # if supervisors is None:
+                        #     supervisors = Author(
+                        #         name=supervisors_name_and_patronymic[0],
+                        #         surname=supervisors_fio_new[0],
+                        #         patronymic=supervisors_name_and_patronymic[1],
+                        #         confirmed=False
+                        #     )
+                        #
+                        #     db.add(supervisors)
 
                         supervisors_dissertation_result = await db.execute(
                             select(AuthorSupervisorsDissertation).filter(
@@ -542,59 +643,53 @@ async def upload_dissertation(json_resp, identifier_dissertation, db: Session):
                             db.add(opponents_dissertation)
                             count_opponents += 1
                             await db.commit()
-
     await db.commit()
 
-#Протестировать дисы и накатить миграцию endpoint
 
-#
-# async def service_get_rids(params: Rid_params, db: Session):
-#     query = select(Rid).filter(Rid.rid_date >= params.from_date)\
-#         .filter(Rid.rid_date <= params.to_date)
-#
-#     if not (params.search is None) and params.search != "":
-#         query = query.filter(func.lower(Rid.title).contains(params.search.lower()))
-#
-#     if not (params.author_id is None):
-#         query = query.join(Author).filter(Author.author_id == params.author_id).distinct()
-#
-#     offset = params.limit * params.page
-#     rid_result = await db.execute(query.order_by(desc(Rid.rid_date))
-#                                       .order_by(Rid.title)
-#                                       .options(joinedload(Rid.keyword_rids).joinedload(KeywordRid.keyword))
-#                                       .options(joinedload(Rid.work_supervisor))
-#                                       .offset(offset).limit(params.limit))
-#     rids = rid_result.scalars().unique().all()
-#     scheme_rids = [SchemeRid.from_orm(rid) for rid in rids]
-#     count = await get_count(query, db)
-#     return dict(rids=scheme_rids, count=count)
-#
-#
-# async def service_get_rid(id: int, db: Session):
-#     rid_result = await db.execute(select(Rid).filter(Rid.id == id)
-#                                      .options(joinedload(Rid.organization_executor)
-#                                               .joinedload(OrganizationExecutor.organization))
-#
-#                                      .options(joinedload(Rid.rid_subject)
-#                                               .joinedload(RidSubject.subject))
-#
-#                                      .options(joinedload(Rid.keyword_rids)
-#                                               .joinedload(KeywordRid.keyword))
-#
-#                                      .options(joinedload(Rid.rid_authors)
-#                                               .joinedload(AuthorRid.author))
-#
-#                                      .options(joinedload(Rid.work_supervisor))
-#                                      .options(joinedload(Rid.organization_supervisor))
-#                                      .options(joinedload(Rid.customer))
-#                                      )
-#     rid = rid_result.scalars().first()
-#     if rid is None:
-#         return False
-#     scheme_rid = SchemeRidPage.from_orm(rid)
-#     return dict(rid=scheme_rid)
+async def service_get_dissertations(params: Dissertation_params, db: Session):
+
+    query = select(Dissertation).filter(Dissertation.dissertation_date >= params.from_date)\
+        .filter(Dissertation.dissertation_date <= params.to_date)
+
+    if not (params.search is None) and params.search != "":
+        query = query.filter(func.lower(Dissertation.title).contains(params.search.lower()))
+
+    if not (params.author_id is None):
+        query = query.join(Author).filter(Author.author_id == params.author_id).distinct()
+
+    offset = params.limit * params.page
+    dissertations_result = await db.execute(query.order_by(desc(Dissertation.dissertation_date))
+                                      .order_by(Dissertation.title)
+                                      .options(joinedload(Dissertation.dissertation_keywords).joinedload(KeywordDissertation.keyword))
+                                      .options(joinedload(Dissertation.chairman_dissertation_council))
+                                      .offset(offset).limit(params.limit))
+    dissertations = dissertations_result.scalars().unique().all()
+    scheme_dissertations = [SchemeDissertation.from_orm(rid) for rid in dissertations]
+    count = await get_count(query, db)
+    return dict(dissertations=scheme_dissertations, count=count)
 
 
+async def service_get_dissertation_by_id(id: int, db: Session):
+    dissertation_result = await db.execute(select(Dissertation).filter(Dissertation.id == id)
+                                    .options(joinedload(Dissertation.dissertation_subject)
+                                            .joinedload(DissertationSubject.subject))
 
-# Разобраться с датой 2019-04-11
-# Пустые customer не добавляются
+                                    .options(joinedload(Dissertation.dissertation_keywords)
+                                            .joinedload(KeywordDissertation.keyword))
+
+                                     .options(joinedload(Dissertation.dissertation_supervisors)
+                                              .joinedload(AuthorSupervisorsDissertation.author))
+
+                                     .options(joinedload(Dissertation.dissertation_opponents)
+                                              .joinedload(AuthorOpponentsDissertation.author))
+
+                                     .options(joinedload(Dissertation.chairman_dissertation_council))
+                                     .options(joinedload(Dissertation.organization_supervisor))
+                                     .options(joinedload(Dissertation.author_organization))
+                                     .options(joinedload(Dissertation.protection_organization))
+                                     )
+    dissertation = dissertation_result.scalars().first()
+    if dissertation is None:
+        return False
+    scheme_dissertation = SchemeDissertationPage.from_orm(dissertation)
+    return dict(dissertation=scheme_dissertation)

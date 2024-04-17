@@ -71,7 +71,6 @@ async def service_update_nioktr(start_date, end_date, uid, db: Session):
     while True:
         try:
             resp = session.request("POST", search_url, verify=False, data=json.dumps(payload, ensure_ascii=False).encode('utf-8'))
-            print(payload)
             if resp.status_code == 200:
                 json_resp = resp.json()
                 page = payload['page']
@@ -85,11 +84,11 @@ async def service_update_nioktr(start_date, end_date, uid, db: Session):
                 payload['page'] += 1
 
         except BaseException as e:
-            print(e)
             await db.rollback()
             return 'error'
 
     return 'ok'
+
 
 async def upload_nioktr(json_resp, identifier_nioktr, db: Session):
     for nioktr in json_resp['hits']['hits']:

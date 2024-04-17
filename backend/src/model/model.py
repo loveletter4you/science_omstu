@@ -405,6 +405,7 @@ class Dissertation(Base):
     organization_supervisor_id = Column(Integer, ForeignKey("author.id"), nullable=False)
     author_organization_id = Column(Integer, ForeignKey("organization.id"), nullable=False)
     protection_organization_id = Column(Integer, ForeignKey("organization.id"), nullable=False)
+    author_id = Column(Integer, ForeignKey("author.id"), nullable=False)
     rosrid_id = Column(String)
     title = Column(String, nullable=False)
     abstract = Column(String)
@@ -428,6 +429,7 @@ class Dissertation(Base):
     organization_supervisor = relationship("Author", foreign_keys=[organization_supervisor_id], lazy="joined")
     author_organization = relationship("Organization", foreign_keys=[author_organization_id], lazy="joined")
     protection_organization = relationship("Organization", foreign_keys=[protection_organization_id], lazy="joined")
+    author = relationship("Author", foreign_keys=[author_id], lazy="joined")
 
 
 class KeywordDissertation(Base):
