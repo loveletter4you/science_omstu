@@ -15,12 +15,12 @@ from src.schemas.schemas import SchemeDissertation, SchemeDissertationPage
 
 # Создаём сессию и проставляем стандартные заголовки, что бы не сильно отличаться от браузера
 
-async def service_update_dissertation(db: Session):
+async def service_update_dissertation(start_date, end_date, uid, db: Session):
     identifier_dissertation = await get_or_create_identifier("Dissertation", db)
-    uid = []
-    uid.append('9569096')  # ОмГТУ
-    start_date = '2008-01-10'
-    end_date = '2024-04-17'
+    # uid = []
+    # uid.append('9569096')  # ОмГТУ
+    # start_date = '2008-01-10'
+    # end_date = '2024-04-17'
     items_in_page = 10
 
     # URL API, который осуществляет поиск по ИС
@@ -33,7 +33,7 @@ async def service_update_dissertation(db: Session):
         "full_text_available": False,
         "ikrbses": False,
         "nioktrs": False,
-        "organization": uid,
+        "organization": [uid],
         "page": 1,
         "priority_directions": [],
         "rids": False,
@@ -67,12 +67,10 @@ async def service_update_dissertation(db: Session):
 
     while True:
         try:
-            resp = session.request("POST", search_url, data=json.dumps(payload, ensure_ascii=False).encode('utf-8'))
-            print(payload)
+            resp = session.request("POST", search_url, verify=False, data=json.dumps(payload, ensure_ascii=False).encode('utf-8'))
             if resp.status_code == 200:
                 json_resp = resp.json()
                 page = payload['page']
-
                 total = json_resp['hits']['total']['value']
                 count_of_pages = (int(total / items_in_page) + 1) if total % items_in_page else total / items_in_page
                 print(f"Downloaded data from page {page} of {count_of_pages}")
@@ -90,7 +88,6 @@ async def service_update_dissertation(db: Session):
 async def upload_dissertation(json_resp, identifier_dissertation, db: Session):
 
     for dissertation in json_resp['hits']['hits']:
-        print(dissertation['_source']['supervisors'])
         count_dissertation = 0
         if dissertation['_id']:
             dissertation_id_result = await db.execute(select(Dissertation).filter(Dissertation.rosrid_id == dissertation['_id']))
@@ -326,9 +323,11 @@ async def upload_dissertation(json_resp, identifier_dissertation, db: Session):
                 author_name = dissertation['_source']['author_name']
                 author_patronymic = dissertation['_source']['author_patronymic']
 
-                if author_name is None:
+                if author_name is None and not (author_surname is None and author_name is None and author_patronymic is None):
+
 
                     new_author_fullname = author_surname.split(' ')
+
                     if len(new_author_fullname) >= 3:
                         if '.' in new_author_fullname:
                             new_author_fullname = new_author_fullname[::len(new_author_fullname) - 1]
@@ -354,7 +353,14 @@ async def upload_dissertation(json_resp, identifier_dissertation, db: Session):
                         db.add(author)
                         await db.commit()
                 else:
-
+                    if author_surname is None and author_name is None and author_patronymic is None:
+                        author_name_splited = dissertation['_source']['author_str'].split()
+                        author_name = author_name_splited[1]
+                        author_surname = author_name_splited[0]
+                        if len(author_name_splited) >= 3:
+                            author_patronymic = author_name_splited[2]
+                        else:
+                            author_patronymic = '-'
                     author_result = await db.execute(select(Author).filter(and_(
                         Author.name == author_name,
                         Author.surname == author_surname,
@@ -398,7 +404,7 @@ async def upload_dissertation(json_resp, identifier_dissertation, db: Session):
 
 
 
-                # keywords_dis
+
                 key_len = len(dissertation['_source']['keyword_list'])
 
                 # keyword
@@ -516,78 +522,75 @@ async def upload_dissertation(json_resp, identifier_dissertation, db: Session):
                                 subject=speciality_codes
                             )
                             db.add(dissertation_subject_speciality_codes)
-                            count_oecds += 1
+                            count_speciality_codes += 1
                             await db.commit()
 
-                # #NioktrSubject ПЕРЕНЕСТИ ФУНКЦИЮ ВЫШЕ КАК В SUBJECT AND KEYWORD
-                # #написать функцию в storage, чтобы код не дублировался  ???
 
-
-#Разбраться с добавлением
                 supervisors_len = len(dissertation['_source']['supervisors'])
                 count_supervisors = 0
                 for supervisors_value in range(supervisors_len):
                     if count_supervisors < supervisors_len:
-                        supervisors_fio = dissertation['_source']['supervisors']['fio']
-                        supervisors_fio_new = supervisors_fio.split('.')
-                        if supervisors_fio_new[2] == '':
-                            supervisors_split = supervisors_fio_new[0].split(' ')
-                            supervisors_result = await db.execute(
-                                select(Author).filter(
-                                    and_(Author.name == supervisors_split[1],
-                                         Author.surname == supervisors_split[0],
-                                         Author.patronymic == supervisors_fio_new[1].strip())))
-                            supervisors = supervisors_result.scalars().first()
+                        supervisors_fio = dissertation['_source']['supervisors'][count_supervisors]['fio']
+                        # print(supervisors_fio)
+                        if '.' in supervisors_fio:
+                            supervisors_fio_new = supervisors_fio.split('.')
+                            if supervisors_fio_new[2] == '':
+                                supervisors_split = supervisors_fio_new[0].split(' ')
+                                supervisors_result = await db.execute(
+                                    select(Author).filter(
+                                        and_(Author.name == supervisors_split[1],
+                                             Author.surname == supervisors_split[0],
+                                             Author.patronymic == supervisors_fio_new[1].strip())))
+                                supervisors = supervisors_result.scalars().first()
 
-                            if supervisors is None:
-                                supervisors = Author(
-                                    name=supervisors_split[1],
-                                    surname=supervisors_split[0],
-                                    patronymic=supervisors_fio_new[1].strip(),
-                                    confirmed=False
-                                )
+                                if supervisors is None:
+                                    supervisors = Author(
+                                        name=supervisors_split[1],
+                                        surname=supervisors_split[0],
+                                        patronymic=supervisors_fio_new[1].strip(),
+                                        confirmed=False
+                                    )
+                                    count_supervisors += 1
+                                    db.add(supervisors)
 
-                                db.add(supervisors)
+                            else:
 
+                                supervisors_more = supervisors_fio.split('.')
+                                supervisors_result = await db.execute(
+                                    select(Author).filter(
+                                        and_(Author.name == supervisors_more[1],
+                                             Author.surname == supervisors_more[0],
+                                             Author.patronymic == supervisors_more[2].strip())))
+                                supervisors = supervisors_result.scalars().first()
+
+                                if supervisors is None:
+                                    supervisors = Author(
+                                        name=supervisors_more[1],
+                                        surname=supervisors_more[0],
+                                        patronymic=supervisors_more[2].strip(),
+                                        confirmed=False
+                                    )
+                                    count_supervisors += 1
+                                    db.add(supervisors)
                         else:
-
-                            supervisors_more = supervisors_fio.split('.')
+                            supervisors_full = supervisors_fio.split(' ')
                             supervisors_result = await db.execute(
                                 select(Author).filter(
-                                    and_(Author.name == supervisors_more[1],
-                                         Author.surname == supervisors_more[0],
-                                         Author.patronymic == supervisors_more[2].strip())))
+                                    and_(Author.name == supervisors_full[1],
+                                         Author.surname == supervisors_full[0],
+                                         Author.patronymic == supervisors_full[2])))
                             supervisors = supervisors_result.scalars().first()
 
                             if supervisors is None:
                                 supervisors = Author(
-                                    name=supervisors_more[1],
-                                    surname=supervisors_more[0],
-                                    patronymic=supervisors_more[2].strip(),
+                                    name=supervisors_full[1],
+                                    surname=supervisors_full[0],
+                                    patronymic=supervisors_full[2],
                                     confirmed=False
                                 )
-
+                                count_supervisors += 1
                                 db.add(supervisors)
 
-
-
-                        # supervisors_fio_new = supervisors_fio_new[::len(supervisors_fio_new) - 1]
-                        # supervisors_name_and_patronymic = supervisors_fio_new[1].split('.')
-
-                        # supervisors_result = await db.execute(
-                        #     select(Author).filter(
-                        #         and_(Author.name == supervisors_name_and_patronymic[0], Author.surname == supervisors_fio_new[0],
-                        #              Author.patronymic == supervisors_name_and_patronymic[1])))
-                        # supervisors = supervisors_result.scalars().first()
-                        # if supervisors is None:
-                        #     supervisors = Author(
-                        #         name=supervisors_name_and_patronymic[0],
-                        #         surname=supervisors_fio_new[0],
-                        #         patronymic=supervisors_name_and_patronymic[1],
-                        #         confirmed=False
-                        #     )
-                        #
-                        #     db.add(supervisors)
 
                         supervisors_dissertation_result = await db.execute(
                             select(AuthorSupervisorsDissertation).filter(
@@ -609,26 +612,68 @@ async def upload_dissertation(json_resp, identifier_dissertation, db: Session):
                 count_opponents = 0
                 for opponents_value in range(opponents_len):
                     if count_opponents < opponents_len:
-                        opponents_fio = dissertation['_source']['opponents']['fio']
-                        opponents_fio_new = opponents_fio.split(' ')
-                        opponents_fio_new = opponents_fio_new[::len(opponents_fio_new) - 1]
-                        opponents_name_and_patronymic = opponents_fio_new[1].split('.')
+                        opponents_fio = dissertation['_source']['opponents'][count_opponents]['fio']
 
-                        opponents_result = await db.execute(
-                            select(Author).filter(
-                                and_(Author.name == opponents_name_and_patronymic[0],
-                                     Author.surname == opponents_fio_new[0],
-                                     Author.patronymic == opponents_name_and_patronymic[1])))
-                        opponents = opponents_result.scalars().first()
-                        if opponents is None:
-                            opponents = Author(
-                                name=opponents_name_and_patronymic[0],
-                                surname=opponents_fio_new[0],
-                                patronymic=opponents_name_and_patronymic[1],
-                                confirmed=False
-                            )
+                        if '.' in opponents_fio:
+                            opponents_fio_new = opponents_fio.split('.')
+                            if opponents_fio_new[2] == '':
+                                opponents_split = opponents_fio_new[0].split(' ')
+                                opponents_result = await db.execute(
+                                    select(Author).filter(
+                                        and_(Author.name == opponents_split[1],
+                                             Author.surname == opponents_split[0],
+                                             Author.patronymic == opponents_fio_new[1].strip())))
+                                opponents = opponents_result.scalars().first()
 
-                            db.add(opponents)
+                                if opponents is None:
+                                    opponents = Author(
+                                        name=opponents_split[1],
+                                        surname=opponents_split[0],
+                                        patronymic=opponents_fio_new[1].strip(),
+                                        confirmed=False
+                                    )
+                                    count_opponents += 1
+                                    db.add(opponents)
+
+                            else:
+
+                                opponents_more = opponents_fio.split('.')
+                                opponents_result = await db.execute(
+                                    select(Author).filter(
+                                        and_(Author.name == opponents_more[1],
+                                             Author.surname == opponents_more[0],
+                                             Author.patronymic == opponents_more[2].strip())))
+                                opponents = opponents_result.scalars().first()
+
+                                if opponents is None:
+                                    opponents = Author(
+                                        name=opponents_more[1],
+                                        surname=opponents_more[0],
+                                        patronymic=opponents_more[2].strip(),
+                                        confirmed=False
+                                    )
+                                    count_opponents += 1
+                                    db.add(opponents)
+
+                        else:
+                            opponents_full = opponents_fio.split(' ')
+                            opponents_result = await db.execute(
+                                select(Author).filter(
+                                    and_(Author.name == opponents_full[1],
+                                         Author.surname == opponents_full[0],
+                                         Author.patronymic == opponents_full[2])))
+                            opponents = opponents_result.scalars().first()
+
+                            if opponents is None:
+                                opponents = Author(
+                                    name=opponents_full[1],
+                                    surname=opponents_full[0],
+                                    patronymic=opponents_full[2],
+                                    confirmed=False
+                                )
+                                count_opponents += 1
+                                db.add(opponents)
+
 
                         opponents_dissertation_result = await db.execute(
                             select(AuthorOpponentsDissertation).filter(
@@ -661,7 +706,7 @@ async def service_get_dissertations(params: Dissertation_params, db: Session):
     dissertations_result = await db.execute(query.order_by(desc(Dissertation.dissertation_date))
                                       .order_by(Dissertation.title)
                                       .options(joinedload(Dissertation.dissertation_keywords).joinedload(KeywordDissertation.keyword))
-                                      .options(joinedload(Dissertation.chairman_dissertation_council))
+                                      .options(joinedload(Dissertation.author))
                                       .offset(offset).limit(params.limit))
     dissertations = dissertations_result.scalars().unique().all()
     scheme_dissertations = [SchemeDissertation.from_orm(rid) for rid in dissertations]
@@ -687,6 +732,7 @@ async def service_get_dissertation_by_id(id: int, db: Session):
                                      .options(joinedload(Dissertation.organization_supervisor))
                                      .options(joinedload(Dissertation.author_organization))
                                      .options(joinedload(Dissertation.protection_organization))
+                                     .options(joinedload(Dissertation.author))
                                      )
     dissertation = dissertation_result.scalars().first()
     if dissertation is None:

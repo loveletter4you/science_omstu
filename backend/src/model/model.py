@@ -459,10 +459,3 @@ class AuthorOpponentsDissertation(Base):
     author_id = Column(Integer, ForeignKey("author.id"), nullable=False)
     dissertation_id = Column(Integer, ForeignKey("dissertation.id"), nullable=False)
 
-
-
-
-
-    # изменеил create_date на rid_date
-    # bpvtybk keyword_rids
-    # сделать миграцию

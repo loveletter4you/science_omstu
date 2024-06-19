@@ -26,6 +26,9 @@ import AnalysisDate from "./components/Analysis/AnalysisDate";
 import Nioktrs from "./components/Nioktrs/Nioktrs";
 import Nioktr from "./components/Nioktrs/Nioktr/Nioktr";
 import Rids from "./components/Rids/Rids";
+import Rid from "./components/Rids/Rid/Rid";
+import Dissertations from "./components/Dissertation/Dissertations";
+import Dissertation from "./components/Dissertation/Dissertation/Dissertation";
 
 function App() {
     const [cookies, , ] = useCookies(['isAuth']);
@@ -62,8 +65,12 @@ function App() {
                                element={<Nioktr/>}/>
                         <Route exact path='/rid'
                                element={<Rids/>}/>
-                        {/*<Route exact path='/rid/:id'*/}
-                        {/*       element={<Rid/>}/>*/}
+                        <Route exact path='/rid/:id'
+                               element={<Rid/>}/>
+                        <Route exact path='/dissertation'
+                               element={<Dissertations/>}/>
+                        <Route exact path='/dissertation/:id'
+                               element={<Dissertation/>}/>
                         <Route exact path='/login'
                                element={<SignIn/>}/>
                         <Route exact path='/source'

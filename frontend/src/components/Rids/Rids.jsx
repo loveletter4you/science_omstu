@@ -8,11 +8,6 @@ import {NavLink} from "react-router-dom";
 import {useDebounce} from "use-debounce";
 import Preloader from "../Helpers/Preloader/Preloader";
 
-// import NioktrFilterSize from "../Helpers/Filters/NioktrFilterSize";
-// PublicationFilterSize Посмотреть и переделать?
-// import PublicationFilterSize from "../Helpers/Filters/PublicationFilterSize";
-
-
 const Rids = () => {
     const {rids, pageSize, count, isFetching, data} = useSelector(state => state.rids);
     const dispatch = useDispatch();

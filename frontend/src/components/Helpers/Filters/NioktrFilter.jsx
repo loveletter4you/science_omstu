@@ -30,17 +30,6 @@ const NioktrFilter = () => {
     }
 
     React.useEffect(() => {
-        const getOrganization = async () => {
-            const res = await FilterAPI.getPublicationType();
-            dispatch(getPublicationType(res.data.publication_types))
-        }
-
-
-        getOrganization();
-
-    }, [])
-
-    React.useEffect(() => {
         try {
             dispatch(fetchAuthorSearch({search, page: 0, pageSize: count}))
         } catch (e) {
@@ -49,18 +38,10 @@ const NioktrFilter = () => {
     }, [debouncedSearch[0]])
 
     const onSubmit = (data) => {
-        if (data.publicationType === '') {
-            data.publicationType = null
-        }
         if (data.authorName === '') {
             data.authorName = null
         }
-        if (data.SourceRating === '') {
-            data.SourceRating = null
-        }
-        if (data.department === '') {
-            data.department = null
-        }
+
         if (data.beforeTime === '') {
             data.beforeTime = `1960-06-12`
         }
@@ -86,10 +67,7 @@ const NioktrFilter = () => {
             sendFilters();
         if (state.button === 2){
             try {
-                let url = '/api/nioktr?';
-
-                if (data.authorName)
-                    url += `author_id=${data.authorName}&`
+                let url = '/api/nioktr/excel?';
                 if (data.beforeTime)
                     url += `from_date=${data.beforeTime}&`
                 if (data.afterTime)
@@ -97,6 +75,13 @@ const NioktrFilter = () => {
                 url += `limit=1000`
                 fetch(url).then(res => {
                     return res.blob();
+                }).then(blob => {
+                    const href = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.download = 'output.xlsx';
+                    a.href = href;
+                    a.click();
+                    a.href = '';
                 })
             }
             catch (e){
@@ -137,6 +122,9 @@ const NioktrFilter = () => {
                 </div>
                 <div>
                     <input className={style.dataName} type={"submit"} value={"Применить"} onClick={() => (state.button = 1)}/>
+                </div>
+                <div>
+                    <input className={style.dataName} type={"submit"} value={"Скачать в Excel"} onClick={() => (state.button = 2)}/>
                 </div>
 
             </form>

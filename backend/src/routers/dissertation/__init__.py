@@ -14,8 +14,8 @@ router = APIRouter(
 
 
 @router.post("/upload/dissertation")
-async def dissertation_update(db: Session = Depends(get_db)):
-    message = await service_update_dissertation(db)
+async def dissertation_update(start_date:str, end_date:str, uid: str = 9569096, db: Session = Depends(get_db)):
+    message = await service_update_dissertation(start_date, end_date, uid, db)
     return message
 
 

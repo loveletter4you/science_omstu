@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession as Session
 from src.model.database import get_db
 from src.routers.nioktr.schema import Nioktr_params
-from src.routers.nioktr.service import service_update_nioktr
+from src.routers.nioktr.service import service_update_nioktr, service_get_nioktr_excel
 from src.routers.nioktr.controller import controller_get_nioktrs, controller_get_nioktrs_by_id
 from src.schemas.routers import SchemeNioktrsRouter, SchemeNioktrRouter
 
@@ -30,3 +30,8 @@ async def get_nioktr_by_id(id: int, db: Session = Depends(get_db)):
     nioktr = await controller_get_nioktrs_by_id(id, db)
     return nioktr
 
+
+@router.get("/excel")
+async def get_nioktr_excel(params: Nioktr_params = Depends(), db: Session = Depends(get_db)):
+    excel = await service_get_nioktr_excel(params, db)
+    return excel

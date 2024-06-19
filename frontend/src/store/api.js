@@ -225,6 +225,35 @@ export const RidsAPI = {
 }
 
 
+export const DissertationAPI = {
+    getDissertation(id) {
+        return instance.get(`/api/dissertation/${id}`)
+    }
+}
+
+export const DissertationsAPI = {
+    getDissertationsSearch(search,author_id,
+                  from_date, to_date,
+                  page, pageSize=20) {
+        let url = '/api/dissertation?';
+        if (search)
+            url += `search=${search}&`
+        if (author_id)
+            url += `author_id=${author_id}&`
+        if (from_date)
+            url += `from_date=${from_date}&`
+        if (to_date)
+            url += `to_date=${to_date}&`
+
+        return instance.get(`${url}page=${page}&limit=${pageSize}`)
+    },
+    getDissertations(page, pageSize) {
+        return instance.get(`/api/dissertation?page=${page}&limit=${pageSize}`)
+    },
+
+}
+
+
 
 export const SourceAPI = {
     getSource(id) {

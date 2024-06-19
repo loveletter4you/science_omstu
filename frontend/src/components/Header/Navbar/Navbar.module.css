@@ -12,7 +12,7 @@
 }
 
 .item + .item {
-    margin-left: 30px;
+    margin-left: 20px;
 }
 
 .item {
@@ -45,7 +45,7 @@
 }
 
 .btn {
-    margin-left: 40px;
+    margin-left: 20px;
     font-size: 18px;
     cursor: pointer;
     border: 1px solid;
@@ -164,3 +164,213 @@
         margin-top: 20px;
     }
 }
+
+/*.appWrapperNavbar {*/
+/*    display: flex;*/
+/*    align-items: center;*/
+/*    font-size: 18px;*/
+/*    line-height: 28px;*/
+/*    color: var(--color-font);*/
+
+/*}*/
+
+/*.appWrapperNavbar a {*/
+/*    color: var(--color-font);*/
+/*}*/
+
+/*.upItem + .upItem {*/
+/*    margin-left: 30px;*/
+/*}*/
+
+/*.upItem {*/
+/*    position: relative;*/
+/*    cursor: pointer;*/
+/*    text-decoration: none;*/
+/*}*/
+
+/*.downItem {*/
+/*    position: relative;*/
+/*    cursor: pointer;*/
+/*    text-decoration: none;*/
+/*}*/
+
+/*.downItem a {*/
+/*    text-decoration: none;*/
+/*}*/
+
+/*.upItem a {*/
+/*    text-decoration: none;*/
+/*}*/
+
+/*.upItem a.active {*/
+/*    color: #06c895;*/
+/*}*/
+
+/*.upItem a:after {*/
+/*    display: block;*/
+/*    position: absolute;*/
+/*    left: 0;*/
+/*    width: 0;*/
+/*    height: 1px;*/
+/*    background-color: #06c895;*/
+/*    content: "";*/
+/*    transition: width 0.3s;*/
+/*}*/
+
+/*.upItem a:hover:after {*/
+/*    width: 100%;*/
+/*}*/
+
+/*.downItem a.active {*/
+/*    color: #06c895;*/
+/*}*/
+
+/*.downItem a:after {*/
+/*    display: block;*/
+/*    position: absolute;*/
+/*    left: 0;*/
+/*    width: 0;*/
+/*    height: 1px;*/
+/*    background-color: #06c895;*/
+/*    content: "";*/
+/*    transition: width 0.3s;*/
+/*}*/
+
+/*.downItem a:hover:after {*/
+/*    width: 100%;*/
+/*}*/
+
+/*.btn {*/
+/*    margin-left: 40px;*/
+/*    font-size: 18px;*/
+/*    cursor: pointer;*/
+/*    border: 1px solid;*/
+/*    padding: 8px 20px;*/
+/*    border-radius: 10px;*/
+/*    background: none;*/
+/*    color: var(--color-font);*/
+/*}*/
+
+/*.menu {*/
+/*    display: inline-flex;*/
+/*    padding-top: 5px;*/
+/*}*/
+
+/*.burger {*/
+/*    display: none;*/
+/*}*/
+
+/*.image {*/
+/*    width: 20px;*/
+/*    height: 20px;*/
+/*    filter: var(--filter);*/
+
+/*}*/
+
+/*@media (max-width: 991px) {*/
+
+/*    .upItem a:hover:after {*/
+/*        width: 110px;*/
+/*    }*/
+
+/*    .downItem a:hover:after {*/
+/*        width: 110px;*/
+/*    }*/
+
+/*    .burger {*/
+/*        display: block;*/
+/*        position: relative;*/
+/*        width: 30px;*/
+/*        height: 20px;*/
+/*        z-index: 3;*/
+/*    }*/
+
+/*    .burger span {*/
+/*        position: absolute;*/
+/*        width: 100%;*/
+/*        height: 2px;*/
+/*        top: 9px;*/
+/*        background-color: var(--background);*/
+/*    }*/
+
+/*    .burger:before,*/
+/*    .burger:after {*/
+/*        content: '';*/
+/*        position: absolute;*/
+/*        width: 100%;*/
+/*        height: 2px;*/
+/*        background-color: var(--background);*/
+/*    }*/
+
+/*    .burger:before {*/
+/*        top: 0;*/
+/*    }*/
+
+/*    .burger:after {*/
+/*        bottom: 0;*/
+/*    }*/
+
+/*    .menu {*/
+/*        display: block;*/
+/*        position: fixed;*/
+/*        right: -150%;*/
+/*        top: 0;*/
+/*        width: 65%;*/
+/*        height: 100%;*/
+/*        padding: 20px 0px 0px 50px;*/
+/*        transition: all 0.3s ease 0s;*/
+/*        background-color: var(--color-background);*/
+/*        color: var(--color-font);*/
+/*        z-index: 5;*/
+/*    }*/
+
+/*    .menu.active {*/
+/*        right: 0;*/
+/*        opacity: 1;*/
+/*        pointer-events: all;*/
+
+/*    }*/
+
+
+/*    .active {*/
+/*        display: block;*/
+/*    }*/
+
+
+/*    .back {*/
+/*        display: block;*/
+/*        position: fixed;*/
+/*        top: 0;*/
+/*        left: 0;*/
+/*        width: 100%;*/
+/*        height: 100%;*/
+/*        background-color: var(--color-background-menu);*/
+/*        transition: all 0.3s ease 0s;*/
+/*    }*/
+
+
+/*    .upItem {*/
+/*        display: block;*/
+/*        padding-top: 10px;*/
+/*    }*/
+
+
+/*    .upItem + .upItem {*/
+/*        margin-left: 0px;*/
+/*    }*/
+
+/*    .downItem {*/
+/*        display: block;*/
+/*        padding-top: 10px;*/
+/*    }*/
+
+
+/*    .downItem + .downItem {*/
+/*        margin-left: 0px;*/
+/*    }*/
+
+/*    .btn {*/
+/*        margin-left: 0px;*/
+/*        margin-top: 20px;*/
+/*    }*/
+/*}*/

@@ -30,8 +30,18 @@ const Nioktr = () => {
                     </div>
 
                     <div className={style.block}>
-                        <div>Руководитель организации: {nioktr.organization_supervisor.name} {nioktr.organization_supervisor.surname} {nioktr.organization_supervisor.patronymic}</div>
-                        <div>Руководитель работы: {nioktr.work_supervisor.name} {nioktr.work_supervisor.surname} {nioktr.work_supervisor.patronymic}</div>
+
+                        <div>Руководитель организации:
+                            <NavLink to={"/author/" + nioktr.organization_supervisor.id}>
+                                &nbsp;{nioktr.organization_supervisor.surname} {nioktr.organization_supervisor.name} {nioktr.organization_supervisor.patronymic}
+                            </NavLink>
+                        </div>
+                        <div>
+                            Руководитель работы:
+                            <NavLink to={"/author/" + nioktr.work_supervisor.id}>
+                                &nbsp;{nioktr.work_supervisor.surname} {nioktr.work_supervisor.name} {nioktr.work_supervisor.patronymic}
+                            </NavLink>
+                        </div>
                     </div>
 
                     <div className={style.block}>

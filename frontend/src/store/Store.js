@@ -15,6 +15,9 @@ import filterSlices from "./slices/FilterSlices";
 import nioktrsSlice from "./slices/NioktrsSlice";
 import nioktrSlice from "./slices/NioktrSlice";
 import ridsSlice from "./slices/RidsSlice";
+import ridSlice from "./slices/RidSlice";
+import dissertationsSlice from "./slices/DissertationsSlice";
+import dissertationSlice from "./slices/DissertationSlice";
 
 
 const store = configureStore({
@@ -35,6 +38,9 @@ const store = configureStore({
         nioktrs: nioktrsSlice,
         nioktr: nioktrSlice,
         rids: ridsSlice,
+        rid: ridSlice,
+        dissertations: dissertationsSlice,
+        dissertation: dissertationSlice,
     }
 })
 export default store;

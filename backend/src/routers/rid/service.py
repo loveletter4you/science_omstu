@@ -32,7 +32,7 @@ async def service_update_rid(start_date, end_date, uid, db: Session):
         "full_text_available": False,
         "ikrbses": False,
         "nioktrs": False,
-        "organization": uid,
+        "organization": [uid],
         "page": 1,
         "priority_directions": [],
         "rids": True,
@@ -54,7 +54,7 @@ async def service_update_rid(start_date, end_date, uid, db: Session):
         'accept': 'application/json, text/plain, */*',
         'sec-ch-ua-mobile': '?0',
         'content-type': 'application/json;charset=UTF-8',
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
         'sec-ch-ua-platform': '"Linux"',
         'origin': 'https://rosrid.ru',
         'sec-fetch-site': 'same-origin',
@@ -79,16 +79,14 @@ async def service_update_rid(start_date, end_date, uid, db: Session):
                 if page >= count_of_pages:
                     break
                 payload['page'] += 1
+            else:
+                return 'connection error'
 
         except BaseException as e:
             await db.rollback()
-            print('Retry connection', str(e))
-            search_results = await service_update_rid(db)
+            return 'error'
     return 'ok'
 
-        #Start Test
-        # Сначала сделать зависимости с которыми связаны nioktr и параллельно заполнять поля
-        #     nioktr_type = await get_or_create_budget_type()
 
 
 async def upload_rid(json_resp, identifier_rid, db: Session):
@@ -127,7 +125,7 @@ async def upload_rid(json_resp, identifier_rid, db: Session):
                         await db.commit()
 
                 else:
-                    # work_supervisor_surname = nioktr['_source']['work_supervisor']['surname']
+
                     work_supervisor_result = await db.execute(
                         select(Author).filter(and_(Author.name == work_supervisor_name,
                                                    Author.surname == work_supervisor_surname,
@@ -475,7 +473,3 @@ async def service_get_rid(id: int, db: Session):
     scheme_rid = SchemeRidPage.from_orm(rid)
     return dict(rid=scheme_rid)
 
-
-
-# Разобраться с датой 2019-04-11
-# Пустые customer не добавляются

@@ -471,7 +471,7 @@ class SchemeDissertation(BaseModel):
     title: str
     registration_number: str
     dissertation_date: date
-    chairman_dissertation_council: SchemeAuthor
+    author: SchemeAuthor
     dissertation_keywords: List[SchemeKeywordsDissertation]
 
     class Config:
@@ -491,6 +491,7 @@ class SchemeDissertationPage(SchemeDissertation):
     books_count: int
     bibliography: str
     organization_supervisor: SchemeAuthor
+    chairman_dissertation_council: SchemeAuthor
     author_organization: SchemeOrganization
     protection_organization: SchemeOrganization
     dissertation_subject: List[SchemeDissertationSubject]

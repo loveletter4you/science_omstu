@@ -1,9 +1,13 @@
+import io
 from datetime import datetime
+
+import pandas
 import requests
 import json
 from sqlalchemy import select, and_, func, desc
 from sqlalchemy.ext.asyncio import AsyncSession as Session
 from sqlalchemy.orm import joinedload
+from starlette.responses import StreamingResponse
 
 from src.model.model import Nioktr, Keyword, KeywordNioktr, Author, Organization, NioktrTypes, BudgetType, \
     NioktrBudget, Subject, NioktrSubject, OrganizationCoexecutor, OrganizationIdentifier
@@ -16,13 +20,6 @@ from src.schemas.schemas import SchemeNioktr, SchemeNioktrPage
 
 async def service_update_nioktr(start_date, end_date, uid, db: Session):
     identifier_nioktr = await get_or_create_identifier("Nioktr", db)
-    # uid = []
-    # uid.append('9569096')  # ОмГТУ
-    # start_date = '2022-11-30'
-    # start_date = '2014-06-30'
-    # end_date = '2024-01-01'
-    # start_date = '2022-06-06'
-    # end_date = '2023-01-01'
     items_in_page = 10
 
     # URL API, который осуществляет поиск по ИС
@@ -535,9 +532,7 @@ async def upload_nioktr(json_resp, identifier_nioktr, db: Session):
                             db.add(nioktr_subject_critical_technologies)
                             count_critical_technologies += 1
                             await db.commit()
-                #
-                # #NioktrSubject ПЕРЕНЕСТИ ФУНКЦИЮ ВЫШЕ КАК В SUBJECT AND KEYWORD
-                # #написать функцию в storage, чтобы код не дублировался  ???
+
 
                 coexecutors_len = len(nioktr['_source']['coexecutors'])
                 count_coexecutors = 0
@@ -621,3 +616,39 @@ async def service_get_nioktr(id: int, db: Session):
         return False
     scheme_nioktr = SchemeNioktrPage.from_orm(nioktr)
     return dict(nioktr=scheme_nioktr)
+
+
+async def service_get_nioktr_excel(params: Nioktr_params, db: Session):
+    query = select(Nioktr).filter(Nioktr.nioktr_date >= params.from_date)\
+        .filter(Nioktr.nioktr_date <= params.to_date)
+
+    if not (params.search is None) and params.search != "":
+        query = query.filter(func.lower(Nioktr.title).contains(params.search.lower()))
+    if not (params.author_id is None):
+        query = query.join(Author).filter(Author.author_id == params.author_id).distinct()
+
+    nioktrs_result = await db.execute(query.order_by(desc(Nioktr.nioktr_date))
+                                           .order_by(Nioktr.title)
+                                      .options(joinedload(Nioktr.work_supervisor))
+                                           .offset(params.page).limit(params.limit))
+    nioktrs = nioktrs_result.scalars().unique().all()
+    data_list = []
+    for nioktr in nioktrs:
+
+        data = {
+            'NIOKTR': nioktr.title,
+            'Date': nioktr.nioktr_date,
+            'Work supervisor': nioktr.work_supervisor,
+        }
+        data_list.append(data)
+    df = pandas.DataFrame(data_list)
+    output = io.BytesIO()
+    writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+    df.to_excel(writer, index=False)
+    writer.save()
+    xlsx_data = output.getvalue()
+    return StreamingResponse(
+            io.BytesIO(xlsx_data),
+            media_type="application/vnd.ms-excel.sheet.macroEnabled.12",
+            headers={"Content-Disposition": f"attachment; filename=outputе.xlsx"}
+    )
